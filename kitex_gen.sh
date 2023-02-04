@@ -1,1 +1,0 @@
-kitex --module "toktik" --service auth -I idl idl/auth.proto
