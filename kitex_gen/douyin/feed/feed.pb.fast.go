@@ -197,7 +197,7 @@ func (x *ListFeedResponse) fastReadField2(buf []byte, _type int8) (offset int, e
 }
 
 func (x *ListFeedResponse) fastReadField3(buf []byte, _type int8) (offset int, err error) {
-	tmp, offset, err := fastpb.ReadString(buf, _type)
+	tmp, offset, err := fastpb.ReadInt64(buf, _type)
 	x.NextTime = &tmp
 	return offset, err
 }
@@ -347,7 +347,7 @@ func (x *ListFeedResponse) fastWriteField3(buf []byte) (offset int) {
 	if x.NextTime == nil {
 		return offset
 	}
-	offset += fastpb.WriteString(buf[offset:], 3, *x.NextTime)
+	offset += fastpb.WriteInt64(buf[offset:], 3, *x.NextTime)
 	return offset
 }
 
@@ -496,7 +496,7 @@ func (x *ListFeedResponse) sizeField3() (n int) {
 	if x.NextTime == nil {
 		return n
 	}
-	n += fastpb.SizeString(3, *x.NextTime)
+	n += fastpb.SizeInt64(3, *x.NextTime)
 	return n
 }
 
