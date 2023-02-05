@@ -9,6 +9,7 @@ import (
 	"io"
 	"log"
 	"net/url"
+	"strconv"
 	appcfg "toktik/config"
 )
 
@@ -30,7 +31,10 @@ func Init() {
 		log.Fatal(err)
 	}
 
-	client = s3.NewFromConfig(cfg)
+	client = s3.NewFromConfig(cfg, func(o *s3.Options) {
+		// Required when using minio
+		o.UsePathStyle, _ = strconv.ParseBool(appcfg.EnvConfig.S3_PATH_STYLE)
+	})
 }
 
 // Upload to the s3 storage using given fileName
