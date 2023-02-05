@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"net/http"
 	"toktik/repo/model"
 
 	"github.com/bakape/thumbnailer/v2"
@@ -37,6 +38,9 @@ type PublishServiceImpl struct{}
 
 // CreateVideo implements the PublishServiceImpl interface.
 func (s *PublishServiceImpl) CreateVideo(ctx context.Context, req *publish.CreateVideoRequest) (resp *publish.CreateVideoResponse, err error) {
+	if http.DetectContentType(req.Data) != "video/mp4" {
+		return nil, errors.New("invalid content type")
+	}
 	// byte[] -> reader
 	reader := bytes.NewReader(req.Data)
 
