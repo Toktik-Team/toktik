@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"toktik/repo/model"
 
 	"github.com/bakape/thumbnailer/v2"
 	"github.com/gofrs/uuid"
@@ -14,7 +15,6 @@ import (
 
 	publish "toktik/kitex_gen/douyin/publish"
 	gen "toktik/repo"
-	"toktik/service/publish/model"
 	"toktik/storage"
 )
 
@@ -66,14 +66,14 @@ func (s *PublishServiceImpl) CreateVideo(ctx context.Context, req *publish.Creat
 		return nil, fmt.Errorf("failed to upload cover %s: %w", fileName, err)
 	}
 
-	publishModel := model.Publish{
+	publishModel := model.Video{
 		UserId:    req.UserId,
 		FileName:  fileName,
 		CoverName: coverName,
 		Title:     req.Title,
 	}
 
-	err = gen.Q.Publish.WithContext(ctx).Create(&publishModel)
+	err = gen.Q.Video.WithContext(ctx).Create(&publishModel)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create db entry %s: %w", fileName, err)
 	}
