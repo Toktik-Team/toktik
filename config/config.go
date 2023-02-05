@@ -16,6 +16,9 @@ const WebServiceAddr = ":40126"
 const AuthServiceName = "toktik-auth"
 const AuthServiceAddr = "localhost:40127"
 
+const PublishServiceName = "toktik-publish"
+const PublishServiceAddr = "localhost:40128"
+
 var DSN string
 
 func init() {
@@ -40,6 +43,13 @@ type envConfigSchema struct {
 	REDIS_ADDR     string
 	REDIS_PASSWORD string
 	REDIS_DB       string
+
+	S3_ENDPOINT_URL string
+	S3_PUBLIC_URL   string
+	S3_BUCKET       string
+	S3_SECRET_ID    string
+	S3_SECRET_KEY   string
+	S3_PATH_STYLE   string
 }
 
 var defaultConfig = envConfigSchema{
@@ -54,6 +64,13 @@ var defaultConfig = envConfigSchema{
 	REDIS_ADDR:     "localhost:6379",
 	REDIS_PASSWORD: "",
 	REDIS_DB:       "0",
+
+	S3_ENDPOINT_URL: "http://localhost:9000",
+	S3_PUBLIC_URL:   "http://localhost:9000",
+	S3_BUCKET:       "bucket",
+	S3_SECRET_ID:    "minio",
+	S3_SECRET_KEY:   "12345678",
+	S3_PATH_STYLE:   "true",
 }
 
 var EnvConfig = envConfigSchema{}

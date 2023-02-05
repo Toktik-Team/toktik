@@ -6,6 +6,7 @@ import (
 	"gorm.io/gorm"
 	"toktik/config"
 	auth "toktik/service/auth/model"
+	publish "toktik/service/publish/model"
 )
 
 func main() {
@@ -21,6 +22,10 @@ func main() {
 		panic(fmt.Errorf("db connection failed: %v", err))
 	}
 	err = db.AutoMigrate(&auth.UserToken{})
+	if err != nil {
+		panic(fmt.Errorf("db migrate failed: %v", err))
+	}
+	err = db.AutoMigrate(&publish.Publish{})
 	if err != nil {
 		panic(fmt.Errorf("db migrate failed: %v", err))
 	}

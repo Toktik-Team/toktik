@@ -28,7 +28,7 @@ func main() {
 
 	// publish service
 	publishGroup := h.Group("/publish")
-	publishGroup.POST("/action")
+	publishGroup.POST("/action", PublishAction)
 	publishGroup.GET("/list")
 
 	// favorite service
