@@ -14,7 +14,7 @@ const WebServiceName = "toktik-api-gateway"
 const WebServiceAddr = ":40126"
 
 const AuthServiceName = "toktik-auth"
-const AuthServiceAddr = "localhost:40127"
+const AuthServiceAddr = ":40127"
 
 var DSN string
 
