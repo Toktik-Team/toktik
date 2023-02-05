@@ -1,9 +1,10 @@
 package main
 
 import (
+	"github.com/cloudwego/kitex/pkg/rpcinfo"
 	"github.com/cloudwego/kitex/server"
+	consul "github.com/kitex-contrib/registry-consul"
 	"log"
-	"net"
 	"toktik/config"
 	auth "toktik/kitex_gen/douyin/auth/authservice"
 )
@@ -11,15 +12,16 @@ import (
 func main() {
 	var err error
 
-	addr, err := net.ResolveTCPAddr("tcp", config.AuthServiceAddr)
+	r, err := consul.NewConsulRegister(config.EnvConfig.CONSUL_ADDR)
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
-	svr := auth.NewServer(new(AuthServiceImpl), server.WithServiceAddr(addr))
 
-	err = svr.Run()
-
+	srv := auth.NewServer(new(AuthServiceImpl), server.WithRegistry(r), server.WithServerBasicInfo(&rpcinfo.EndpointBasicInfo{
+		ServiceName: config.AuthServiceName,
+	}))
+	err = srv.Run()
 	if err != nil {
-		log.Println(err.Error())
+		log.Fatal(err)
 	}
 }
