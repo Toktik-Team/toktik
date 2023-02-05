@@ -8,7 +8,6 @@ import (
 	"runtime"
 	"testing"
 	"toktik/kitex_gen/douyin/publish"
-	"toktik/service/publish/storage"
 )
 
 func TestPublishServiceImpl_CreateVideo(t *testing.T) {
@@ -27,11 +26,18 @@ func TestPublishServiceImpl_CreateVideo(t *testing.T) {
 		Title:  "Video for test",
 	}}
 
+	var invalidContentArg = struct {
+		ctx context.Context
+		req *publish.CreateVideoRequest
+	}{ctx: context.Background(), req: &publish.CreateVideoRequest{
+		UserId: 1,
+		Data:   []byte{1, 2},
+		Title:  "Invalid content",
+	}}
+
 	var successResp = &publish.CreateVideoResponse{
 		Id: 1,
 	}
-
-	storage.Init()
 
 	type args struct {
 		ctx context.Context
@@ -44,6 +50,7 @@ func TestPublishServiceImpl_CreateVideo(t *testing.T) {
 		wantErr  bool
 	}{
 		{name: "should create success", args: successArg, wantResp: successResp},
+		{name: "invalid content type", args: invalidContentArg, wantErr: true},
 		// TODO: Add test cases.
 	}
 	for _, tt := range tests {

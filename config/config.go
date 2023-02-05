@@ -8,13 +8,13 @@ import (
 	"reflect"
 )
 
-const ConsulAddress = "127.0.0.1:8500"
+var EnvConfig = envConfigSchema{}
 
 const WebServiceName = "toktik-api-gateway"
 const WebServiceAddr = ":40126"
 
 const AuthServiceName = "toktik-auth"
-const AuthServiceAddr = "localhost:40127"
+const AuthServiceAddr = ":40127"
 
 const PublishServiceName = "toktik-publish"
 const PublishServiceAddr = "localhost:40128"
@@ -37,6 +37,8 @@ func init() {
 type envConfigSchema struct {
 	ENV string
 
+	CONSUL_ADDR string
+
 	PGSQL_HOST     string
 	PGSQL_PORT     string
 	PGSQL_USER     string
@@ -58,6 +60,8 @@ type envConfigSchema struct {
 var defaultConfig = envConfigSchema{
 	ENV: "dev",
 
+	CONSUL_ADDR: "127.0.0.1:8500",
+
 	PGSQL_HOST:     "localhost",
 	PGSQL_PORT:     "5432",
 	PGSQL_USER:     "postgres",
@@ -76,10 +80,9 @@ var defaultConfig = envConfigSchema{
 	S3_PATH_STYLE:   "true",
 }
 
-var EnvConfig = envConfigSchema{}
-
+// envInit Reads .env as environment variables and fill corresponding fields into EnvConfig.
+// To use a value from EnvConfig , simply call EnvConfig.FIELD like EnvConfig.ENV
 func envInit() {
-
 	err := godotenv.Load()
 	if err != nil {
 		log.Fatal("Error loading .env file")

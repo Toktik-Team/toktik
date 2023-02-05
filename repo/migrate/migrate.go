@@ -5,8 +5,8 @@ import (
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"toktik/config"
+	"toktik/repo/model"
 	auth "toktik/service/auth/model"
-	publish "toktik/service/publish/model"
 )
 
 func main() {
@@ -25,7 +25,7 @@ func main() {
 	if err != nil {
 		panic(fmt.Errorf("db migrate failed: %v", err))
 	}
-	err = db.AutoMigrate(&publish.Publish{})
+	err = db.AutoMigrate(&model.Video{})
 	if err != nil {
 		panic(fmt.Errorf("db migrate failed: %v", err))
 	}

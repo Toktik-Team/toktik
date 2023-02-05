@@ -22,11 +22,11 @@ var publishClient publishService.Client
 var feedClient feedService.Client
 
 func init() {
-	r, err := consul.NewConsulResolver(config.ConsulAddress)
+	r, err := consul.NewConsulResolver(config.EnvConfig.CONSUL_ADDR)
 	if err != nil {
 		log.Fatal(err)
 	}
-	authClient, err = authService.NewClient("auth.server", client.WithResolver(r))
+	authClient, err = authService.NewClient(config.AuthServiceName, client.WithResolver(r))
 	if err != nil {
 		log.Fatal(err)
 	}
