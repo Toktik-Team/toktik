@@ -13,7 +13,7 @@ var EnvConfig = envConfigSchema{}
 const WebServiceName = "toktik-api-gateway"
 const WebServiceAddr = ":40126"
 
-const AuthServiceName = "toktik-auth"
+const AuthServiceName = "toktik-auth-api"
 const AuthServiceAddr = ":40127"
 
 var DSN string
