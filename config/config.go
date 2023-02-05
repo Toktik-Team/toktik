@@ -16,6 +16,9 @@ const WebServiceAddr = ":40126"
 const AuthServiceName = "toktik-auth"
 const AuthServiceAddr = "localhost:40127"
 
+const PublishServiceName = "toktik-publish"
+const PublishServiceAddr = "localhost:40128"
+
 var DSN string
 
 func init() {
