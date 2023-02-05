@@ -1,0 +1,17 @@
+syntax = "proto3";
+package douyin.publish;
+option go_package = "douyin/publish";
+
+message CreateVideoRequest {
+  int64 userId = 1;
+  bytes data = 2;
+  string title = 3;
+}
+
+message CreateVideoResponse {
+  int64 id = 1;
+}
+
+service PublishService {
+  rpc CreateVideo(CreateVideoRequest) returns (CreateVideoResponse) {}
+}

@@ -1,11 +1,13 @@
 package main
 
 import (
+	"toktik/config"
+	auth "toktik/service/auth/model"
+	publish "toktik/service/publish/model"
+
 	"gorm.io/driver/postgres"
 	"gorm.io/gen"
 	"gorm.io/gorm"
-	"toktik/config"
-	auth "toktik/service/auth/model"
 )
 
 // Dynamic SQL
@@ -25,9 +27,11 @@ func main() {
 
 	// Generate basic type-safe DAO API for struct `model.User` following conventions
 	g.ApplyBasic(auth.UserToken{})
+	g.ApplyBasic(publish.Publish{})
 
 	// Generate Type Safe API with Dynamic SQL defined on Querier interface for `model.User` and `model.Company`
 	g.ApplyInterface(func(Querier) {}, auth.UserToken{})
+	g.ApplyInterface(func(Querier) {}, publish.Publish{})
 
 	// Generate the code
 	g.Execute()

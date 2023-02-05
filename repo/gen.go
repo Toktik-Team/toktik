@@ -17,17 +17,20 @@ import (
 
 var (
 	Q         = new(Query)
+	Publish   *publish
 	UserToken *userToken
 )
 
 func SetDefault(db *gorm.DB, opts ...gen.DOOption) {
 	*Q = *Use(db, opts...)
+	Publish = &Q.Publish
 	UserToken = &Q.UserToken
 }
 
 func Use(db *gorm.DB, opts ...gen.DOOption) *Query {
 	return &Query{
 		db:        db,
+		Publish:   newPublish(db, opts...),
 		UserToken: newUserToken(db, opts...),
 	}
 }
@@ -35,6 +38,7 @@ func Use(db *gorm.DB, opts ...gen.DOOption) *Query {
 type Query struct {
 	db *gorm.DB
 
+	Publish   publish
 	UserToken userToken
 }
 
@@ -43,6 +47,7 @@ func (q *Query) Available() bool { return q.db != nil }
 func (q *Query) clone(db *gorm.DB) *Query {
 	return &Query{
 		db:        db,
+		Publish:   q.Publish.clone(db),
 		UserToken: q.UserToken.clone(db),
 	}
 }
@@ -58,16 +63,19 @@ func (q *Query) WriteDB() *Query {
 func (q *Query) ReplaceDB(db *gorm.DB) *Query {
 	return &Query{
 		db:        db,
+		Publish:   q.Publish.replaceDB(db),
 		UserToken: q.UserToken.replaceDB(db),
 	}
 }
 
 type queryCtx struct {
+	Publish   IPublishDo
 	UserToken IUserTokenDo
 }
 
 func (q *Query) WithContext(ctx context.Context) *queryCtx {
 	return &queryCtx{
+		Publish:   q.Publish.WithContext(ctx),
 		UserToken: q.UserToken.WithContext(ctx),
 	}
 }
