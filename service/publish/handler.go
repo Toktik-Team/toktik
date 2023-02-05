@@ -47,14 +47,14 @@ func (s *PublishServiceImpl) CreateVideo(ctx context.Context, req *publish.Creat
 	}
 
 	// Upload video file
-	fileName := fmt.Sprintf("%s.%s", uid.String(), "mp4")
+	fileName := fmt.Sprintf("%d/%s.%s", req.UserId, uid.String(), "mp4")
 	_, err = storage.Upload(fileName, reader)
 	if err != nil {
 		return nil, fmt.Errorf("failed to upload video %s: %w", fileName, err)
 	}
 
 	// Generate thumbnail
-	coverName := fmt.Sprintf("%s.%s", uid.String(), "jpg")
+	coverName := fmt.Sprintf("%d/%s.%s", req.UserId, uid.String(), "jpg")
 	thumbData, err := getThumbnail(reader)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create thumbnail %s: %w", fileName, err)
