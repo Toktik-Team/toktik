@@ -3,6 +3,7 @@ module toktik
 go 1.19
 
 require (
+	bou.ke/monkey v1.0.2
 	github.com/aws/aws-sdk-go-v2 v1.17.4
 	github.com/aws/aws-sdk-go-v2/config v1.18.12
 	github.com/aws/aws-sdk-go-v2/credentials v1.13.12
