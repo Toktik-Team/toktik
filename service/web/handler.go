@@ -11,12 +11,15 @@ import (
 	"toktik/config"
 	"toktik/kitex_gen/douyin/auth"
 	authService "toktik/kitex_gen/douyin/auth/authservice"
+	"toktik/kitex_gen/douyin/feed"
+	feedService "toktik/kitex_gen/douyin/feed/feedservice"
 	"toktik/kitex_gen/douyin/publish"
 	publishService "toktik/kitex_gen/douyin/publish/publishservice"
 )
 
 var authClient authService.Client
 var publishClient publishService.Client
+var feedClient feedService.Client
 
 func init() {
 	r, err := consul.NewConsulResolver(config.ConsulAddress)
@@ -67,4 +70,29 @@ func PublishAction(ctx context.Context, c *app.RequestContext) {
 		}{0},
 	)
 	return
+}
+
+func FeedAction(ctx context.Context, c *app.RequestContext) {
+	latestTime := c.Query("latest_time")
+
+	token := c.Query("token")
+
+	response, err := feedClient.ListVideos(ctx, &feed.ListFeedRequest{
+		LatestTime: &latestTime,
+		Token:      &token,
+	})
+	if err != nil {
+		c.JSON(
+			consts.StatusOK,
+			struct {
+				StatusCode    int    `json:"status_code"`
+				StatusMessage string `json:"status_message"`
+			}{1, err.Error()},
+		)
+		return
+	}
+	c.JSON(
+		consts.StatusOK,
+		response,
+	)
 }

@@ -18,7 +18,7 @@ func main() {
 	h.Any("/authenticate", Authenticate)
 
 	// feed service
-	h.GET("/feed")
+	h.GET("/feed", FeedAction)
 
 	// user service
 	userGroup := h.Group("/user")
