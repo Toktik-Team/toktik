@@ -34,8 +34,8 @@ func newPublish(db *gorm.DB, opts ...gen.DOOption) publish {
 	_publish.DeletedAt = field.NewField(tableName, "deleted_at")
 	_publish.UserId = field.NewInt64(tableName, "user_id")
 	_publish.Title = field.NewString(tableName, "title")
-	_publish.PlayUrl = field.NewString(tableName, "play_url")
-	_publish.CoverUrl = field.NewString(tableName, "cover_url")
+	_publish.FileName = field.NewString(tableName, "file_name")
+	_publish.CoverName = field.NewString(tableName, "cover_name")
 
 	_publish.fillFieldMap()
 
@@ -52,8 +52,8 @@ type publish struct {
 	DeletedAt field.Field
 	UserId    field.Int64
 	Title     field.String
-	PlayUrl   field.String
-	CoverUrl  field.String
+	FileName  field.String
+	CoverName field.String
 
 	fieldMap map[string]field.Expr
 }
@@ -76,8 +76,8 @@ func (p *publish) updateTableName(table string) *publish {
 	p.DeletedAt = field.NewField(table, "deleted_at")
 	p.UserId = field.NewInt64(table, "user_id")
 	p.Title = field.NewString(table, "title")
-	p.PlayUrl = field.NewString(table, "play_url")
-	p.CoverUrl = field.NewString(table, "cover_url")
+	p.FileName = field.NewString(table, "file_name")
+	p.CoverName = field.NewString(table, "cover_name")
 
 	p.fillFieldMap()
 
@@ -101,8 +101,8 @@ func (p *publish) fillFieldMap() {
 	p.fieldMap["deleted_at"] = p.DeletedAt
 	p.fieldMap["user_id"] = p.UserId
 	p.fieldMap["title"] = p.Title
-	p.fieldMap["play_url"] = p.PlayUrl
-	p.fieldMap["cover_url"] = p.CoverUrl
+	p.fieldMap["file_name"] = p.FileName
+	p.fieldMap["cover_name"] = p.CoverName
 }
 
 func (p publish) clone(db *gorm.DB) publish {

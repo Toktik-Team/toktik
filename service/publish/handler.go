@@ -3,19 +3,34 @@ package main
 import (
 	"bytes"
 	"context"
+	"errors"
 	"fmt"
+	"io"
 
 	"github.com/bakape/thumbnailer/v2"
 	"github.com/gofrs/uuid"
 
 	"image/jpeg"
-	"os"
 
 	publish "toktik/kitex_gen/douyin/publish"
 	gen "toktik/repo"
 	"toktik/service/publish/model"
 	"toktik/service/publish/storage"
 )
+
+// getThumbnail Generate JPEG thumbnail from video
+func getThumbnail(input io.ReadSeeker) ([]byte, error) {
+	_, thumb, err := thumbnailer.Process(input, thumbnailer.Options{})
+	if err != nil {
+		return nil, errors.New("failed to create thumbnail")
+	}
+	buf := new(bytes.Buffer)
+	err = jpeg.Encode(buf, thumb, nil)
+	if err != nil {
+		return nil, errors.New("failed to create buffer")
+	}
+	return buf.Bytes(), nil
+}
 
 // PublishServiceImpl implements the last service interface defined in the IDL.
 type PublishServiceImpl struct{}
@@ -24,57 +39,43 @@ type PublishServiceImpl struct{}
 func (s *PublishServiceImpl) CreateVideo(ctx context.Context, req *publish.CreateVideoRequest) (resp *publish.CreateVideoResponse, err error) {
 	// byte[] -> reader
 	reader := bytes.NewReader(req.Data)
+
 	// V7 based on timestamp
 	uid, err := uuid.NewV7()
 	if err != nil {
 		return nil, err
 	}
-	// Handle video file
+
+	// Upload video file
 	fileName := fmt.Sprintf("%s.%s", uid.String(), "mp4")
 	_, err = storage.Upload(fileName, reader)
 	if err != nil {
-		_, _ = fmt.Fprintf(os.Stderr, "failed to upload video %s\n", fileName)
-		return nil, err
-	}
-	playURL, err := storage.GetLink(fileName)
-	if err != nil {
-		_, _ = fmt.Fprintf(os.Stderr, "failed to get link for video %s\n", fileName)
-		return nil, err
+		return nil, fmt.Errorf("failed to upload video %s: %w", fileName, err)
 	}
 
-	// Handle cover file
-	_, thumb, err := thumbnailer.Process(reader, thumbnailer.Options{})
-	if err != nil {
-		_, _ = fmt.Fprintf(os.Stderr, "failed to create thumbnail %s\n", fileName)
-		return nil, err
-	}
-	buf := new(bytes.Buffer)
-	err = jpeg.Encode(buf, thumb, nil)
-	if err != nil {
-		_, _ = fmt.Fprintf(os.Stderr, "failed to create buffer %s\n", fileName)
-		return nil, err
-	}
-	reader = bytes.NewReader(buf.Bytes())
+	// Generate thumbnail
 	coverName := fmt.Sprintf("%s.%s", uid.String(), "jpg")
-	_, err = storage.Upload(coverName, reader)
+	thumbData, err := getThumbnail(reader)
 	if err != nil {
-		_, _ = fmt.Fprintf(os.Stderr, "failed to upload cover %s\n", fileName)
-		return nil, err
+		return nil, fmt.Errorf("failed to create thumbnail %s: %w", fileName, err)
 	}
-	coverURL, err := storage.GetLink(coverName)
+
+	// Upload thumbnail
+	_, err = storage.Upload(coverName, bytes.NewReader(thumbData))
 	if err != nil {
-		_, _ = fmt.Fprintf(os.Stderr, "failed to get link for cover %s\n", fileName)
-		return nil, err
+		return nil, fmt.Errorf("failed to upload cover %s: %w", fileName, err)
 	}
+
 	publishModel := model.Publish{
-		UserId:   req.UserId,
-		PlayUrl:  playURL,
-		CoverUrl: coverURL,
-		Title:    req.Title,
+		UserId:    req.UserId,
+		FileName:  fileName,
+		CoverName: coverName,
+		Title:     req.Title,
 	}
+
 	err = gen.Q.Publish.WithContext(ctx).Create(&publishModel)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to create db entry %s: %w", fileName, err)
 	}
 
 	return &publish.CreateVideoResponse{Id: int64(publishModel.ID)}, nil
