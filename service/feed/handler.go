@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"strconv"
 	"time"
-	feed "toktik/kitex_gen/douyin/feed"
+	"toktik/kitex_gen/douyin/feed"
 	"toktik/kitex_gen/douyin/user"
 	gen "toktik/repo"
-	"toktik/service/publish/storage"
+	"toktik/storage"
 )
 
 // FeedServiceImpl implements the last service interface defined in the IDL.
@@ -24,7 +24,7 @@ var (
 
 // ListVideos implements the FeedServiceImpl interface.
 func (s *FeedServiceImpl) ListVideos(ctx context.Context, req *feed.ListFeedRequest) (resp *feed.ListFeedResponse, err error) {
-	publish := gen.Q.Publish
+	publish := gen.Q.Video
 
 	latestTime, err := strconv.ParseInt(*req.LatestTime, 10, 64)
 	if err != nil {

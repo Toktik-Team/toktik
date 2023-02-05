@@ -6,12 +6,9 @@ import (
 	"net"
 	"toktik/config"
 	feed "toktik/kitex_gen/douyin/feed/feedservice"
-	"toktik/service/publish/storage"
 )
 
 func main() {
-	storage.Init()
-
 	var err error
 
 	addr, err := net.ResolveTCPAddr("tcp", config.FeedServiceAddr)
