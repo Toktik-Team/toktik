@@ -8,7 +8,6 @@ import (
 	"runtime"
 	"testing"
 	"toktik/kitex_gen/douyin/publish"
-	"toktik/service/publish/storage"
 )
 
 func TestPublishServiceImpl_CreateVideo(t *testing.T) {
@@ -30,8 +29,6 @@ func TestPublishServiceImpl_CreateVideo(t *testing.T) {
 	var successResp = &publish.CreateVideoResponse{
 		Id: 1,
 	}
-
-	storage.Init()
 
 	type args struct {
 		ctx context.Context

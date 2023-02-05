@@ -15,7 +15,7 @@ import (
 	publish "toktik/kitex_gen/douyin/publish"
 	gen "toktik/repo"
 	"toktik/service/publish/model"
-	"toktik/service/publish/storage"
+	"toktik/storage"
 )
 
 // getThumbnail Generate JPEG thumbnail from video

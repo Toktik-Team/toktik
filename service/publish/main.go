@@ -8,11 +8,9 @@ import (
 	"net"
 	"toktik/config"
 	publish "toktik/kitex_gen/douyin/publish/publishservice"
-	"toktik/service/publish/storage"
 )
 
 func main() {
-	storage.Init()
 	var err error
 
 	r, err := consul.NewConsulRegister(config.EnvConfig.CONSUL_ADDR)

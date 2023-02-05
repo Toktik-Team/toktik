@@ -15,8 +15,7 @@ import (
 
 var client *s3.Client
 
-func Init() {
-
+func init() {
 	r2Resolver := aws.EndpointResolverWithOptionsFunc(func(service, region string, options ...interface{}) (aws.Endpoint, error) {
 		return aws.Endpoint{
 			URL: appcfg.EnvConfig.S3_ENDPOINT_URL,
