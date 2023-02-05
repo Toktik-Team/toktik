@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/cloudwego/kitex/server"
 	"log"
 	"net"
 	"toktik/config"
@@ -14,10 +15,15 @@ import (
 
 func main() {
 	storage.Init()
+	var err error
 
-	svr := publish.NewServer(new(PublishServiceImpl))
+	addr, err := net.ResolveTCPAddr("tcp", config.PublishServiceAddr)
+	if err != nil {
+		panic(err)
+	}
+	svr := publish.NewServer(new(PublishServiceImpl), server.WithServiceAddr(addr))
 
-	err := svr.Run()
+	err = svr.Run()
 
 	r, err := consul.NewConsulRegister(config.EnvConfig.CONSUL_ADDR)
 	if err != nil {
