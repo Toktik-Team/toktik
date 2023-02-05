@@ -69,7 +69,7 @@ ReadFieldError:
 }
 
 func (x *Video) fastReadField1(buf []byte, _type int8) (offset int, err error) {
-	x.Id, offset, err = fastpb.ReadInt64(buf, _type)
+	x.Id, offset, err = fastpb.ReadUint32(buf, _type)
 	return offset, err
 }
 
@@ -94,12 +94,12 @@ func (x *Video) fastReadField4(buf []byte, _type int8) (offset int, err error) {
 }
 
 func (x *Video) fastReadField5(buf []byte, _type int8) (offset int, err error) {
-	x.FavoriteCount, offset, err = fastpb.ReadInt64(buf, _type)
+	x.FavoriteCount, offset, err = fastpb.ReadUint32(buf, _type)
 	return offset, err
 }
 
 func (x *Video) fastReadField6(buf []byte, _type int8) (offset int, err error) {
-	x.CommentCount, offset, err = fastpb.ReadInt64(buf, _type)
+	x.CommentCount, offset, err = fastpb.ReadUint32(buf, _type)
 	return offset, err
 }
 
@@ -231,7 +231,7 @@ func (x *Video) fastWriteField1(buf []byte) (offset int) {
 	if x.Id == 0 {
 		return offset
 	}
-	offset += fastpb.WriteInt64(buf[offset:], 1, x.Id)
+	offset += fastpb.WriteUint32(buf[offset:], 1, x.Id)
 	return offset
 }
 
@@ -263,7 +263,7 @@ func (x *Video) fastWriteField5(buf []byte) (offset int) {
 	if x.FavoriteCount == 0 {
 		return offset
 	}
-	offset += fastpb.WriteInt64(buf[offset:], 5, x.FavoriteCount)
+	offset += fastpb.WriteUint32(buf[offset:], 5, x.FavoriteCount)
 	return offset
 }
 
@@ -271,7 +271,7 @@ func (x *Video) fastWriteField6(buf []byte) (offset int) {
 	if x.CommentCount == 0 {
 		return offset
 	}
-	offset += fastpb.WriteInt64(buf[offset:], 6, x.CommentCount)
+	offset += fastpb.WriteUint32(buf[offset:], 6, x.CommentCount)
 	return offset
 }
 
@@ -380,7 +380,7 @@ func (x *Video) sizeField1() (n int) {
 	if x.Id == 0 {
 		return n
 	}
-	n += fastpb.SizeInt64(1, x.Id)
+	n += fastpb.SizeUint32(1, x.Id)
 	return n
 }
 
@@ -412,7 +412,7 @@ func (x *Video) sizeField5() (n int) {
 	if x.FavoriteCount == 0 {
 		return n
 	}
-	n += fastpb.SizeInt64(5, x.FavoriteCount)
+	n += fastpb.SizeUint32(5, x.FavoriteCount)
 	return n
 }
 
@@ -420,7 +420,7 @@ func (x *Video) sizeField6() (n int) {
 	if x.CommentCount == 0 {
 		return n
 	}
-	n += fastpb.SizeInt64(6, x.CommentCount)
+	n += fastpb.SizeUint32(6, x.CommentCount)
 	return n
 }
 
