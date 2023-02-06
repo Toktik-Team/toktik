@@ -34,6 +34,10 @@ func init() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	feedClient, err = feedService.NewClient(config.FeedServiceName, client.WithResolver(r))
+	if err != nil {
+		log.Fatal(err)
+	}
 }
 
 func Authenticate(ctx context.Context, c *app.RequestContext) {

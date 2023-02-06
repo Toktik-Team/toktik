@@ -42,7 +42,7 @@ func (s *FeedServiceImpl) ListVideos(ctx context.Context, req *feed.ListFeedRequ
 	for _, m := range find {
 
 		u := &user.User{
-			Id: uint32(m.UserId),
+			Id: m.UserId,
 			// TODO: fill other fields
 		}
 

@@ -186,7 +186,7 @@ ReadFieldError:
 }
 
 func (x *ListFeedResponse) fastReadField1(buf []byte, _type int8) (offset int, err error) {
-	x.StatusCode, offset, err = fastpb.ReadInt32(buf, _type)
+	x.StatusCode, offset, err = fastpb.ReadUint32(buf, _type)
 	return offset, err
 }
 
@@ -331,7 +331,7 @@ func (x *ListFeedResponse) fastWriteField1(buf []byte) (offset int) {
 	if x.StatusCode == 0 {
 		return offset
 	}
-	offset += fastpb.WriteInt32(buf[offset:], 1, x.StatusCode)
+	offset += fastpb.WriteUint32(buf[offset:], 1, x.StatusCode)
 	return offset
 }
 
@@ -480,7 +480,7 @@ func (x *ListFeedResponse) sizeField1() (n int) {
 	if x.StatusCode == 0 {
 		return n
 	}
-	n += fastpb.SizeInt32(1, x.StatusCode)
+	n += fastpb.SizeUint32(1, x.StatusCode)
 	return n
 }
 
