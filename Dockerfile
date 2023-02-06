@@ -1,5 +1,5 @@
 # 编译镜像
-FROM golang:1.19.5-bullseye AS build
+FROM docker.io/golang:1.19.5-bullseye AS build
 ENV TZ=Asia/Shanghai
 
 # 配置 git
@@ -12,7 +12,7 @@ WORKDIR /source
 COPY . .
 
 # 编译
-RUN ./build-all.sh
+RUN bash build-all.sh
 
 # 运行环境
 FROM gcr.io/distroless/base-debian11

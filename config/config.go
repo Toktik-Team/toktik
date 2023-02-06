@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 	"reflect"
+	"strings"
 )
 
 var EnvConfig = envConfigSchema{}
@@ -29,9 +30,9 @@ func init() {
 }
 
 type envConfigSchema struct {
-	ENV string
+	ENV string `env:"ENV,DREAM_ENV"`
 
-	CONSUL_ADDR string
+	CONSUL_ADDR string `env:"CONSUL_ADDR,DREAM_SERVICE_DISCOVERY_URI"`
 
 	PGSQL_HOST     string
 	PGSQL_PORT     string
@@ -42,6 +43,10 @@ type envConfigSchema struct {
 	REDIS_ADDR     string
 	REDIS_PASSWORD string
 	REDIS_DB       string
+}
+
+func (s envConfigSchema) IsDev() bool {
+	return s.ENV == "dev" || s.ENV == "TESTING"
 }
 
 var defaultConfig = envConfigSchema{
@@ -71,21 +76,34 @@ func envInit() {
 	typeOfS := v.Type()
 
 	for i := 0; i < v.NumField(); i++ {
+		envNameAlt := make([]string, 0)
 		fieldName := typeOfS.Field(i).Name
 		fieldValue := v.Field(i).Interface()
 
-		configKey := fieldName
-		var configValue string
-		configDefaultValue := fieldValue.(string)
-		envValue := os.Getenv(configKey)
-		if envValue != "" {
-			configValue = envValue
-		} else {
-			configValue = configDefaultValue
+		envNameAlt = append(envNameAlt, fieldName)
+		if fieldTag, ok := typeOfS.Field(i).Tag.Lookup("env"); ok && len(fieldTag) > 0 {
+			tags := strings.Split(fieldTag, ",")
+			envNameAlt = append(envNameAlt, tags...)
 		}
-		if EnvConfig.ENV == "dev" {
+
+		configDefaultValue := fieldValue.(string)
+		envValue := resolveEnv(envNameAlt)
+
+		if EnvConfig.IsDev() {
 			fmt.Printf("Reading field[ %s ] default: %v env: %s\n", fieldName, configDefaultValue, envValue)
 		}
-		reflect.ValueOf(&EnvConfig).Elem().Field(i).SetString(configValue)
+		if len(envValue) > 0 {
+			reflect.ValueOf(&EnvConfig).Elem().Field(i).SetString(envValue)
+		}
 	}
+}
+
+func resolveEnv(configKeys []string) string {
+	for _, item := range configKeys {
+		envValue := os.Getenv(item)
+		if envValue != "" {
+			return envValue
+		}
+	}
+	return ""
 }
