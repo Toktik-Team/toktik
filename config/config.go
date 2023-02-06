@@ -20,7 +20,7 @@ const AuthServiceAddr = ":40127"
 const PublishServiceName = "toktik-publish"
 const PublishServiceAddr = ":40128"
 
-const FeedServiceName = "toktik-feed"
+const FeedServiceName = "toktik-feed-api"
 const FeedServiceAddr = ":40129"
 
 var DSN string

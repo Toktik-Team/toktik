@@ -4,29 +4,29 @@ metadata:
   annotations:
     sidecar.jaegertracing.io/inject: 'true'
   labels:
-    app: toktik-feed
-  name: toktik-feed
+    app: toktik-feed-api
+  name: toktik-feed-api
   namespace: toktik-service-bundle
 spec:
   selector:
     matchLabels:
-      name: toktik-feed
+      name: toktik-feed-api
   template:
     metadata:
       labels:
-        app: toktik-feed
+        app: toktik-feed-api
         branch: dev
         version: ${BUILD_NUMBER}-${CI_COMMIT_ID}
-        name: toktik-feed
-        dream-app: toktik-feed
-        dream-unit: toktik-feed
+        name: toktik-feed-api
+        dream-app: toktik-feed-api
+        dream-unit: toktik-feed-api
     spec:
       imagePullSecrets:
         -   name: regcred
       containers:
         -   image: ${IMAGE}
             imagePullPolicy: IfNotPresent
-            name: toktik-feed
+            name: toktik-feed-api
             command:
               - bin/feed
             envFrom:
