@@ -34,7 +34,7 @@ for d in */ ; do
 
   # Execute the build.sh script
   echo "Executing build.sh..."
-  ./build.sh
+  bash build.sh
 
   # Copy the binary to the output/binaries directory
   echo "Copying binary to output/bin..."
