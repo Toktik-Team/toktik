@@ -59,7 +59,7 @@ func (s *FeedServiceImpl) ListVideos(ctx context.Context, req *feed.ListFeedRequ
 		}
 
 		videos = append(videos, &feed.Video{
-			Id:       uint32(m.ID),
+			Id:       m.ID,
 			Author:   u,
 			PlayUrl:  playUrl,
 			CoverUrl: coverUrl,
