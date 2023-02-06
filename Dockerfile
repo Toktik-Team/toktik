@@ -15,11 +15,11 @@ COPY . .
 RUN bash build-all.sh
 
 # 运行环境
-FROM gcr.io/distroless/base-debian11
+FROM docker.io/ubuntu:lunar-20230128
 ENV TZ=Asia/Shanghai
 
-# RUN mkdir -p /data/apps/nico-minidouyin-web
-WORKDIR /data/apps/nico-minidouyin-web
+# RUN mkdir -p /data/apps/toktik-service-bundle
+WORKDIR /data/apps/toktik-service-bundle
 
 # 收集数据
 COPY --from=build /source/start.sh .
