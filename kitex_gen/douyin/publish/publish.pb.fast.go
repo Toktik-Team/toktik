@@ -43,7 +43,7 @@ ReadFieldError:
 }
 
 func (x *CreateVideoRequest) fastReadField1(buf []byte, _type int8) (offset int, err error) {
-	x.UserId, offset, err = fastpb.ReadInt64(buf, _type)
+	x.UserId, offset, err = fastpb.ReadUint32(buf, _type)
 	return offset, err
 }
 
@@ -64,6 +64,11 @@ func (x *CreateVideoResponse) FastRead(buf []byte, _type int8, number int32) (of
 		if err != nil {
 			goto ReadFieldError
 		}
+	case 2:
+		offset, err = x.fastReadField2(buf, _type)
+		if err != nil {
+			goto ReadFieldError
+		}
 	default:
 		offset, err = fastpb.Skip(buf, _type, number)
 		if err != nil {
@@ -78,7 +83,12 @@ ReadFieldError:
 }
 
 func (x *CreateVideoResponse) fastReadField1(buf []byte, _type int8) (offset int, err error) {
-	x.Id, offset, err = fastpb.ReadInt64(buf, _type)
+	x.StatusCode, offset, err = fastpb.ReadUint32(buf, _type)
+	return offset, err
+}
+
+func (x *CreateVideoResponse) fastReadField2(buf []byte, _type int8) (offset int, err error) {
+	x.StatusMsg, offset, err = fastpb.ReadString(buf, _type)
 	return offset, err
 }
 
@@ -96,7 +106,7 @@ func (x *CreateVideoRequest) fastWriteField1(buf []byte) (offset int) {
 	if x.UserId == 0 {
 		return offset
 	}
-	offset += fastpb.WriteInt64(buf[offset:], 1, x.UserId)
+	offset += fastpb.WriteUint32(buf[offset:], 1, x.UserId)
 	return offset
 }
 
@@ -121,14 +131,23 @@ func (x *CreateVideoResponse) FastWrite(buf []byte) (offset int) {
 		return offset
 	}
 	offset += x.fastWriteField1(buf[offset:])
+	offset += x.fastWriteField2(buf[offset:])
 	return offset
 }
 
 func (x *CreateVideoResponse) fastWriteField1(buf []byte) (offset int) {
-	if x.Id == 0 {
+	if x.StatusCode == 0 {
 		return offset
 	}
-	offset += fastpb.WriteInt64(buf[offset:], 1, x.Id)
+	offset += fastpb.WriteUint32(buf[offset:], 1, x.StatusCode)
+	return offset
+}
+
+func (x *CreateVideoResponse) fastWriteField2(buf []byte) (offset int) {
+	if x.StatusMsg == "" {
+		return offset
+	}
+	offset += fastpb.WriteString(buf[offset:], 2, x.StatusMsg)
 	return offset
 }
 
@@ -146,7 +165,7 @@ func (x *CreateVideoRequest) sizeField1() (n int) {
 	if x.UserId == 0 {
 		return n
 	}
-	n += fastpb.SizeInt64(1, x.UserId)
+	n += fastpb.SizeUint32(1, x.UserId)
 	return n
 }
 
@@ -171,14 +190,23 @@ func (x *CreateVideoResponse) Size() (n int) {
 		return n
 	}
 	n += x.sizeField1()
+	n += x.sizeField2()
 	return n
 }
 
 func (x *CreateVideoResponse) sizeField1() (n int) {
-	if x.Id == 0 {
+	if x.StatusCode == 0 {
 		return n
 	}
-	n += fastpb.SizeInt64(1, x.Id)
+	n += fastpb.SizeUint32(1, x.StatusCode)
+	return n
+}
+
+func (x *CreateVideoResponse) sizeField2() (n int) {
+	if x.StatusMsg == "" {
+		return n
+	}
+	n += fastpb.SizeString(2, x.StatusMsg)
 	return n
 }
 
@@ -189,5 +217,6 @@ var fieldIDToName_CreateVideoRequest = map[int32]string{
 }
 
 var fieldIDToName_CreateVideoResponse = map[int32]string{
-	1: "Id",
+	1: "StatusCode",
+	2: "StatusMsg",
 }
