@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    sidecar.jaegertracing.io/inject: 'true'
+  labels:
+    app: toktik-feed
+  name: toktik-feed
+  namespace: toktik-service-bundle
+spec:
+  selector:
+    matchLabels:
+      name: toktik-feed
+  template:
+    metadata:
+      labels:
+        app: toktik-feed
+        branch: dev
+        version: ${BUILD_NUMBER}-${CI_COMMIT_ID}
+        name: toktik-feed
+        dream-app: toktik-feed
+        dream-unit: toktik-feed
+    spec:
+      imagePullSecrets:
+        -   name: regcred
+      containers:
+        -   image: ${IMAGE}
+            imagePullPolicy: IfNotPresent
+            name: toktik-feed
+            command:
+              - bin/feed
+            envFrom:
+              -   configMapRef:
+                    name: env-config
+              -   configMapRef:
+                    name: config
+            ports:
+              -   containerPort: 40129
+      terminationGracePeriodSeconds: 30
