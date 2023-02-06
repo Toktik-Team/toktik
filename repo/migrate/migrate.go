@@ -21,11 +21,7 @@ func main() {
 	if err != nil {
 		panic(fmt.Errorf("db connection failed: %v", err))
 	}
-	err = db.AutoMigrate(&auth.UserToken{})
-	if err != nil {
-		panic(fmt.Errorf("db migrate failed: %v", err))
-	}
-	err = db.AutoMigrate(&model.Video{})
+	err = db.AutoMigrate(&auth.UserToken{}, &model.Video{})
 	if err != nil {
 		panic(fmt.Errorf("db migrate failed: %v", err))
 	}
