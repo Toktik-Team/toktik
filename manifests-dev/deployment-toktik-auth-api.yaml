@@ -28,7 +28,7 @@ spec:
                     imagePullPolicy: IfNotPresent
                     name: toktik-auth-api
                     command:
-                        - bin/auth
+                        - bootstrap-auth.sh
                     envFrom:
                         -   configMapRef:
                                 name: env-config
