@@ -82,5 +82,5 @@ func (s *PublishServiceImpl) CreateVideo(ctx context.Context, req *publish.Creat
 		return nil, fmt.Errorf("failed to create db entry %s: %w", fileName, err)
 	}
 
-	return &publish.CreateVideoResponse{Id: int64(publishModel.ID)}, nil
+	return &publish.CreateVideoResponse{StatusCode: 0}, nil
 }

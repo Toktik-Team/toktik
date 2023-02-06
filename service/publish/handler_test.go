@@ -45,7 +45,7 @@ func TestPublishServiceImpl_CreateVideo(t *testing.T) {
 	}}
 
 	var successResp = &publish.CreateVideoResponse{
-		Id: 1,
+		StatusCode: 0,
 	}
 
 	var invalidContentArg = struct {

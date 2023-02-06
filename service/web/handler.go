@@ -30,6 +30,10 @@ func init() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	publishClient, err = publishService.NewClient(config.PublishServiceName, client.WithResolver(r))
+	if err != nil {
+		log.Fatal(err)
+	}
 }
 
 func Authenticate(ctx context.Context, c *app.RequestContext) {
@@ -49,25 +53,22 @@ func Authenticate(ctx context.Context, c *app.RequestContext) {
 func PublishAction(ctx context.Context, c *app.RequestContext) {
 	// TODO: read user id from gateway
 	userId := 1
-	_, err := publishClient.CreateVideo(ctx, &publish.CreateVideoRequest{
-		UserId: int64(userId),
+	publishResp, err := publishClient.CreateVideo(ctx, &publish.CreateVideoRequest{
+		UserId: uint32(userId),
 	})
-	// TODO wrap response
 	if err != nil {
 		c.JSON(
 			consts.StatusOK,
-			struct {
-				StatusCode    int    `json:"status_code"`
-				StatusMessage string `json:"status_message"`
-			}{1, err.Error()},
+			&publish.CreateVideoResponse{
+				StatusCode: 1,
+				StatusMsg:  err.Error(),
+			},
 		)
 		return
 	}
 	c.JSON(
 		consts.StatusOK,
-		struct {
-			StatusCode int `json:"status_code"`
-		}{0},
+		publishResp,
 	)
 	return
 }
