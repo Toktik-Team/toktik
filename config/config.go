@@ -21,12 +21,29 @@ var DSN string
 
 func init() {
 	envInit()
+	envValidate()
 	DSN = fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s",
 		EnvConfig.PGSQL_HOST,
 		EnvConfig.PGSQL_USER,
 		EnvConfig.PGSQL_PASSWORD,
 		EnvConfig.PGSQL_DBNAME,
 		EnvConfig.PGSQL_PORT)
+}
+
+var defaultConfig = envConfigSchema{
+	ENV: "dev",
+
+	CONSUL_ADDR: "127.0.0.1:8500",
+
+	PGSQL_HOST:     "localhost",
+	PGSQL_PORT:     "5432",
+	PGSQL_USER:     "postgres",
+	PGSQL_PASSWORD: "",
+	PGSQL_DBNAME:   "postgres",
+
+	REDIS_ADDR:     "localhost:6379",
+	REDIS_PASSWORD: "",
+	REDIS_DB:       "0",
 }
 
 type envConfigSchema struct {
@@ -45,24 +62,12 @@ type envConfigSchema struct {
 	REDIS_DB       string
 }
 
-func (s envConfigSchema) IsDev() bool {
+func (s *envConfigSchema) IsDev() bool {
 	return s.ENV == "dev" || s.ENV == "TESTING"
 }
 
-var defaultConfig = envConfigSchema{
-	ENV: "dev",
-
-	CONSUL_ADDR: "127.0.0.1:8500",
-
-	PGSQL_HOST:     "localhost",
-	PGSQL_PORT:     "5432",
-	PGSQL_USER:     "postgres",
-	PGSQL_PASSWORD: "",
-	PGSQL_DBNAME:   "postgres",
-
-	REDIS_ADDR:     "localhost:6379",
-	REDIS_PASSWORD: "",
-	REDIS_DB:       "0",
+func envValidate() {
+	EnvConfig.CONSUL_ADDR = strings.TrimPrefix(EnvConfig.CONSUL_ADDR, "consul://")
 }
 
 // envInit Reads .env as environment variables and fill corresponding fields into EnvConfig.
@@ -87,7 +92,7 @@ func envInit() {
 		}
 
 		configDefaultValue := fieldValue.(string)
-		envValue := resolveEnv(envNameAlt)
+		envValue := resolveEnv(envNameAlt, configDefaultValue)
 
 		if EnvConfig.IsDev() {
 			fmt.Printf("Reading field[ %s ] default: %v env: %s\n", fieldName, configDefaultValue, envValue)
@@ -98,12 +103,12 @@ func envInit() {
 	}
 }
 
-func resolveEnv(configKeys []string) string {
+func resolveEnv(configKeys []string, defaultValue string) string {
 	for _, item := range configKeys {
 		envValue := os.Getenv(item)
 		if envValue != "" {
 			return envValue
 		}
 	}
-	return ""
+	return defaultValue
 }
