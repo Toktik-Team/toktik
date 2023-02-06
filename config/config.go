@@ -13,7 +13,7 @@ var EnvConfig = envConfigSchema{}
 const WebServiceName = "toktik-api-gateway"
 const WebServiceAddr = ":40126"
 
-const AuthServiceName = "toktik-auth"
+const AuthServiceName = "toktik-auth-api"
 const AuthServiceAddr = ":40127"
 
 const PublishServiceName = "toktik-publish"
@@ -83,6 +83,7 @@ var defaultConfig = envConfigSchema{
 // envInit Reads .env as environment variables and fill corresponding fields into EnvConfig.
 // To use a value from EnvConfig , simply call EnvConfig.FIELD like EnvConfig.ENV
 func envInit() {
+
 	err := godotenv.Load()
 	if err != nil {
 		log.Fatal("Error loading .env file")
