@@ -22,6 +22,4 @@ ENV TZ=Asia/Shanghai
 WORKDIR /data/apps/toktik-service-bundle
 
 # 收集数据
-COPY --from=build /source/start.sh .
 COPY --from=build /source/output/ .
-ENTRYPOINT ["./start.sh"]

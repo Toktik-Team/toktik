@@ -70,7 +70,7 @@ var defaultConfig = envConfigSchema{
 func envInit() {
 	err := godotenv.Load()
 	if err != nil {
-		log.Fatal("Error loading .env file")
+		log.Print("Error loading .env file, ignored")
 	}
 	v := reflect.ValueOf(defaultConfig)
 	typeOfS := v.Type()
