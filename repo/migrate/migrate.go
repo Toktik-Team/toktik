@@ -5,6 +5,7 @@ import (
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"toktik/config"
+	"toktik/repo/model"
 	auth "toktik/service/auth/model"
 )
 
@@ -20,7 +21,7 @@ func main() {
 	if err != nil {
 		panic(fmt.Errorf("db connection failed: %v", err))
 	}
-	err = db.AutoMigrate(&auth.UserToken{})
+	err = db.AutoMigrate(&auth.UserToken{}, model.User{})
 	if err != nil {
 		panic(fmt.Errorf("db migrate failed: %v", err))
 	}

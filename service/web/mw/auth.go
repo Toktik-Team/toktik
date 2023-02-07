@@ -36,6 +36,7 @@ func AuthMiddleware() app.HandlerFunc {
 			rc.Set(AUTH_RESULT_KEY, AUTH_RESULT_NO_TOKEN)
 			rc.Set(USER_ID_KEY, 0)
 			rc.Next(ctx)
+			return
 		}
 
 		authResp, err := auth.AuthClient.Authenticate(ctx, &authRPC.AuthenticateRequest{Token: token})
@@ -43,6 +44,7 @@ func AuthMiddleware() app.HandlerFunc {
 			rc.Set(AUTH_RESULT_KEY, AUTH_RESULT_UNKNOWN)
 			rc.Set(USER_ID_KEY, 0)
 			rc.Next(ctx)
+			return
 		}
 		if authResp.StatusCode == 0 && authResp.StatusMsg == string(AUTH_RESULT_SUCCESS) {
 			rc.Set(AUTH_RESULT_KEY, AUTH_RESULT_SUCCESS)
