@@ -17,6 +17,12 @@ const WebServiceAddr = ":40126"
 const AuthServiceName = "toktik-auth-api"
 const AuthServiceAddr = ":40127"
 
+const PublishServiceName = "toktik-publish"
+const PublishServiceAddr = ":40128"
+
+const FeedServiceName = "toktik-feed-api"
+const FeedServiceAddr = ":40129"
+
 var DSN string
 
 func init() {
@@ -44,6 +50,13 @@ var defaultConfig = envConfigSchema{
 	REDIS_ADDR:     "localhost:6379",
 	REDIS_PASSWORD: "",
 	REDIS_DB:       "0",
+
+	S3_ENDPOINT_URL: "http://localhost:9000",
+	S3_PUBLIC_URL:   "http://localhost:9000",
+	S3_BUCKET:       "bucket",
+	S3_SECRET_ID:    "minio",
+	S3_SECRET_KEY:   "12345678",
+	S3_PATH_STYLE:   "true",
 }
 
 type envConfigSchema struct {
@@ -60,6 +73,13 @@ type envConfigSchema struct {
 	REDIS_ADDR     string
 	REDIS_PASSWORD string
 	REDIS_DB       string
+
+	S3_ENDPOINT_URL string
+	S3_PUBLIC_URL   string
+	S3_BUCKET       string
+	S3_SECRET_ID    string
+	S3_SECRET_KEY   string
+	S3_PATH_STYLE   string
 }
 
 func (s *envConfigSchema) IsDev() bool {
@@ -73,6 +93,7 @@ func envValidate() {
 // envInit Reads .env as environment variables and fill corresponding fields into EnvConfig.
 // To use a value from EnvConfig , simply call EnvConfig.FIELD like EnvConfig.ENV
 func envInit() {
+
 	err := godotenv.Load()
 	if err != nil {
 		log.Print("Error loading .env file, ignored")

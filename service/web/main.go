@@ -20,7 +20,7 @@ func main() {
 	h.Any("/authenticate", auth.Authenticate)
 
 	// feed service
-	h.GET("/feed")
+	h.GET("/feed", FeedAction)
 
 	// user service
 	userGroup := h.Group("/user")
@@ -30,7 +30,7 @@ func main() {
 
 	// publish service
 	publishGroup := h.Group("/publish")
-	publishGroup.POST("/action")
+	publishGroup.POST("/action", PublishAction)
 	publishGroup.GET("/list")
 
 	// favorite service
