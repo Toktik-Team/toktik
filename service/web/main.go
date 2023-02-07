@@ -7,15 +7,17 @@ import (
 	"github.com/hertz-contrib/swagger"
 	swaggerFiles "github.com/swaggo/files"
 	"toktik/config"
+	"toktik/service/web/auth"
+	"toktik/service/web/mw"
 )
 
 func main() {
 	h := server.Default(server.WithHostPorts(config.WebServiceAddr))
 	h.Use(gzip.Gzip(gzip.DefaultCompression))
-	h.Use(ProtoJsonMiddleware())
+	h.Use(mw.ProtoJsonMiddleware())
 	pprof.Register(h)
 
-	h.Any("/authenticate", Authenticate)
+	h.Any("/authenticate", auth.Authenticate)
 
 	// feed service
 	h.GET("/feed")

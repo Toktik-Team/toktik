@@ -1,4 +1,4 @@
-package main
+package auth
 
 import (
 	"context"
@@ -13,14 +13,14 @@ import (
 	authService "toktik/kitex_gen/douyin/auth/authservice"
 )
 
-var authClient authService.Client
+var AuthClient authService.Client
 
 func init() {
 	r, err := consul.NewConsulResolver(config.EnvConfig.CONSUL_ADDR)
 	if err != nil {
 		log.Fatal(err)
 	}
-	authClient, err = authService.NewClient(config.AuthServiceName, client.WithResolver(r))
+	AuthClient, err = authService.NewClient(config.AuthServiceName, client.WithResolver(r))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -32,7 +32,7 @@ func Authenticate(ctx context.Context, c *app.RequestContext) {
 		c.String(consts.StatusUnauthorized, "failed")
 		return
 	}
-	authenticateResp, err := authClient.Authenticate(ctx, &auth.AuthenticateRequest{Token: token})
+	authenticateResp, err := AuthClient.Authenticate(ctx, &auth.AuthenticateRequest{Token: token})
 	if err != nil {
 		c.String(consts.StatusUnauthorized, "failed")
 		return
