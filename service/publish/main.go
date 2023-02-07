@@ -1,18 +1,18 @@
 package main
 
 import (
-	"github.com/cloudwego/kitex/pkg/rpcinfo"
-	"github.com/cloudwego/kitex/server"
-	consul "github.com/kitex-contrib/registry-consul"
 	"log"
 	"net"
 	"toktik/config"
 	publish "toktik/kitex_gen/douyin/publish/publishservice"
+
+	"github.com/cloudwego/kitex/server"
+
+	"github.com/cloudwego/kitex/pkg/rpcinfo"
+	consul "github.com/kitex-contrib/registry-consul"
 )
 
 func main() {
-	var err error
-
 	r, err := consul.NewConsulRegister(config.EnvConfig.CONSUL_ADDR)
 	if err != nil {
 		log.Fatal(err)

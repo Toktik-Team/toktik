@@ -2,10 +2,6 @@ package auth
 
 import (
 	"context"
-	"github.com/cloudwego/hertz/pkg/app"
-	"github.com/cloudwego/hertz/pkg/protocol/consts"
-	"github.com/cloudwego/kitex/client"
-	consul "github.com/kitex-contrib/registry-consul"
 	"log"
 	"strconv"
 	"toktik/config"
@@ -15,6 +11,11 @@ import (
 	feedService "toktik/kitex_gen/douyin/feed/feedservice"
 	"toktik/kitex_gen/douyin/publish"
 	publishService "toktik/kitex_gen/douyin/publish/publishservice"
+
+	"github.com/cloudwego/hertz/pkg/app"
+	"github.com/cloudwego/hertz/pkg/protocol/consts"
+	"github.com/cloudwego/kitex/client"
+	consul "github.com/kitex-contrib/registry-consul"
 )
 
 var AuthClient authService.Client
