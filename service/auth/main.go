@@ -6,7 +6,7 @@ import (
 	consul "github.com/kitex-contrib/registry-consul"
 	"log"
 	"net"
-	"toktik/config"
+	"toktik/constant/config"
 	auth "toktik/kitex_gen/douyin/auth/authservice"
 )
 

@@ -11,24 +11,16 @@ import (
 
 var EnvConfig = envConfigSchema{}
 
-const WebServiceName = "toktik-api-gateway"
-const WebServiceAddr = ":40126"
+func (s *envConfigSchema) GetDSN() string {
+	return dsn
+}
 
-const AuthServiceName = "toktik-auth-api"
-const AuthServiceAddr = ":40127"
-
-const PublishServiceName = "toktik-publish"
-const PublishServiceAddr = ":40128"
-
-const FeedServiceName = "toktik-feed-api"
-const FeedServiceAddr = ":40129"
-
-var DSN string
+var dsn string
 
 func init() {
 	envInit()
 	envValidate()
-	DSN = fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s",
+	dsn = fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s",
 		EnvConfig.PGSQL_HOST,
 		EnvConfig.PGSQL_USER,
 		EnvConfig.PGSQL_PASSWORD,
@@ -92,22 +84,22 @@ func envValidate() {
 
 // envInit Reads .env as environment variables and fill corresponding fields into EnvConfig.
 // To use a value from EnvConfig , simply call EnvConfig.FIELD like EnvConfig.ENV
+// Note: Please keep Env as the first field of envConfigSchema for better logging.
 func envInit() {
-
 	err := godotenv.Load()
 	if err != nil {
 		log.Print("Error loading .env file, ignored")
 	}
 	v := reflect.ValueOf(defaultConfig)
-	typeOfS := v.Type()
+	typeOfV := v.Type()
 
 	for i := 0; i < v.NumField(); i++ {
 		envNameAlt := make([]string, 0)
-		fieldName := typeOfS.Field(i).Name
+		fieldName := typeOfV.Field(i).Name
 		fieldValue := v.Field(i).Interface()
 
 		envNameAlt = append(envNameAlt, fieldName)
-		if fieldTag, ok := typeOfS.Field(i).Tag.Lookup("env"); ok && len(fieldTag) > 0 {
+		if fieldTag, ok := typeOfV.Field(i).Tag.Lookup("env"); ok && len(fieldTag) > 0 {
 			tags := strings.Split(fieldTag, ",")
 			envNameAlt = append(envNameAlt, tags...)
 		}

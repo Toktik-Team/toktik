@@ -3,7 +3,7 @@ package main
 import (
 	"log"
 	"net"
-	"toktik/config"
+	"toktik/constant/config"
 	publish "toktik/kitex_gen/douyin/publish/publishservice"
 
 	"github.com/cloudwego/kitex/server"

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strconv"
 	"time"
+	"toktik/constant/biz"
 	"toktik/kitex_gen/douyin/feed"
 	"toktik/kitex_gen/douyin/user"
 	gen "toktik/repo"
@@ -14,25 +15,33 @@ import (
 // FeedServiceImpl implements the last service interface defined in the IDL.
 type FeedServiceImpl struct{}
 
-const (
-	OkStatusCode = 0
-)
-
-var (
-	OkStatusMsg = "OK"
-)
-
 // ListVideos implements the FeedServiceImpl interface.
 func (s *FeedServiceImpl) ListVideos(ctx context.Context, req *feed.ListFeedRequest) (resp *feed.ListFeedResponse, err error) {
-	publish := gen.Q.Video
+	video := gen.Q.Video
 
 	latestTime, err := strconv.ParseInt(*req.LatestTime, 10, 64)
 	if err != nil {
-		latestTime = time.Now().UnixMilli()
+		if _, ok := err.(*strconv.NumError); ok {
+			latestTime = time.Now().UnixMilli()
+		} else {
+			resp = &feed.ListFeedResponse{
+				StatusCode: biz.Unable2ParseLatestTimeStatusCode,
+				StatusMsg:  &biz.BadRequestStatusMsg,
+				NextTime:   nil,
+				Videos:     nil,
+			}
+			return resp, nil
+		}
 	}
 
-	find, err := publish.WithContext(ctx).Where(publish.CreatedAt.Lte(time.UnixMilli(latestTime))).Order(publish.CreatedAt.Desc()).Limit(30).Offset(0).Find()
+	find, err := video.WithContext(ctx).
+		Where(video.CreatedAt.Lte(time.UnixMilli(latestTime))).
+		Order(video.CreatedAt.Desc()).
+		Limit(biz.VideoCount).
+		Offset(0).
+		Find()
 	if err != nil {
+		// TODO: handle error
 		return nil, err
 	}
 
@@ -74,8 +83,8 @@ func (s *FeedServiceImpl) ListVideos(ctx context.Context, req *feed.ListFeedRequ
 	}
 
 	return &feed.ListFeedResponse{
-		StatusCode: OkStatusCode,
-		StatusMsg:  &OkStatusMsg,
+		StatusCode: biz.OkStatusCode,
+		StatusMsg:  &biz.OkStatusMsg,
 		NextTime:   &nextTime,
 		Videos:     videos,
 	}, nil

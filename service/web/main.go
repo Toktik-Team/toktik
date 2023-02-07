@@ -6,9 +6,11 @@ import (
 	"github.com/hertz-contrib/pprof"
 	"github.com/hertz-contrib/swagger"
 	swaggerFiles "github.com/swaggo/files"
-	"toktik/config"
+	"toktik/constant/config"
 	"toktik/service/web/auth"
+	"toktik/service/web/feed"
 	"toktik/service/web/mw"
+	"toktik/service/web/publish"
 )
 
 func main() {
@@ -20,7 +22,7 @@ func main() {
 	h.Any("/authenticate", auth.Authenticate)
 
 	// feed service
-	h.GET("/feed", FeedAction)
+	h.GET("/feed", feed.Action)
 
 	// user service
 	userGroup := h.Group("/user")
@@ -30,7 +32,7 @@ func main() {
 
 	// publish service
 	publishGroup := h.Group("/publish")
-	publishGroup.POST("/action", PublishAction)
+	publishGroup.POST("/action", publish.Action)
 	publishGroup.GET("/list")
 
 	// favorite service
