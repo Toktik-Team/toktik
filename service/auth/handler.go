@@ -6,6 +6,7 @@ import (
 	"golang.org/x/crypto/bcrypt"
 	"toktik/kitex_gen/douyin/auth"
 	gen "toktik/repo"
+	"toktik/service/web/mw"
 )
 
 func HashPassword(password string) (string, error) {
@@ -30,7 +31,7 @@ func (s *AuthServiceImpl) Authenticate(ctx context.Context, req *auth.Authentica
 	}
 	resp = &auth.AuthenticateResponse{
 		StatusCode: 0,
-		StatusMsg:  "6",
+		StatusMsg:  string(mw.AUTH_RESULT_SUCCESS),
 		UserId:     first.UserID,
 	}
 	return
