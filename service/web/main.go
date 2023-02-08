@@ -1,4 +1,5 @@
-package main
+package 
+
 
 import (
 	"github.com/cloudwego/hertz/pkg/app/server"
@@ -22,6 +23,7 @@ func main() {
 	douyin := h.Group("/douyin")
 
 	douyin.Any("/authenticate", auth.Authenticate)
+
 
 	// feed service
 	douyin.GET("/feed")
