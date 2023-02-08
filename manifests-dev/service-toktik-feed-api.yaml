@@ -7,10 +7,10 @@ metadata:
   namespace: toktik-service-bundle
 spec:
   ports:
-    -   name: grpc
-        port: 40129
-        protocol: TCP
-        targetPort: 40129
+    - name: grpc
+      port: 40129
+      protocol: TCP
+      targetPort: 40129
   selector:
     name: toktik-feed-api
     branch: dev

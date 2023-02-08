@@ -22,20 +22,29 @@ spec:
         dream-unit: toktik-feed-api
     spec:
       imagePullSecrets:
-        -   name: regcred
+        - name: regcred
       containers:
-        -   image: ${IMAGE}
-            imagePullPolicy: IfNotPresent
-            name: toktik-feed-api
-            command:
-              - /bin/bash
-            args:
-              - bootstrap-feed.sh
-            envFrom:
-              -   configMapRef:
-                    name: env-config
-              -   configMapRef:
-                    name: config
-            ports:
-              -   containerPort: 40129
+        - image: ${IMAGE}
+          imagePullPolicy: IfNotPresent
+          name: toktik-feed-api
+          command:
+            - /bin/bash
+          args:
+            - bootstrap-feed.sh
+          envFrom:
+            - configMapRef:
+                name: env-config
+            - configMapRef:
+                name: config
+          ports:
+            - name: grpc-40129
+              containerPort: 40129
+              protocol: TCP
+          resources:
+            limits:
+              cpu: 500m
+              memory: 256Mi
+            requests:
+              cpu: 100m
+              memory: 8Mi
       terminationGracePeriodSeconds: 30
