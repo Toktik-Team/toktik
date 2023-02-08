@@ -28,7 +28,9 @@ spec:
             imagePullPolicy: IfNotPresent
             name: toktik-feed-api
             command:
-              - bin/feed
+              - /bin/bash
+            args:
+              - bootstrap-feed.sh
             envFrom:
               -   configMapRef:
                     name: env-config
