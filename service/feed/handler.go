@@ -41,8 +41,13 @@ func (s *FeedServiceImpl) ListVideos(ctx context.Context, req *feed.ListFeedRequ
 		Offset(0).
 		Find()
 	if err != nil {
-		// TODO: handle error
-		return nil, err
+		resp = &feed.ListFeedResponse{
+			StatusCode: biz.SQLQueryErrorStatusCode,
+			StatusMsg:  &biz.InternalErrorMsg,
+			NextTime:   nil,
+			Videos:     nil,
+		}
+		return resp, nil
 	}
 
 	nextTime := find[len(find)].CreatedAt.UnixMilli()
