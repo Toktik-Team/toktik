@@ -9,6 +9,7 @@ import (
 	"toktik/config"
 	"toktik/service/web/auth"
 	"toktik/service/web/mw"
+	"toktik/service/web/user"
 )
 
 func main() {
@@ -29,7 +30,7 @@ func main() {
 	userGroup := douyin.Group("/user")
 	userGroup.POST("/register", auth.Register)
 	userGroup.POST("/login", auth.Login)
-	userGroup.GET("/")
+	userGroup.GET("/", user.GetUserInfo)
 
 	// publish service
 	publishGroup := douyin.Group("/publish")

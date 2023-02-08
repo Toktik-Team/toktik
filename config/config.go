@@ -2,11 +2,12 @@ package config
 
 import (
 	"fmt"
-	"github.com/joho/godotenv"
 	"log"
 	"os"
 	"reflect"
 	"strings"
+
+	"github.com/joho/godotenv"
 )
 
 var EnvConfig = envConfigSchema{}
@@ -16,6 +17,9 @@ const WebServiceAddr = ":40126"
 
 const AuthServiceName = "toktik-auth-api"
 const AuthServiceAddr = ":40127"
+
+const UserServiceName = "toktik-user"
+const UserServiceAddr = ":40130"
 
 var DSN string
 
