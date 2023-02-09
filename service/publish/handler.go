@@ -14,7 +14,7 @@ import (
 
 	"image/jpeg"
 
-	publish "toktik/kitex_gen/douyin/publish"
+	"toktik/kitex_gen/douyin/publish"
 	gen "toktik/repo"
 	"toktik/storage"
 )

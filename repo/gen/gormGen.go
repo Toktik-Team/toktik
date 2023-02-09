@@ -4,12 +4,12 @@ import (
 	"gorm.io/driver/postgres"
 	"gorm.io/gen"
 	"gorm.io/gorm"
-	"toktik/config"
+	"toktik/constant/config"
 	"toktik/repo/model"
 	auth "toktik/service/auth/model"
 )
 
-// Dynamic SQL
+// Querier Dynamic SQL
 type Querier interface {
 	// SELECT * FROM @@table WHERE name = @name{{if role !=""}} AND role = @role{{end}}
 	FilterWithNameAndRole(name, role string) ([]gen.T, error)
@@ -21,7 +21,7 @@ func main() {
 		Mode:    gen.WithoutContext | gen.WithDefaultQuery | gen.WithQueryInterface, // generate mode
 	})
 
-	gormdb, _ := gorm.Open(postgres.Open(config.DSN))
+	gormdb, _ := gorm.Open(postgres.Open(config.EnvConfig.GetDSN()))
 	g.UseDB(gormdb) // reuse your gorm db
 
 	// Generate basic type-safe DAO API for struct `model.User` following conventions

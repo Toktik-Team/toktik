@@ -10,7 +10,7 @@ import (
 	"log"
 	"net/url"
 	"strconv"
-	appcfg "toktik/config"
+	appcfg "toktik/constant/config"
 )
 
 var client *s3.Client

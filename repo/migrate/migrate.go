@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
-	"toktik/config"
+	"toktik/constant/config"
 	"toktik/repo/model"
 	auth "toktik/service/auth/model"
 )
@@ -14,7 +14,7 @@ func main() {
 	db, err := gorm.Open(
 		postgres.New(
 			postgres.Config{
-				DSN: config.DSN,
+				DSN: config.EnvConfig.GetDSN(),
 			}), &gorm.Config{
 			DisableForeignKeyConstraintWhenMigrating: true,
 		})
