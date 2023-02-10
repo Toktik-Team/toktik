@@ -25,9 +25,10 @@ func main() {
 	g.UseDB(gormdb) // reuse your gorm db
 
 	// Generate basic type-safe DAO API for struct `model.User` following conventions
-	g.ApplyBasic(auth.UserToken{}, model.Video{})
-	// Generate Type Safe API with Dynamic SQL defined on Querier interface for `model.User` and `model.Company`
-	g.ApplyInterface(func(Querier) {}, auth.UserToken{}, model.Video{})
+	g.ApplyBasic(auth.UserToken{}, model.User{}, model.Video{})
+
+	// Generate Type Safe API with Dynamic SQL defined on Querier interface
+	g.ApplyInterface(func(Querier) {}, auth.UserToken{}, model.User{}, model.Video{})
 
 	// Generate the code
 	g.Execute()
