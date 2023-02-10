@@ -35,14 +35,14 @@ func TestMain(m *testing.M) {
 				ID:        uint32(i),
 				CreatedAt: time.UnixMilli(now).Add(time.Duration(i) * time.Second),
 			},
-			UserId:    65535, //TODO: mock user
+			UserId:    65535,
 			Title:     "Test Video " + strconv.Itoa(i),
 			FileName:  "test_video_file_" + strconv.Itoa(i) + ".mp4",
 			CoverName: "test_video_cover_file_" + strconv.Itoa(i) + ".png",
 		}
 		resp := &feed.Video{
 			Id:            uint32(i),
-			Author:        &user.User{Id: 65535}, // TODO
+			Author:        &user.User{Id: 65535},
 			PlayUrl:       "https://test.com/test_video_file_" + strconv.Itoa(i) + ".mp4",
 			CoverUrl:      "https://test.com/test_video_cover_file_" + strconv.Itoa(i) + ".png",
 			FavoriteCount: 0,     // TODO
@@ -76,8 +76,6 @@ func TestFeedServiceImpl_ListVideos(t *testing.T) {
 		NextTime:   &expectedNextTime,
 		Videos:     respVideos[:biz.VideoCount],
 	}
-
-	// TODO: mock user
 
 	monkey.Patch(storage.GetLink, func(fileName string) (string, error) {
 		return "https://test.com/" + fileName, nil
