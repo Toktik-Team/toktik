@@ -9,19 +9,19 @@ import (
 	consul "github.com/kitex-contrib/registry-consul"
 	"log"
 	"strconv"
-	"toktik/config"
+	"toktik/constant/config"
 	"toktik/kitex_gen/douyin/auth"
 	authService "toktik/kitex_gen/douyin/auth/authservice"
 )
 
-var AuthClient authService.Client
+var Client authService.Client
 
 func init() {
 	r, err := consul.NewConsulResolver(config.EnvConfig.CONSUL_ADDR)
 	if err != nil {
 		log.Fatal(err)
 	}
-	AuthClient, err = authService.NewClient(config.AuthServiceName, client.WithResolver(r))
+	Client, err = authService.NewClient(config.AuthServiceName, client.WithResolver(r))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -36,7 +36,7 @@ func Authenticate(ctx context.Context, c *app.RequestContext) {
 		})
 		return
 	}
-	authenticateResp, err := AuthClient.Authenticate(ctx, &auth.AuthenticateRequest{Token: token})
+	authenticateResp, err := Client.Authenticate(ctx, &auth.AuthenticateRequest{Token: token})
 	if err != nil {
 		c.JSON(consts.StatusUnauthorized, authenticateResp)
 		return
@@ -54,7 +54,7 @@ func Register(ctx context.Context, c *app.RequestContext) {
 		})
 		return
 	}
-	registerResponse, err := AuthClient.Register(ctx, &auth.RegisterRequest{
+	registerResponse, err := Client.Register(ctx, &auth.RegisterRequest{
 		Username: username,
 		Password: password,
 	})
@@ -78,7 +78,7 @@ func Login(ctx context.Context, c *app.RequestContext) {
 		})
 		return
 	}
-	loginResponse, err := AuthClient.Login(ctx, &auth.LoginRequest{
+	loginResponse, err := Client.Login(ctx, &auth.LoginRequest{
 		Username: username,
 		Password: password,
 	})

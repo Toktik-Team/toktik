@@ -8,19 +8,19 @@ import (
 	consul "github.com/kitex-contrib/registry-consul"
 	"log"
 	"strconv"
-	"toktik/config"
+	"toktik/constant/config"
 	"toktik/kitex_gen/douyin/user"
 	"toktik/kitex_gen/douyin/user/userservice"
 )
 
-var UserClient userservice.Client
+var userClient userservice.Client
 
 func init() {
 	r, err := consul.NewConsulResolver(config.EnvConfig.CONSUL_ADDR)
 	if err != nil {
 		log.Fatal(err)
 	}
-	UserClient, err = userservice.NewClient(config.UserServiceName, client.WithResolver(r))
+	userClient, err = userservice.NewClient(config.UserServiceName, client.WithResolver(r))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -43,7 +43,7 @@ func GetUserInfo(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	resp, err := UserClient.GetUser(ctx, &user.UserRequest{
+	resp, err := userClient.GetUser(ctx, &user.UserRequest{
 		UserId: uint32(id),
 		Token:  token,
 	})

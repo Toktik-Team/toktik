@@ -2,7 +2,7 @@ package repo
 
 import (
 	"time"
-	"toktik/config"
+	"toktik/constant/config"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -24,7 +24,7 @@ func init() {
 		},
 	)
 	DB, err = gorm.Open(
-		postgres.Open(config.DSN),
+		postgres.Open(config.EnvConfig.GetDSN()),
 		&gorm.Config{
 			PrepareStmt: true,
 			Logger:      gormlogrus,

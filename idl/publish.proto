@@ -1,0 +1,18 @@
+syntax = "proto3";
+package douyin.publish;
+option go_package = "douyin/publish";
+
+message CreateVideoRequest {
+  uint32 userId = 1;
+  bytes data = 2;
+  string title = 3;
+}
+
+message CreateVideoResponse {
+  uint32 status_code = 1; // 状态码，0-成功，其他值-失败
+  string status_msg = 2; // 返回状态描述
+}
+
+service PublishService {
+  rpc CreateVideo(CreateVideoRequest) returns (CreateVideoResponse) {}
+}

@@ -39,7 +39,7 @@ func AuthMiddleware() app.HandlerFunc {
 			return
 		}
 
-		authResp, err := auth.AuthClient.Authenticate(ctx, &authRPC.AuthenticateRequest{Token: token})
+		authResp, err := auth.Client.Authenticate(ctx, &authRPC.AuthenticateRequest{Token: token})
 		if err != nil {
 			rc.Set(AUTH_RESULT_KEY, AUTH_RESULT_UNKNOWN)
 			rc.Set(USER_ID_KEY, 0)
