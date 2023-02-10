@@ -9,6 +9,7 @@ import (
 	"toktik/kitex_gen/douyin/feed"
 	"toktik/kitex_gen/douyin/user"
 	gen "toktik/repo"
+	"toktik/repo/model"
 	"toktik/storage"
 )
 
@@ -17,8 +18,6 @@ type FeedServiceImpl struct{}
 
 // ListVideos implements the FeedServiceImpl interface.
 func (s *FeedServiceImpl) ListVideos(ctx context.Context, req *feed.ListFeedRequest) (resp *feed.ListFeedResponse, err error) {
-	video := gen.Q.Video
-
 	latestTime, err := strconv.ParseInt(*req.LatestTime, 10, 64)
 	if err != nil {
 		if _, ok := err.(*strconv.NumError); ok {
@@ -34,12 +33,7 @@ func (s *FeedServiceImpl) ListVideos(ctx context.Context, req *feed.ListFeedRequ
 		}
 	}
 
-	find, err := video.WithContext(ctx).
-		Where(video.CreatedAt.Lte(time.UnixMilli(latestTime))).
-		Order(video.CreatedAt.Desc()).
-		Limit(biz.VideoCount).
-		Offset(0).
-		Find()
+	find, err := findVideos(ctx, latestTime)
 	if err != nil {
 		resp = &feed.ListFeedResponse{
 			StatusCode: biz.SQLQueryErrorStatusCode,
@@ -93,4 +87,14 @@ func (s *FeedServiceImpl) ListVideos(ctx context.Context, req *feed.ListFeedRequ
 		NextTime:   &nextTime,
 		Videos:     videos,
 	}, nil
+}
+
+func findVideos(ctx context.Context, latestTime int64) ([]*model.Video, error) {
+	video := gen.Q.Video
+	return video.WithContext(ctx).
+		Where(video.CreatedAt.Lte(time.UnixMilli(latestTime))).
+		Order(video.CreatedAt.Desc()).
+		Limit(biz.VideoCount).
+		Offset(0).
+		Find()
 }
