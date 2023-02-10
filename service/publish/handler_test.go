@@ -1,12 +1,7 @@
 package main
 
 import (
-	"bou.ke/monkey"
 	"context"
-	"github.com/DATA-DOG/go-sqlmock"
-	"github.com/aws/aws-sdk-go-v2/service/s3"
-	"gorm.io/driver/postgres"
-	"gorm.io/gorm"
 	"io"
 	"os"
 	"path"
@@ -14,10 +9,16 @@ import (
 	"regexp"
 	"runtime"
 	"testing"
-
+	"toktik/constant/biz"
 	"toktik/kitex_gen/douyin/publish"
 	"toktik/repo"
 	"toktik/storage"
+
+	"bou.ke/monkey"
+	"github.com/DATA-DOG/go-sqlmock"
+	"github.com/aws/aws-sdk-go-v2/service/s3"
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
 )
 
 var testVideo []byte
@@ -46,7 +47,7 @@ func TestPublishServiceImpl_CreateVideo(t *testing.T) {
 	}}
 
 	var successResp = &publish.CreateVideoResponse{
-
+		StatusCode: biz.OkStatusCode,
 	}
 
 	var invalidContentArg = struct {
@@ -58,11 +59,11 @@ func TestPublishServiceImpl_CreateVideo(t *testing.T) {
 		Title:  "Invalid content",
 	}}
 
-	}}
-
 	var invalidContentResp = &publish.CreateVideoResponse{
 		StatusCode: biz.InvalidContentType,
 		StatusMsg:  biz.BadRequestStatusMsg,
+	}
+
 	monkey.Patch(storage.Upload, func(fileName string, content io.Reader) (*s3.PutObjectOutput, error) {
 		// TODO: nothing
 		return nil, nil
@@ -106,7 +107,7 @@ func TestPublishServiceImpl_CreateVideo(t *testing.T) {
 		wantErr  bool
 	}{
 		{name: "should create success", args: successArg, wantResp: successResp},
-	}{
+		{name: "invalid content type", args: invalidContentArg, wantResp: invalidContentResp},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
