@@ -2,11 +2,12 @@ package config
 
 import (
 	"fmt"
-	"github.com/joho/godotenv"
 	"log"
 	"os"
 	"reflect"
 	"strings"
+
+	"github.com/joho/godotenv"
 )
 
 var EnvConfig = envConfigSchema{}
