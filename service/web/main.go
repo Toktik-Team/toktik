@@ -27,8 +27,8 @@ func main() {
 
 	// user service
 	userGroup := douyin.Group("/user")
-	userGroup.POST("/register", auth.Register)
-	userGroup.POST("/login", auth.Login)
+	userGroup.POST("/register/", auth.Register)
+	userGroup.POST("/login/", auth.Login)
 	userGroup.GET("/")
 
 	// publish service
