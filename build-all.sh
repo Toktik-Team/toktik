@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Exit if any error occured
+set -euxo pipefail
+
 SERVICE_DIR=$(pwd)/service
 
 # Remove the output directory
