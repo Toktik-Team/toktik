@@ -44,7 +44,7 @@ func (s *FeedServiceImpl) ListVideos(ctx context.Context, req *feed.ListFeedRequ
 		return resp, nil
 	}
 
-	nextTime := find[len(find)].CreatedAt.UnixMilli()
+	nextTime := find[len(find)-1].CreatedAt.Add(time.Duration(-1)).UnixMilli()
 
 	var videos []*feed.Video
 	for _, m := range find {
