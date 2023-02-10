@@ -3,14 +3,14 @@ package douyin.publish;
 option go_package = "douyin/publish";
 
 message CreateVideoRequest {
-  uint32 userId = 1;
-  bytes data = 2;
-  string title = 3;
+  uint32 userId = 1 [json_name = "user_id"]; // 用户id
+  bytes data = 2; // 视频数据
+  string title = 3; // 视频标题
 }
 
 message CreateVideoResponse {
-  uint32 status_code = 1; // 状态码，0-成功，其他值-失败
-  string status_msg = 2; // 返回状态描述
+  uint32 status_code = 1 [json_name = "status_code"]; // 状态码，0-成功，其他值-失败
+  string status_msg = 2 [json_name = "status_msg"]; // 返回状态描述
 }
 
 service PublishService {
