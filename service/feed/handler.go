@@ -3,15 +3,33 @@ package main
 import (
 	"context"
 	"fmt"
+	"github.com/cloudwego/kitex/client"
+	consul "github.com/kitex-contrib/registry-consul"
+	"log"
 	"strconv"
 	"time"
 	"toktik/constant/biz"
+	"toktik/constant/config"
 	"toktik/kitex_gen/douyin/feed"
 	"toktik/kitex_gen/douyin/user"
+	"toktik/kitex_gen/douyin/user/userservice"
 	gen "toktik/repo"
 	"toktik/repo/model"
 	"toktik/storage"
 )
+
+var userClient userservice.Client
+
+func init() {
+	r, err := consul.NewConsulResolver(config.EnvConfig.CONSUL_ADDR)
+	if err != nil {
+		log.Fatal(err)
+	}
+	userClient, err = userservice.NewClient(config.UserServiceName, client.WithResolver(r))
+	if err != nil {
+		log.Fatal(err)
+	}
+}
 
 // FeedServiceImpl implements the last service interface defined in the IDL.
 type FeedServiceImpl struct{}
@@ -49,9 +67,13 @@ func (s *FeedServiceImpl) ListVideos(ctx context.Context, req *feed.ListFeedRequ
 	var videos []*feed.Video
 	for _, m := range find {
 
-		u := &user.User{
-			Id: m.UserId,
-			// TODO: fill other fields
+		userResponse, err := userClient.GetUser(ctx, &user.UserRequest{
+			UserId: m.UserId,
+			Token:  *req.Token,
+		})
+		if err != nil || userResponse.StatusCode != biz.OkStatusCode {
+			_ = fmt.Errorf("failed to get user info: %w", err)
+			continue
 		}
 
 		playUrl, err := storage.GetLink(m.FileName)
@@ -68,7 +90,7 @@ func (s *FeedServiceImpl) ListVideos(ctx context.Context, req *feed.ListFeedRequ
 
 		videos = append(videos, &feed.Video{
 			Id:       m.ID,
-			Author:   u,
+			Author:   userResponse.User,
 			PlayUrl:  playUrl,
 			CoverUrl: coverUrl,
 			// TODO: finish this
