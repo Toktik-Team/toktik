@@ -30,7 +30,7 @@ func main() {
 	douyin.GET("/feed", feed.Action)
 
 	// user service
-	userGroup := h.Group("/user")
+	userGroup := douyin.Group("/user")
 	userGroup.POST("/register/", auth.Register)
 	userGroup.POST("/login/", auth.Login)
 	userGroup.GET("/", user.GetUserInfo)
@@ -41,23 +41,23 @@ func main() {
 	publishGroup.GET("/list")
 
 	// favorite service
-	favoriteGroup := h.Group("/favorite")
+	favoriteGroup := douyin.Group("/favorite")
 	favoriteGroup.POST("/action")
 	favoriteGroup.GET("/list")
 
 	// comment service
-	commentGroup := h.Group("/comment")
+	commentGroup := douyin.Group("/comment")
 	commentGroup.POST("/action")
 	commentGroup.GET("/list")
 
 	// relation service
-	relationGroup := h.Group("/relation")
+	relationGroup := douyin.Group("/relation")
 	relationGroup.GET("/follow/list")
 	relationGroup.GET("/follower/list")
 	relationGroup.GET("/friend/list")
 
 	// message service
-	messageGroup := h.Group("/message")
+	messageGroup := douyin.Group("/message")
 	messageGroup.POST("/action")
 	messageGroup.GET("/chat")
 
