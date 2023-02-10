@@ -2,14 +2,16 @@ package publish
 
 import (
 	"context"
-	"github.com/cloudwego/hertz/pkg/app"
-	"github.com/cloudwego/hertz/pkg/protocol/consts"
-	"github.com/cloudwego/kitex/client"
-	consul "github.com/kitex-contrib/registry-consul"
 	"log"
 	"toktik/constant/config"
 	"toktik/kitex_gen/douyin/publish"
 	publishService "toktik/kitex_gen/douyin/publish/publishservice"
+	"toktik/service/web/mw"
+
+	"github.com/cloudwego/hertz/pkg/app"
+	"github.com/cloudwego/hertz/pkg/protocol/consts"
+	"github.com/cloudwego/kitex/client"
+	consul "github.com/kitex-contrib/registry-consul"
 )
 
 var publishClient publishService.Client
@@ -26,8 +28,7 @@ func init() {
 }
 
 func Action(ctx context.Context, c *app.RequestContext) {
-	// TODO: read user id from gateway
-	userId := 1
+	userId := c.GetUint32(mw.USER_ID_KEY)
 	publishResp, err := publishClient.CreateVideo(ctx, &publish.CreateVideoRequest{
 		UserId: uint32(userId),
 	})
@@ -45,5 +46,4 @@ func Action(ctx context.Context, c *app.RequestContext) {
 		consts.StatusOK,
 		publishResp,
 	)
-	return
 }
