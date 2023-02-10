@@ -1,5 +1,7 @@
 #!/bin/bash
 
+SERVICE_DIR=$(pwd)/service
+
 # Remove the output directory
 echo "Removing previous output directory..."
 rm -rf output
@@ -10,13 +12,13 @@ mkdir -p output/bin
 
 # Navigate to the service directory
 echo "Navigating to service directory..."
-cd service || exit
+cd $SERVICE_DIR || exit
 
 # Loop through all directories in the service directory
 for d in */ ; do
   echo "Building $d..."
   # Navigate into the current directory
-  cd "$d"
+  cd "$SERVICE_DIR/$d"
 
   # Remove the output directory
   echo "Removing previous output directory..."
@@ -48,6 +50,5 @@ for d in */ ; do
   fi
 
   # Navigate back to the service directory
-  cd ..
   echo "Finished building $d"
 done
