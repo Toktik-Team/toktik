@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"github.com/DATA-DOG/go-sqlmock"
 	"io"
 	"os"
 	"path"
@@ -11,14 +12,11 @@ import (
 	"testing"
 	"toktik/constant/biz"
 	"toktik/kitex_gen/douyin/publish"
-	"toktik/repo"
 	"toktik/storage"
+	"toktik/test/mock"
 
 	"bou.ke/monkey"
-	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
-	"gorm.io/driver/postgres"
-	"gorm.io/gorm"
 )
 
 var testVideo []byte
@@ -68,22 +66,9 @@ func TestPublishServiceImpl_CreateVideo(t *testing.T) {
 		// TODO: nothing
 		return nil, nil
 	})
-
-	db, mock, err := sqlmock.New()
-	DB, err := gorm.Open(postgres.New(postgres.Config{
-		DSN:                  "sqlmock_db_0",
-		DriverName:           "postgres",
-		Conn:                 db,
-		PreferSimpleProtocol: true,
-	}), &gorm.Config{})
-	if err != nil {
-		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
-	}
-	defer db.Close()
-	repo.SetDefault(DB)
-
-	mock.ExpectBegin()
-	mock.ExpectQuery(regexp.QuoteMeta(`INSERT INTO "videos" 
+	defer mock.MockConn.Close()
+	mock.DBMock.ExpectBegin()
+	mock.DBMock.ExpectQuery(regexp.QuoteMeta(`INSERT INTO "videos" 
     		("created_at","updated_at","deleted_at","user_id","title","file_name","cover_name") 
 			VALUES ($1,$2,$3,$4,$5,$6,$7) RETURNING "id"`)).
 		WithArgs(sqlmock.AnyArg(),
@@ -94,7 +79,7 @@ func TestPublishServiceImpl_CreateVideo(t *testing.T) {
 			sqlmock.AnyArg(),
 			sqlmock.AnyArg()).
 		WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(1))
-	mock.ExpectCommit()
+	mock.DBMock.ExpectCommit()
 
 	type args struct {
 		ctx context.Context
