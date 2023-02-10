@@ -69,7 +69,7 @@ func (s *FeedServiceImpl) ListVideos(ctx context.Context, req *feed.ListFeedRequ
 
 		userResponse, err := userClient.GetUser(ctx, &user.UserRequest{
 			UserId: m.UserId,
-			Token:  *req.Token,
+			Token:  req.Token,
 		})
 		if err != nil || userResponse.StatusCode != biz.OkStatusCode {
 			_ = fmt.Errorf("failed to get user info: %w", err)
