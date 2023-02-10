@@ -117,6 +117,7 @@ func (s *AuthServiceImpl) Register(ctx context.Context, req *auth.RegisterReques
 		return
 	}
 	resp.Token = token
+	resp.UserId = newUser.ID
 	resp.StatusCode = 0
 	resp.StatusMsg = "success"
 	return
@@ -153,6 +154,7 @@ func (s *AuthServiceImpl) Login(ctx context.Context, req *auth.LoginRequest) (re
 	tokens, err := userToken.WithContext(ctx).Where(userToken.UserID.Eq(dbUser[0].ID)).Find()
 	if len(tokens) == 1 {
 		resp.Token = tokens[0].Token
+		resp.UserId = dbUser[0].ID
 		resp.StatusCode = 0
 		resp.StatusMsg = "success"
 		return
@@ -176,6 +178,7 @@ func (s *AuthServiceImpl) Login(ctx context.Context, req *auth.LoginRequest) (re
 		return
 	}
 	resp.Token = token
+	resp.UserId = dbUser[0].ID
 	resp.StatusCode = 0
 	resp.StatusMsg = "success"
 	return

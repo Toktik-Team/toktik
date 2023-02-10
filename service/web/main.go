@@ -1,17 +1,18 @@
 package main
 
 import (
-	"github.com/cloudwego/hertz/pkg/app/server"
-	"github.com/hertz-contrib/gzip"
-	"github.com/hertz-contrib/pprof"
-	"github.com/hertz-contrib/swagger"
-	swaggerFiles "github.com/swaggo/files"
 	"toktik/constant/config"
 	"toktik/service/web/auth"
 	"toktik/service/web/feed"
 	"toktik/service/web/mw"
 	"toktik/service/web/publish"
 	"toktik/service/web/user"
+
+	"github.com/cloudwego/hertz/pkg/app/server"
+	"github.com/hertz-contrib/gzip"
+	"github.com/hertz-contrib/pprof"
+	"github.com/hertz-contrib/swagger"
+	swaggerFiles "github.com/swaggo/files"
 )
 
 func main() {
@@ -21,10 +22,12 @@ func main() {
 	h.Use(mw.AuthMiddleware())
 	pprof.Register(h)
 
-	h.Any("/authenticate", auth.Authenticate)
+	douyin := h.Group("/douyin")
+
+	douyin.Any("/authenticate", auth.Authenticate)
 
 	// feed service
-	h.GET("/feed", feed.Action)
+	douyin.GET("/feed", feed.Action)
 
 	// user service
 	userGroup := h.Group("/user")
@@ -33,7 +36,7 @@ func main() {
 	userGroup.GET("/", user.GetUserInfo)
 
 	// publish service
-	publishGroup := h.Group("/publish")
+	publishGroup := douyin.Group("/publish")
 	publishGroup.POST("/action/", publish.Action)
 	publishGroup.GET("/list")
 
