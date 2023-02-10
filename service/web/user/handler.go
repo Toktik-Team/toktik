@@ -45,7 +45,7 @@ func GetUserInfo(ctx context.Context, c *app.RequestContext) {
 
 	resp, err := userClient.GetUser(ctx, &user.UserRequest{
 		UserId: uint32(id),
-		Token:  token,
+		Token:  &token,
 	})
 
 	if err != nil {
