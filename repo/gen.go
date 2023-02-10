@@ -18,20 +18,26 @@ import (
 var (
 	Q         = new(Query)
 	User      *user
+	Publish   *publish
 	UserToken *userToken
+	Video     *video
 )
 
 func SetDefault(db *gorm.DB, opts ...gen.DOOption) {
 	*Q = *Use(db, opts...)
 	User = &Q.User
+	Publish = &Q.Publish
 	UserToken = &Q.UserToken
+	Video = &Q.Video
 }
 
 func Use(db *gorm.DB, opts ...gen.DOOption) *Query {
 	return &Query{
 		db:        db,
 		User:      newUser(db, opts...),
+		Publish:   newPublish(db, opts...),
 		UserToken: newUserToken(db, opts...),
+		Video:     newVideo(db, opts...),
 	}
 }
 
@@ -39,7 +45,9 @@ type Query struct {
 	db *gorm.DB
 
 	User      user
+	Publish   publish
 	UserToken userToken
+	Video     video
 }
 
 func (q *Query) Available() bool { return q.db != nil }
@@ -48,7 +56,9 @@ func (q *Query) clone(db *gorm.DB) *Query {
 	return &Query{
 		db:        db,
 		User:      q.User.clone(db),
+		Publish:   q.Publish.clone(db),
 		UserToken: q.UserToken.clone(db),
+		Video:     q.Video.clone(db),
 	}
 }
 
@@ -64,19 +74,25 @@ func (q *Query) ReplaceDB(db *gorm.DB) *Query {
 	return &Query{
 		db:        db,
 		User:      q.User.replaceDB(db),
+		Publish:   q.Publish.replaceDB(db),
 		UserToken: q.UserToken.replaceDB(db),
+		Video:     q.Video.replaceDB(db),
 	}
 }
 
 type queryCtx struct {
 	User      IUserDo
+	Publish   IPublishDo
 	UserToken IUserTokenDo
+	Video     IVideoDo
 }
 
 func (q *Query) WithContext(ctx context.Context) *queryCtx {
 	return &queryCtx{
 		User:      q.User.WithContext(ctx),
+		Publish:   q.Publish.WithContext(ctx),
 		UserToken: q.UserToken.WithContext(ctx),
+		Video:     q.Video.WithContext(ctx),
 	}
 }
 

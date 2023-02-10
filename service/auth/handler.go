@@ -117,7 +117,7 @@ func (s *AuthServiceImpl) Register(ctx context.Context, req *auth.RegisterReques
 		return
 	}
 	resp.Token = token
-	resp.UserID = newUser.ID,
+	resp.UserId = newUser.ID
 	resp.StatusCode = 0
 	resp.StatusMsg = "success"
 	return

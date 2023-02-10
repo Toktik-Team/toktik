@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
-	"toktik/config"
+	"toktik/constant/config"
 	"toktik/repo/model"
 	auth "toktik/service/auth/model"
 )
@@ -14,14 +14,14 @@ func main() {
 	db, err := gorm.Open(
 		postgres.New(
 			postgres.Config{
-				DSN: config.DSN,
+				DSN: config.EnvConfig.GetDSN(),
 			}), &gorm.Config{
 			DisableForeignKeyConstraintWhenMigrating: true,
 		})
 	if err != nil {
 		panic(fmt.Errorf("db connection failed: %v", err))
 	}
-	err = db.AutoMigrate(&auth.UserToken{}, model.User{})
+	err = db.AutoMigrate(&auth.UserToken{}, model.User{}, &model.Video{})
 	if err != nil {
 		panic(fmt.Errorf("db migrate failed: %v", err))
 	}

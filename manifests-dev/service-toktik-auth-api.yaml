@@ -1,17 +1,17 @@
 apiVersion: v1
 kind: Service
 metadata:
-    labels:
-        app: toktik-auth-api
-    name: toktik-auth-api
-    namespace: toktik-service-bundle
+  labels:
+    app: toktik-auth-api
+  name: toktik-auth-api
+  namespace: toktik-service-bundle
 spec:
-    ports:
-        -   name: grpc
-            port: 40127
-            protocol: TCP
-            targetPort: 40127
-    selector:
-        name: toktik-auth-api
-        branch: dev
-    type: ClusterIP
+  ports:
+    - name: grpc
+      port: 40127
+      protocol: TCP
+      targetPort: 40127
+  selector:
+    name: toktik-auth-api
+    branch: dev
+  type: ClusterIP
