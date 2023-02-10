@@ -23,6 +23,6 @@ jobs:
         run: |
           for dir in service/*/; do
             pushd "$dir"
-              go test -v -cover ./...
+              go test -gcflags=-l -v -cover ./...
             popd
           done
