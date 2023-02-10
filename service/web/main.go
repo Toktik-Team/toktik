@@ -1,23 +1,24 @@
 package main
 
 import (
-	"toktik/constant/config"
-	"toktik/service/web/auth"
-	"toktik/service/web/feed"
-	"toktik/service/web/mw"
-	"toktik/service/web/publish"
-
 	"github.com/cloudwego/hertz/pkg/app/server"
 	"github.com/hertz-contrib/gzip"
 	"github.com/hertz-contrib/pprof"
 	"github.com/hertz-contrib/swagger"
 	swaggerFiles "github.com/swaggo/files"
+	"toktik/constant/config"
+	"toktik/service/web/auth"
+	"toktik/service/web/feed"
+	"toktik/service/web/mw"
+	"toktik/service/web/publish"
+	"toktik/service/web/user"
 )
 
 func main() {
 	h := server.Default(server.WithHostPorts(config.WebServiceAddr))
 	h.Use(gzip.Gzip(gzip.DefaultCompression))
 	h.Use(mw.ProtoJsonMiddleware())
+	h.Use(mw.AuthMiddleware())
 	pprof.Register(h)
 
 	h.Any("/authenticate", auth.Authenticate)
@@ -27,9 +28,9 @@ func main() {
 
 	// user service
 	userGroup := h.Group("/user")
-	userGroup.POST("/register")
-	userGroup.POST("/login")
-	userGroup.GET("/")
+	userGroup.POST("/register/", auth.Register)
+	userGroup.POST("/login/", auth.Login)
+	userGroup.GET("/", user.GetUserInfo)
 
 	// publish service
 	publishGroup := h.Group("/publish")

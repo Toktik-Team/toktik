@@ -2,11 +2,15 @@ package main
 
 import (
 	"context"
-	"github.com/stretchr/testify/mock"
+	"database/sql"
+	"github.com/DATA-DOG/go-sqlmock"
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
 	"reflect"
+	"regexp"
 	"testing"
 	"toktik/kitex_gen/douyin/auth"
-	"toktik/service/auth/model"
+	"toktik/repo"
 )
 
 var successArg = struct {
@@ -20,23 +24,14 @@ var successResp = &auth.AuthenticateResponse{
 	UserId:     114514,
 }
 
-type MockUserTokenDo struct {
-	mock.Mock
-}
-
-func (m *MockUserTokenDo) First() (*model.UserToken, error) {
-	//TODO implement me
-	panic("implement me")
-}
-
 func TestAuthServiceImpl_Authenticate(t *testing.T) {
-	testDo := new(MockUserTokenDo)
-	testDo.On("First", successArg).Return(model.UserToken{
-		Token:    "",
-		Username: "",
-		UserID:   0,
-		Role:     "",
-	}, nil)
+	mock, db := NewDBMock(t)
+	defer db.Close()
+	mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "user_tokens" WHERE "user_tokens"."token" = $1 ORDER BY "user_tokens"."token" LIMIT 1`)).
+		WithArgs(sqlmock.AnyArg()).
+		WillReturnRows(sqlmock.NewRows([]string{"id", "user_id", "token", "created_at", "updated_at"}).
+			AddRow(1, 114514, "authenticated-token", "2021-01-01 00:00:00", "2021-01-01 00:00:00"))
+
 	type args struct {
 		ctx context.Context
 		req *auth.AuthenticateRequest
@@ -62,4 +57,19 @@ func TestAuthServiceImpl_Authenticate(t *testing.T) {
 			}
 		})
 	}
+}
+
+func NewDBMock(t *testing.T) (sqlmock.Sqlmock, *sql.DB) {
+	db, mock, err := sqlmock.New()
+	DB, err := gorm.Open(postgres.New(postgres.Config{
+		DSN:                  "sqlmock_db_0",
+		DriverName:           "postgres",
+		Conn:                 db,
+		PreferSimpleProtocol: true,
+	}), &gorm.Config{})
+	if err != nil {
+		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+	}
+	repo.SetDefault(DB)
+	return mock, db
 }

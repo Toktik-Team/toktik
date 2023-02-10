@@ -19,7 +19,7 @@ require (
 	github.com/hertz-contrib/swagger v0.0.0-20220711030440-b6402d4709f0
 	github.com/joho/godotenv v1.5.0
 	github.com/kitex-contrib/registry-consul v0.0.0-20221024133802-971ac457240a
-	github.com/stretchr/testify v1.8.0
+	github.com/segmentio/ksuid v1.0.4
 	github.com/swaggo/files v1.0.0
 	golang.org/x/crypto v0.4.0
 	google.golang.org/protobuf v1.28.1
@@ -59,7 +59,6 @@ require (
 	github.com/cloudwego/frugal v0.1.3 // indirect
 	github.com/cloudwego/netpoll v0.3.1 // indirect
 	github.com/cloudwego/thriftgo v0.2.4 // indirect
-	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/fatih/color v1.13.0 // indirect
 	github.com/fsnotify/fsnotify v1.5.4 // indirect
 	github.com/go-logr/logr v1.2.3 // indirect
@@ -100,10 +99,8 @@ require (
 	github.com/nwaples/rardecode v1.1.0 // indirect
 	github.com/nyaruka/phonenumbers v1.0.55 // indirect
 	github.com/oleiade/lane v1.0.1 // indirect
-	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/savsgio/gotils v0.0.0-20220530130905-52f3993e8d6d // indirect
 	github.com/sirupsen/logrus v1.8.1 // indirect
-	github.com/stretchr/objx v0.4.0 // indirect
 	github.com/swaggo/swag v1.8.2 // indirect
 	github.com/tidwall/gjson v1.13.0 // indirect
 	github.com/tidwall/match v1.1.1 // indirect

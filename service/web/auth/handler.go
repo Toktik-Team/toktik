@@ -2,6 +2,7 @@ package auth
 
 import (
 	"context"
+	"fmt"
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
 	"github.com/cloudwego/kitex/client"
@@ -29,13 +30,64 @@ func init() {
 func Authenticate(ctx context.Context, c *app.RequestContext) {
 	token, exist := c.GetQuery("token")
 	if !exist {
-		c.String(consts.StatusUnauthorized, "failed")
+		c.JSON(consts.StatusUnauthorized, &auth.AuthenticateResponse{
+			StatusCode: 1,
+			StatusMsg:  "no token",
+		})
 		return
 	}
 	authenticateResp, err := Client.Authenticate(ctx, &auth.AuthenticateRequest{Token: token})
 	if err != nil {
-		c.String(consts.StatusUnauthorized, "failed")
+		c.JSON(consts.StatusUnauthorized, authenticateResp)
 		return
 	}
 	c.String(consts.StatusOK, strconv.Itoa(int(authenticateResp.UserId)))
+}
+
+func Register(ctx context.Context, c *app.RequestContext) {
+	username, usernameExist := c.GetQuery("username")
+	password, passwordExist := c.GetQuery("password")
+	if !usernameExist || !passwordExist {
+		c.JSON(consts.StatusUnauthorized, &auth.RegisterResponse{
+			StatusCode: 1,
+			StatusMsg:  "no username or password",
+		})
+		return
+	}
+	registerResponse, err := Client.Register(ctx, &auth.RegisterRequest{
+		Username: username,
+		Password: password,
+	})
+	if err != nil {
+		c.JSON(consts.StatusUnauthorized, &auth.RegisterResponse{
+			StatusCode: 1,
+			StatusMsg:  fmt.Sprintf("unknown error: %v", err),
+		})
+		return
+	}
+	c.JSON(consts.StatusOK, registerResponse)
+}
+
+func Login(ctx context.Context, c *app.RequestContext) {
+	username, usernameExist := c.GetQuery("username")
+	password, passwordExist := c.GetQuery("password")
+	if !usernameExist || !passwordExist {
+		c.JSON(consts.StatusUnauthorized, &auth.RegisterResponse{
+			StatusCode: 1,
+			StatusMsg:  "no username or password",
+		})
+		return
+	}
+	loginResponse, err := Client.Login(ctx, &auth.LoginRequest{
+		Username: username,
+		Password: password,
+	})
+	if err != nil {
+		c.JSON(consts.StatusUnauthorized, &auth.RegisterResponse{
+			StatusCode: 1,
+			StatusMsg:  fmt.Sprintf("unknown error: %v", err),
+		})
+		return
+	}
+	c.JSON(consts.StatusOK, loginResponse)
 }

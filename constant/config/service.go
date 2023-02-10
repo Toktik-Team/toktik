@@ -11,3 +11,6 @@ const PublishServiceAddr = ":40128"
 
 const FeedServiceName = "toktik-feed-api"
 const FeedServiceAddr = ":40129"
+
+const UserServiceName = "toktik-user"
+const UserServiceAddr = ":40130"
