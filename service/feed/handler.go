@@ -43,7 +43,7 @@ func (s *FeedServiceImpl) ListVideos(ctx context.Context, req *feed.ListFeedRequ
 	if err != nil {
 		resp = &feed.ListFeedResponse{
 			StatusCode: biz.SQLQueryErrorStatusCode,
-			StatusMsg:  &biz.InternalErrorMsg,
+			StatusMsg:  &biz.InternalServerErrorStatusMsg,
 			NextTime:   nil,
 			Videos:     nil,
 		}
