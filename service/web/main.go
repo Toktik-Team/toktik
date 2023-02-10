@@ -31,34 +31,33 @@ func main() {
 
 	// user service
 	userGroup := douyin.Group("/user")
-	userGroup.POST("/register", auth.Register)
-	userGroup.POST("/login", auth.Login)
+	userGroup.POST("/register/", auth.Register)
+	userGroup.POST("/login/", auth.Login)
 	userGroup.GET("/", user.GetUserInfo)
 
 	// publish service
 	publishGroup := douyin.Group("/publish")
-	publishGroup.POST("/action", publish.Action)
-
+	publishGroup.POST("/action/", publish.Action)
 	publishGroup.GET("/list")
 
 	// favorite service
-	favoriteGroup := douyin.Group("/favorite")
+	favoriteGroup := h.Group("/favorite")
 	favoriteGroup.POST("/action")
 	favoriteGroup.GET("/list")
 
 	// comment service
-	commentGroup := douyin.Group("/comment")
+	commentGroup := h.Group("/comment")
 	commentGroup.POST("/action")
 	commentGroup.GET("/list")
 
 	// relation service
-	relationGroup := douyin.Group("/relation")
+	relationGroup := h.Group("/relation")
 	relationGroup.GET("/follow/list")
 	relationGroup.GET("/follower/list")
 	relationGroup.GET("/friend/list")
 
 	// message service
-	messageGroup := douyin.Group("/message")
+	messageGroup := h.Group("/message")
 	messageGroup.POST("/action")
 	messageGroup.GET("/chat")
 
