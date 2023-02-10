@@ -43,7 +43,8 @@ func (x *UserRequest) fastReadField1(buf []byte, _type int8) (offset int, err er
 }
 
 func (x *UserRequest) fastReadField2(buf []byte, _type int8) (offset int, err error) {
-	x.Token, offset, err = fastpb.ReadString(buf, _type)
+	tmp, offset, err := fastpb.ReadString(buf, _type)
+	x.Token = &tmp
 	return offset, err
 }
 
@@ -180,10 +181,10 @@ func (x *UserRequest) fastWriteField1(buf []byte) (offset int) {
 }
 
 func (x *UserRequest) fastWriteField2(buf []byte) (offset int) {
-	if x.Token == "" {
+	if x.Token == nil {
 		return offset
 	}
-	offset += fastpb.WriteString(buf[offset:], 2, x.Token)
+	offset += fastpb.WriteString(buf[offset:], 2, *x.Token)
 	return offset
 }
 
@@ -291,10 +292,10 @@ func (x *UserRequest) sizeField1() (n int) {
 }
 
 func (x *UserRequest) sizeField2() (n int) {
-	if x.Token == "" {
+	if x.Token == nil {
 		return n
 	}
-	n += fastpb.SizeString(2, x.Token)
+	n += fastpb.SizeString(2, *x.Token)
 	return n
 }
 

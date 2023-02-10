@@ -4,7 +4,7 @@ option go_package = "douyin/user";
 
 message UserRequest {
   uint32 user_id = 1; // 用户id
-  string token = 2; // 用户鉴权token
+  optional string token = 2; // 用户鉴权token // No required needed for RPC request
 }
 
 message UserResponse {
