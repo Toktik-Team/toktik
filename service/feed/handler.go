@@ -18,14 +18,14 @@ import (
 	"toktik/storage"
 )
 
-var userClient userservice.Client
+var UserClient userservice.Client
 
 func init() {
 	r, err := consul.NewConsulResolver(config.EnvConfig.CONSUL_ADDR)
 	if err != nil {
 		log.Fatal(err)
 	}
-	userClient, err = userservice.NewClient(config.UserServiceName, client.WithResolver(r))
+	UserClient, err = userservice.NewClient(config.UserServiceName, client.WithResolver(r))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -67,24 +67,24 @@ func (s *FeedServiceImpl) ListVideos(ctx context.Context, req *feed.ListFeedRequ
 	var videos []*feed.Video
 	for _, m := range find {
 
-		userResponse, err := userClient.GetUser(ctx, &user.UserRequest{
+		userResponse, err := UserClient.GetUser(ctx, &user.UserRequest{
 			UserId: m.UserId,
 			Token:  req.Token,
 		})
 		if err != nil || userResponse.StatusCode != biz.OkStatusCode {
-			_ = fmt.Errorf("failed to get user info: %w", err)
+			log.Println(fmt.Errorf("failed to get user info: %w", err))
 			continue
 		}
 
 		playUrl, err := storage.GetLink(m.FileName)
 		if err != nil {
-			_ = fmt.Errorf("failed to fetch play url: %w", err)
+			log.Println(fmt.Errorf("failed to fetch play url: %w", err))
 			continue
 		}
 
 		coverUrl, err := storage.GetLink(m.CoverName)
 		if err != nil {
-			_ = fmt.Errorf("failed to fetch cover url: %w", err)
+			log.Println(fmt.Errorf("failed to fetch cover url: %w", err))
 			continue
 		}
 

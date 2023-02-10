@@ -4,6 +4,7 @@ import (
 	"bou.ke/monkey"
 	"context"
 	"github.com/DATA-DOG/go-sqlmock"
+	"github.com/cloudwego/kitex/client/callopt"
 	"os"
 	"reflect"
 	"regexp"
@@ -25,22 +26,24 @@ var (
 	respVideos = make([]*feed.Video, mockVideoCount)
 )
 
+var mockUser = user.User{Id: 65535}
+
 func TestMain(m *testing.M) {
-	now := int64(0) // time.Now().UnixMilli()
+	now := time.Now().UnixMilli()
 	for i := 0; i < mockVideoCount; i++ {
 		test := &model.Video{
 			Model: model.Model{
 				ID:        uint32(i),
 				CreatedAt: time.UnixMilli(now).Add(time.Duration(i) * time.Second),
 			},
-			UserId:    65535,
+			UserId:    mockUser.Id,
 			Title:     "Test Video " + strconv.Itoa(i),
 			FileName:  "test_video_file_" + strconv.Itoa(i) + ".mp4",
 			CoverName: "test_video_cover_file_" + strconv.Itoa(i) + ".png",
 		}
 		resp := &feed.Video{
 			Id:            uint32(i),
-			Author:        &user.User{Id: 65535},
+			Author:        &mockUser,
 			PlayUrl:       "https://test.com/test_video_file_" + strconv.Itoa(i) + ".mp4",
 			CoverUrl:      "https://test.com/test_video_cover_file_" + strconv.Itoa(i) + ".png",
 			FavoriteCount: 0,     // TODO
@@ -74,6 +77,8 @@ func TestFeedServiceImpl_ListVideos(t *testing.T) {
 		NextTime:   &expectedNextTime,
 		Videos:     respVideos[:biz.VideoCount],
 	}
+
+	UserClient = MockUserClient{}
 
 	monkey.Patch(storage.GetLink, func(fileName string) (string, error) {
 		return "https://test.com/" + fileName, nil
@@ -133,4 +138,11 @@ func reverseFeedVideo(s []*feed.Video) []*feed.Video {
 		s[i], s[j] = s[j], s[i]
 	}
 	return s
+}
+
+type MockUserClient struct {
+}
+
+func (m MockUserClient) GetUser(ctx context.Context, Req *user.UserRequest, callOptions ...callopt.Option) (r *user.UserResponse, err error) {
+	return &user.UserResponse{StatusCode: biz.OkStatusCode, User: &mockUser}, nil
 }
