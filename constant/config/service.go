@@ -6,7 +6,7 @@ const WebServiceAddr = ":40126"
 const AuthServiceName = "toktik-auth-api"
 const AuthServiceAddr = ":40127"
 
-const PublishServiceName = "toktik-publish"
+const PublishServiceName = "toktik-publish-api"
 const PublishServiceAddr = ":40128"
 
 const FeedServiceName = "toktik-feed-api"
