@@ -17,6 +17,14 @@ RUN bash build-all.sh
 # 运行环境
 FROM docker.io/ubuntu:lunar-20230128
 ENV TZ=Asia/Shanghai
+ENV DEBIAN_FRONTEND=noninteractive
+
+# FFmpeg 及依赖
+RUN apt-get update && \
+    apt-get install -yq ffmpeg libavcodec-dev libavutil-dev libavformat-dev libswscale-dev && \
+    apt-get clean && \
+    apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false && \
+    rm -rf /var/lib/apt/lists/*
 
 # RUN mkdir -p /data/apps/toktik-service-bundle
 WORKDIR /data/apps/toktik-service-bundle
