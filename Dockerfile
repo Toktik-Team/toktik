@@ -16,7 +16,7 @@ WORKDIR /source
 COPY . .
 
 # 编译
-RUN bash build-all.sh
+RUN bash unit-test.sh && bash build-all.sh
 
 # 运行环境
 FROM docker.io/ubuntu:lunar-20230128

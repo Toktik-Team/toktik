@@ -3,7 +3,7 @@ name: Docker Image CI
 on:
   workflow_dispatch:
   push:
-    branches: [ "feat-auth-srv" ]
+    branches: [ "feat-github-action-unit-test" ]
   pull_request:
     branches: [ "main" ]
 
