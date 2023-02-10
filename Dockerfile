@@ -1,10 +1,14 @@
 # 编译镜像
 FROM docker.io/golang:1.19.5-bullseye AS build
 ENV TZ=Asia/Shanghai
+ENV DEBIAN_FRONTEND=noninteractive
 
-# 配置 git
-RUN apt update
-RUN apt install git
+# 构建依赖
+RUN apt-get update && \
+    apt-get install -yq git ffmpeg libavcodec-dev libavutil-dev libavformat-dev libswscale-dev && \
+    apt-get clean && \
+    apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false && \
+    rm -rf /var/lib/apt/lists/*
 
 # 获取文件
 RUN mkdir -p /source
@@ -21,7 +25,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 # FFmpeg 及依赖
 RUN apt-get update && \
-    apt-get install -yq ffmpeg libavcodec-dev libavutil-dev libavformat-dev libswscale-dev && \
+    apt-get install -yq ffmpeg && \
     apt-get clean && \
     apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false && \
     rm -rf /var/lib/apt/lists/*
