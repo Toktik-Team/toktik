@@ -11,18 +11,16 @@ import (
 
 var EnvConfig = envConfigSchema{}
 
-const WebServiceName = "toktik-api-gateway"
-const WebServiceAddr = ":40126"
+func (s *envConfigSchema) GetDSN() string {
+	return dsn
+}
 
-const AuthServiceName = "toktik-auth-api"
-const AuthServiceAddr = ":40127"
-
-var DSN string
+var dsn string
 
 func init() {
 	envInit()
 	envValidate()
-	DSN = fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s",
+	dsn = fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s",
 		EnvConfig.PGSQL_HOST,
 		EnvConfig.PGSQL_USER,
 		EnvConfig.PGSQL_PASSWORD,
@@ -44,6 +42,13 @@ var defaultConfig = envConfigSchema{
 	REDIS_ADDR:     "localhost:6379",
 	REDIS_PASSWORD: "",
 	REDIS_DB:       "0",
+
+	S3_ENDPOINT_URL: "http://localhost:9000",
+	S3_PUBLIC_URL:   "http://localhost:9000",
+	S3_BUCKET:       "bucket",
+	S3_SECRET_ID:    "minio",
+	S3_SECRET_KEY:   "12345678",
+	S3_PATH_STYLE:   "true",
 }
 
 type envConfigSchema struct {
@@ -60,6 +65,13 @@ type envConfigSchema struct {
 	REDIS_ADDR     string
 	REDIS_PASSWORD string
 	REDIS_DB       string
+
+	S3_ENDPOINT_URL string
+	S3_PUBLIC_URL   string
+	S3_BUCKET       string
+	S3_SECRET_ID    string
+	S3_SECRET_KEY   string
+	S3_PATH_STYLE   string
 }
 
 func (s *envConfigSchema) IsDev() bool {
@@ -72,21 +84,22 @@ func envValidate() {
 
 // envInit Reads .env as environment variables and fill corresponding fields into EnvConfig.
 // To use a value from EnvConfig , simply call EnvConfig.FIELD like EnvConfig.ENV
+// Note: Please keep Env as the first field of envConfigSchema for better logging.
 func envInit() {
 	err := godotenv.Load()
 	if err != nil {
 		log.Print("Error loading .env file, ignored")
 	}
 	v := reflect.ValueOf(defaultConfig)
-	typeOfS := v.Type()
+	typeOfV := v.Type()
 
 	for i := 0; i < v.NumField(); i++ {
 		envNameAlt := make([]string, 0)
-		fieldName := typeOfS.Field(i).Name
+		fieldName := typeOfV.Field(i).Name
 		fieldValue := v.Field(i).Interface()
 
 		envNameAlt = append(envNameAlt, fieldName)
-		if fieldTag, ok := typeOfS.Field(i).Tag.Lookup("env"); ok && len(fieldTag) > 0 {
+		if fieldTag, ok := typeOfV.Field(i).Tag.Lookup("env"); ok && len(fieldTag) > 0 {
 			tags := strings.Split(fieldTag, ",")
 			envNameAlt = append(envNameAlt, tags...)
 		}
