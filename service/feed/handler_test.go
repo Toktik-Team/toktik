@@ -4,8 +4,7 @@ import (
 	"bou.ke/monkey"
 	"context"
 	"github.com/DATA-DOG/go-sqlmock"
-	"gorm.io/driver/postgres"
-	"gorm.io/gorm"
+	"github.com/cloudwego/kitex/client/callopt"
 	"os"
 	"reflect"
 	"regexp"
@@ -15,9 +14,9 @@ import (
 	"toktik/constant/biz"
 	"toktik/kitex_gen/douyin/feed"
 	"toktik/kitex_gen/douyin/user"
-	"toktik/repo"
 	"toktik/repo/model"
 	"toktik/storage"
+	"toktik/test/mock"
 )
 
 const mockVideoCount = 50
@@ -27,22 +26,24 @@ var (
 	respVideos = make([]*feed.Video, mockVideoCount)
 )
 
+var mockUser = user.User{Id: 65535}
+
 func TestMain(m *testing.M) {
-	now := int64(0) // time.Now().UnixMilli()
+	now := time.Now().UnixMilli()
 	for i := 0; i < mockVideoCount; i++ {
 		test := &model.Video{
 			Model: model.Model{
 				ID:        uint32(i),
 				CreatedAt: time.UnixMilli(now).Add(time.Duration(i) * time.Second),
 			},
-			UserId:    65535,
+			UserId:    mockUser.Id,
 			Title:     "Test Video " + strconv.Itoa(i),
 			FileName:  "test_video_file_" + strconv.Itoa(i) + ".mp4",
 			CoverName: "test_video_cover_file_" + strconv.Itoa(i) + ".png",
 		}
 		resp := &feed.Video{
 			Id:            uint32(i),
-			Author:        &user.User{Id: 65535},
+			Author:        &mockUser,
 			PlayUrl:       "https://test.com/test_video_file_" + strconv.Itoa(i) + ".mp4",
 			CoverUrl:      "https://test.com/test_video_cover_file_" + strconv.Itoa(i) + ".png",
 			FavoriteCount: 0,     // TODO
@@ -77,29 +78,19 @@ func TestFeedServiceImpl_ListVideos(t *testing.T) {
 		Videos:     respVideos[:biz.VideoCount],
 	}
 
+	UserClient = MockUserClient{}
+
 	monkey.Patch(storage.GetLink, func(fileName string) (string, error) {
 		return "https://test.com/" + fileName, nil
 	})
-
-	db, mock, err := sqlmock.New()
-	DB, err := gorm.Open(postgres.New(postgres.Config{
-		DSN:                  "sqlmock_db_0",
-		DriverName:           "postgres",
-		Conn:                 db,
-		PreferSimpleProtocol: true,
-	}), &gorm.Config{})
-	if err != nil {
-		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
-	}
-	defer db.Close()
-	repo.SetDefault(DB)
 
 	rows := sqlmock.NewRows([]string{"id", "created_at", "updated_at", "deleted_at", "user_id", "title", "file_name", "cover_name"})
 	for _, v := range testVideos[:biz.VideoCount] {
 		rows.AddRow(v.ID, v.CreatedAt, nil, nil, v.UserId, v.Title, v.FileName, v.CoverName)
 	}
 
-	mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "videos" WHERE "videos"."created_at" <= $1 AND "videos"."deleted_at" IS NULL ORDER BY "videos"."created_at" DESC LIMIT ` + strconv.Itoa(biz.VideoCount))).
+	mock.DBMock.
+		ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "videos" WHERE "videos"."created_at" <= $1 AND "videos"."deleted_at" IS NULL ORDER BY "videos"."created_at" DESC LIMIT ` + strconv.Itoa(biz.VideoCount))).
 		WillReturnRows(rows)
 
 	type args struct {
@@ -147,4 +138,11 @@ func reverseFeedVideo(s []*feed.Video) []*feed.Video {
 		s[i], s[j] = s[j], s[i]
 	}
 	return s
+}
+
+type MockUserClient struct {
+}
+
+func (m MockUserClient) GetUser(ctx context.Context, Req *user.UserRequest, callOptions ...callopt.Option) (r *user.UserResponse, err error) {
+	return &user.UserResponse{StatusCode: biz.OkStatusCode, User: &mockUser}, nil
 }
