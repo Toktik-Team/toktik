@@ -19,7 +19,7 @@ COPY . .
 RUN bash unit-test.sh && bash build-all.sh
 
 # 运行环境
-FROM docker.io/ubuntu:lunar-20230128
+FROM docker.io/debian:bullseye-slim
 ENV TZ=Asia/Shanghai
 ENV DEBIAN_FRONTEND=noninteractive
 
