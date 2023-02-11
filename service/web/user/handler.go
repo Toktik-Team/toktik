@@ -28,10 +28,10 @@ func init() {
 
 func GetUserInfo(ctx context.Context, c *app.RequestContext) {
 	userId, idExist := c.GetQuery("user_id")
-	token, tokenExist := c.GetQuery("token")
+	requesterId := c.GetUint32("user_id")
 	id, err := strconv.Atoi(userId)
 
-	if !idExist || !tokenExist || err != nil {
+	if !idExist || err != nil {
 		c.JSON(
 			consts.StatusBadRequest,
 			&user.UserResponse{
@@ -44,8 +44,8 @@ func GetUserInfo(ctx context.Context, c *app.RequestContext) {
 	}
 
 	resp, err := userClient.GetUser(ctx, &user.UserRequest{
-		UserId: uint32(id),
-		Token:  &token,
+		UserId:      uint32(id),
+		RequesterId: requesterId,
 	})
 
 	if err != nil {

@@ -67,7 +67,8 @@ func TestFeedServiceImpl_ListVideos(t *testing.T) {
 		ctx context.Context
 		req *feed.ListFeedRequest
 	}{ctx: context.Background(), req: &feed.ListFeedRequest{
-		LatestTime: &pTime,
+		LatestTime:  &pTime,
+		RequesterId: nil,
 	}}
 
 	expectedNextTime := testVideos[biz.VideoCount-1].CreatedAt.Add(time.Duration(-1)).UnixMilli()
