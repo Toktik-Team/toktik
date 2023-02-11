@@ -146,7 +146,7 @@ func (x *ListFeedRequest) fastReadField1(buf []byte, _type int8) (offset int, er
 
 func (x *ListFeedRequest) fastReadField2(buf []byte, _type int8) (offset int, err error) {
 	tmp, offset, err := fastpb.ReadUint32(buf, _type)
-	x.RequesterId = &tmp
+	x.ActorId = &tmp
 	return offset, err
 }
 
@@ -309,10 +309,10 @@ func (x *ListFeedRequest) fastWriteField1(buf []byte) (offset int) {
 }
 
 func (x *ListFeedRequest) fastWriteField2(buf []byte) (offset int) {
-	if x.RequesterId == nil {
+	if x.ActorId == nil {
 		return offset
 	}
-	offset += fastpb.WriteUint32(buf[offset:], 2, *x.RequesterId)
+	offset += fastpb.WriteUint32(buf[offset:], 2, *x.ActorId)
 	return offset
 }
 
@@ -458,10 +458,10 @@ func (x *ListFeedRequest) sizeField1() (n int) {
 }
 
 func (x *ListFeedRequest) sizeField2() (n int) {
-	if x.RequesterId == nil {
+	if x.ActorId == nil {
 		return n
 	}
-	n += fastpb.SizeUint32(2, *x.RequesterId)
+	n += fastpb.SizeUint32(2, *x.ActorId)
 	return n
 }
 
@@ -523,7 +523,7 @@ var fieldIDToName_Video = map[int32]string{
 
 var fieldIDToName_ListFeedRequest = map[int32]string{
 	1: "LatestTime",
-	2: "RequesterId",
+	2: "ActorId",
 }
 
 var fieldIDToName_ListFeedResponse = map[int32]string{

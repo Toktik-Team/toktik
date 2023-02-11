@@ -18,7 +18,7 @@ message Video {
 
 message ListFeedRequest {
   optional string latest_time = 1; // 限制返回视频的最新投稿时间戳，精确到秒，不填表示当前时间
-  optional uint32 requester_id = 2; // 发送请求的用户的id
+  optional uint32 actor_id = 2; // 发送请求的用户的id
 }
 
 message ListFeedResponse {

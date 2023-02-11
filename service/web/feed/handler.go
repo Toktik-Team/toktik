@@ -26,11 +26,11 @@ func init() {
 }
 func Action(ctx context.Context, c *app.RequestContext) {
 	latestTime := c.Query("latest_time")
-	requesterId := c.GetUint32("user_id")
+	actorId := c.GetUint32("user_id")
 
 	response, err := feedClient.ListVideos(ctx, &feed.ListFeedRequest{
-		LatestTime:  &latestTime,
-		RequesterId: &requesterId,
+		LatestTime: &latestTime,
+		ActorId:    &actorId,
 	})
 	if err != nil {
 		c.JSON(

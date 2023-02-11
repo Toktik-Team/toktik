@@ -65,16 +65,16 @@ func (s *FeedServiceImpl) ListVideos(ctx context.Context, req *feed.ListFeedRequ
 	nextTime := find[len(find)-1].CreatedAt.Add(time.Duration(-1)).UnixMilli()
 
 	var videos []*feed.Video
-	var requesterId uint32 = 0
-	if req.RequesterId != nil {
-		requesterId = *req.RequesterId
+	var actorId uint32 = 0
+	if req.ActorId != nil {
+		actorId = *req.ActorId
 	}
-	
+
 	for _, m := range find {
 
 		userResponse, err := UserClient.GetUser(ctx, &user.UserRequest{
-			UserId:      m.UserId,
-			RequesterId: requesterId,
+			UserId:  m.UserId,
+			ActorId: actorId,
 		})
 		if err != nil || userResponse.StatusCode != biz.OkStatusCode {
 			log.Println(fmt.Errorf("failed to get user info: %w", err))
