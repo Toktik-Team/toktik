@@ -11,19 +11,6 @@ type UserServiceImpl struct{}
 
 // GetUser implements the UserServiceImpl interface.
 func (s *UserServiceImpl) GetUser(ctx context.Context, req *user.UserRequest) (resp *user.UserResponse, err error) {
-	// FIXME: this is no needed, because we have already checked the token in the web gateway
-	//userToken := repo.UserToken
-	//_, err = userToken.WithContext(ctx).Where(userToken.Token.Eq(req.Token)).First()
-	//
-	//if err != nil {
-	//	resp = &user.UserResponse{
-	//		StatusCode: 1,
-	//		StatusMsg:  "user not logged in",
-	//		User:       nil,
-	//	}
-	//	return
-	//}
-
 	userInfo := repo.User
 	u, err := userInfo.WithContext(ctx).Where(userInfo.ID.Eq(req.UserId)).First()
 

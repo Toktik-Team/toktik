@@ -1,10 +1,7 @@
 package main
 
 import (
-	"bou.ke/monkey"
 	"context"
-	"github.com/DATA-DOG/go-sqlmock"
-	"github.com/cloudwego/kitex/client/callopt"
 	"os"
 	"reflect"
 	"regexp"
@@ -17,6 +14,10 @@ import (
 	"toktik/repo/model"
 	"toktik/storage"
 	"toktik/test/mock"
+
+	"bou.ke/monkey"
+	"github.com/DATA-DOG/go-sqlmock"
+	"github.com/cloudwego/kitex/client/callopt"
 )
 
 const mockVideoCount = 50
@@ -68,6 +69,7 @@ func TestFeedServiceImpl_ListVideos(t *testing.T) {
 		req *feed.ListFeedRequest
 	}{ctx: context.Background(), req: &feed.ListFeedRequest{
 		LatestTime: &pTime,
+		ActorId:    nil,
 	}}
 
 	expectedNextTime := testVideos[biz.VideoCount-1].CreatedAt.Add(time.Duration(-1)).UnixMilli()
