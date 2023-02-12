@@ -36,16 +36,19 @@ func init() {
 	})
 }
 
-// Upload to the s3 storage using given fileName
-func Upload(fileName string, content io.Reader) (*s3.PutObjectOutput, error) {
-	resp, err := client.PutObject(context.TODO(), &s3.PutObjectInput{
+type S3Storage struct {
+}
+
+func (s S3Storage) Upload(fileName string, content io.Reader) (*PutObjectOutput, error) {
+	_, err := client.PutObject(context.TODO(), &s3.PutObjectInput{
 		Bucket: &appcfg.EnvConfig.S3_BUCKET,
 		Key:    &fileName,
 		Body:   content,
 	})
-	return resp, err
+
+	return &PutObjectOutput{}, err
 }
 
-func GetLink(fileName string) (string, error) {
+func (s S3Storage) GetLink(fileName string) (string, error) {
 	return url.JoinPath(appcfg.EnvConfig.S3_PUBLIC_URL, fileName)
 }

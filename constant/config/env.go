@@ -2,12 +2,11 @@ package config
 
 import (
 	"fmt"
+	"github.com/joho/godotenv"
 	"log"
 	"os"
 	"reflect"
 	"strings"
-
-	"github.com/joho/godotenv"
 )
 
 var EnvConfig = envConfigSchema{}
@@ -44,6 +43,11 @@ var defaultConfig = envConfigSchema{
 	REDIS_PASSWORD: "",
 	REDIS_DB:       "0",
 
+	STORAGE_TYPE: "s3",
+
+	LOCAL_FS_LOCATION: "/tmp",
+	LOCAL_FS_BASEURL:  "http://localhost/",
+
 	S3_ENDPOINT_URL: "http://localhost:9000",
 	S3_PUBLIC_URL:   "http://localhost:9000",
 	S3_BUCKET:       "bucket",
@@ -66,6 +70,11 @@ type envConfigSchema struct {
 	REDIS_ADDR     string
 	REDIS_PASSWORD string
 	REDIS_DB       string
+
+	STORAGE_TYPE string
+
+	LOCAL_FS_LOCATION string
+	LOCAL_FS_BASEURL  string
 
 	S3_ENDPOINT_URL string
 	S3_PUBLIC_URL   string

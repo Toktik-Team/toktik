@@ -77,7 +77,7 @@ func TestFeedServiceImpl_ListVideos(t *testing.T) {
 		StatusCode: biz.OkStatusCode,
 		StatusMsg:  &biz.OkStatusMsg,
 		NextTime:   &expectedNextTime,
-		Videos:     respVideos[:biz.VideoCount],
+		VideoList:  respVideos[:biz.VideoCount],
 	}
 
 	UserClient = MockUserClient{}
@@ -115,11 +115,11 @@ func TestFeedServiceImpl_ListVideos(t *testing.T) {
 				t.Errorf("ListVideos() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
-			if len(gotResp.Videos) != len(tt.wantResp.Videos) {
-				t.Errorf("ListVideos() lens got %v, want %v", len(gotResp.Videos), len(tt.wantResp.Videos))
+			if len(gotResp.VideoList) != len(tt.wantResp.VideoList) {
+				t.Errorf("ListVideos() lens got %v, want %v", len(gotResp.VideoList), len(tt.wantResp.VideoList))
 			}
-			if len(gotResp.Videos) != biz.VideoCount {
-				t.Errorf("ListVideos() lens got %v, want %v", len(gotResp.Videos), biz.VideoCount)
+			if len(gotResp.VideoList) != biz.VideoCount {
+				t.Errorf("ListVideos() lens got %v, want %v", len(gotResp.VideoList), biz.VideoCount)
 			}
 			if !reflect.DeepEqual(gotResp, tt.wantResp) {
 				t.Errorf("ListVideos() gotResp %v, want %v", gotResp, tt.wantResp)
