@@ -1,5 +1,5 @@
 # 编译镜像
-FROM docker.io/golang:1.19.5-bullseye AS build
+FROM docker.io/nicognaw/toktik-basic-build:v1 AS build
 ENV TZ=Asia/Shanghai
 ENV DEBIAN_FRONTEND=noninteractive
 
@@ -19,7 +19,7 @@ COPY . .
 RUN bash unit-test.sh && bash build-all.sh
 
 # 运行环境
-FROM docker.io/debian:bullseye-slim
+FROM docker.io/nicognaw/toktik-basic:v1
 ENV TZ=Asia/Shanghai
 ENV DEBIAN_FRONTEND=noninteractive
 
