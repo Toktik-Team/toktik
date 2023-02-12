@@ -45,7 +45,7 @@ func (s *FeedServiceImpl) ListVideos(ctx context.Context, req *feed.ListFeedRequ
 				StatusCode: biz.Unable2ParseLatestTimeStatusCode,
 				StatusMsg:  &biz.BadRequestStatusMsg,
 				NextTime:   nil,
-				Videos:     nil,
+				VideoList:  nil,
 			}
 			return resp, nil
 		}
@@ -57,11 +57,20 @@ func (s *FeedServiceImpl) ListVideos(ctx context.Context, req *feed.ListFeedRequ
 			StatusCode: biz.SQLQueryErrorStatusCode,
 			StatusMsg:  &biz.InternalServerErrorStatusMsg,
 			NextTime:   nil,
-			Videos:     nil,
+			VideoList:  nil,
 		}
 		return resp, nil
 	}
 
+	if len(find) == 0 {
+		resp = &feed.ListFeedResponse{
+			StatusCode: biz.OkStatusCode,
+			StatusMsg:  &biz.OkStatusMsg,
+			NextTime:   nil,
+			VideoList:  nil,
+		}
+		return resp, nil
+	}
 	nextTime := find[len(find)-1].CreatedAt.Add(time.Duration(-1)).UnixMilli()
 
 	var videos []*feed.Video
@@ -112,7 +121,7 @@ func (s *FeedServiceImpl) ListVideos(ctx context.Context, req *feed.ListFeedRequ
 		StatusCode: biz.OkStatusCode,
 		StatusMsg:  &biz.OkStatusMsg,
 		NextTime:   &nextTime,
-		Videos:     videos,
+		VideoList:  videos,
 	}, nil
 }
 

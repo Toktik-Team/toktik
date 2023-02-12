@@ -22,6 +22,7 @@ func (s *UserServiceImpl) GetUser(ctx context.Context, req *user.UserRequest) (r
 		}
 		return
 	}
+	resp = &user.UserResponse{}
 
 	resp.User = &user.User{
 		Id:            u.ID,

@@ -208,7 +208,7 @@ func (x *ListFeedResponse) fastReadField4(buf []byte, _type int8) (offset int, e
 	if err != nil {
 		return offset, err
 	}
-	x.Videos = append(x.Videos, &v)
+	x.VideoList = append(x.VideoList, &v)
 	return offset, nil
 }
 
@@ -352,11 +352,11 @@ func (x *ListFeedResponse) fastWriteField3(buf []byte) (offset int) {
 }
 
 func (x *ListFeedResponse) fastWriteField4(buf []byte) (offset int) {
-	if x.Videos == nil {
+	if x.VideoList == nil {
 		return offset
 	}
-	for i := range x.Videos {
-		offset += fastpb.WriteMessage(buf[offset:], 4, x.Videos[i])
+	for i := range x.VideoList {
+		offset += fastpb.WriteMessage(buf[offset:], 4, x.VideoList[i])
 	}
 	return offset
 }
@@ -501,11 +501,11 @@ func (x *ListFeedResponse) sizeField3() (n int) {
 }
 
 func (x *ListFeedResponse) sizeField4() (n int) {
-	if x.Videos == nil {
+	if x.VideoList == nil {
 		return n
 	}
-	for i := range x.Videos {
-		n += fastpb.SizeMessage(4, x.Videos[i])
+	for i := range x.VideoList {
+		n += fastpb.SizeMessage(4, x.VideoList[i])
 	}
 	return n
 }
@@ -530,7 +530,7 @@ var fieldIDToName_ListFeedResponse = map[int32]string{
 	1: "StatusCode",
 	2: "StatusMsg",
 	3: "NextTime",
-	4: "Videos",
+	4: "VideoList",
 }
 
 var _ = user.File_user_proto

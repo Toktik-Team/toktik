@@ -25,7 +25,7 @@ message ListFeedResponse {
   uint32 status_code = 1;
   optional string status_msg = 2;
   optional int64 next_time = 3;
-  repeated Video videos = 4;
+  repeated Video video_list = 4;
 }
 
 service FeedService {

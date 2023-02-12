@@ -18,7 +18,6 @@ import (
 func main() {
 	h := server.Default(server.WithHostPorts(config.WebServiceAddr))
 	h.Use(gzip.Gzip(gzip.DefaultCompression))
-	h.Use(mw.ProtoJsonMiddleware())
 	h.Use(mw.AuthMiddleware())
 	pprof.Register(h)
 
