@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: toktik-user-api
+  name: toktik-user-api
+  namespace: toktik-service-bundle
+spec:
+  ports:
+    - name: grpc
+      port: 40130
+      protocol: TCP
+      targetPort: 40130
+  selector:
+    name: toktik-user-api
+    branch: dev
+  type: ClusterIP
