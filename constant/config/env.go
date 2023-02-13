@@ -7,6 +7,7 @@ import (
 	"os"
 	"reflect"
 	"strings"
+	"toktik/logging"
 )
 
 var EnvConfig = envConfigSchema{}
@@ -108,6 +109,7 @@ func envInit() {
 	for i := 0; i < v.NumField(); i++ {
 		envNameAlt := make([]string, 0)
 		fieldName := typeOfV.Field(i).Name
+		fieldType := typeOfV.Field(i).Type
 		fieldValue := v.Field(i).Interface()
 
 		envNameAlt = append(envNameAlt, fieldName)
@@ -116,15 +118,51 @@ func envInit() {
 			envNameAlt = append(envNameAlt, tags...)
 		}
 
-		configDefaultValue := fieldValue.(string)
-		envValue := resolveEnv(envNameAlt, configDefaultValue)
+		switch fieldType {
+		case reflect.TypeOf(0):
+			{
+				configDefaultValue, ok := fieldValue.(int)
+				if !ok {
+					logging.Logger.WithFields(map[string]interface{}{
+						"field": fieldName,
+						"type":  "int",
+						"value": fieldValue,
+						"env":   envNameAlt,
+					}).Warningf("Failed to parse default value")
+					continue
+				}
+				envValue := resolveEnv(envNameAlt, fmt.Sprintf("%d", configDefaultValue))
+				if EnvConfig.IsDev() {
+					fmt.Printf("Reading field[ %s ] default: %v env: %s\n", fieldName, configDefaultValue, envValue)
+				}
+				if len(envValue) > 0 {
+					reflect.ValueOf(&EnvConfig).Elem().Field(i).SetInt(int64(configDefaultValue))
+				}
+				continue
+			}
+		case reflect.TypeOf(""):
+			{
+				configDefaultValue, ok := fieldValue.(string)
+				if !ok {
+					logging.Logger.WithFields(map[string]interface{}{
+						"field": fieldName,
+						"type":  "int",
+						"value": fieldValue,
+						"env":   envNameAlt,
+					}).Warningf("Failed to parse default value")
+					continue
+				}
+				envValue := resolveEnv(envNameAlt, configDefaultValue)
 
-		if EnvConfig.IsDev() {
-			fmt.Printf("Reading field[ %s ] default: %v env: %s\n", fieldName, configDefaultValue, envValue)
+				if EnvConfig.IsDev() {
+					fmt.Printf("Reading field[ %s ] default: %v env: %s\n", fieldName, configDefaultValue, envValue)
+				}
+				if len(envValue) > 0 {
+					reflect.ValueOf(&EnvConfig).Elem().Field(i).SetString(envValue)
+				}
+			}
 		}
-		if len(envValue) > 0 {
-			reflect.ValueOf(&EnvConfig).Elem().Field(i).SetString(envValue)
-		}
+
 	}
 }
 
