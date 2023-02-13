@@ -42,13 +42,15 @@ type PublishServiceImpl struct{}
 
 // CreateVideo implements the PublishServiceImpl interface.
 func (s *PublishServiceImpl) CreateVideo(ctx context.Context, req *publish.CreateVideoRequest) (resp *publish.CreateVideoResponse, err error) {
-	logger := logging.Logger.WithFields(logrus.Fields{
+	methodFields := logrus.Fields{
 		"user_id":  req.UserId,
 		"title":    req.Title,
 		"time":     time.Now(),
 		"function": "CreateVideo",
-	})
+	}
+	logger := logging.Logger.WithFields(methodFields)
 	logger.Debug("Process start")
+
 	detectedContentType := http.DetectContentType(req.Data)
 	if detectedContentType != "video/mp4" {
 		logger.WithFields(map[string]interface{}{

@@ -41,7 +41,7 @@ func Action(ctx context.Context, c *app.RequestContext) {
 	logger.Debugf("Process start")
 
 	latestTime := c.Query("latest_time")
-	if _, err := strconv.Atoi(latestTime); err != nil {
+	if _, err := strconv.Atoi(latestTime); latestTime != "" && err != nil {
 		bizConstant.InvalidLatestTime.
 			WithCause(err).
 			WithFields(&methodFields).

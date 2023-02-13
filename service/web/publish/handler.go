@@ -91,9 +91,9 @@ func Action(ctx context.Context, c *app.RequestContext) {
 	userId := mw.GetAuthActorId(c)
 
 	logger.WithFields(logrus.Fields{
-		"userId": userId,
-		"title":  title,
-		"data":   data,
+		"userId":    userId,
+		"title":     title,
+		"data_size": len(data),
 	}).Debugf("Executing create video")
 	publishResp, err := publishClient.CreateVideo(ctx, &publish.CreateVideoRequest{
 		UserId: userId,

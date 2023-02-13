@@ -32,7 +32,13 @@ func init() {
 
 func AuthMiddleware() app.HandlerFunc {
 	return func(ctx context.Context, rc *app.RequestContext) {
-		token := rc.Query("token")
+		var token string
+		formToken := string(rc.FormValue("token"))
+
+		if formToken != "" {
+			token = formToken
+		}
+
 		if token == "" {
 			rc.Set(authResultKey, AUTH_RESULT_NO_TOKEN)
 			rc.Set(UserIdKey, 0)
