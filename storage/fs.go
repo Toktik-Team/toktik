@@ -33,7 +33,7 @@ func (f FSStorage) Upload(fileName string, content io.Reader) (output *PutObject
 	}
 	filePath := path.Join(config.EnvConfig.LOCAL_FS_LOCATION, fileName)
 	dir := path.Dir(filePath)
-	err = os.MkdirAll(dir, 666)
+	err = os.MkdirAll(dir, os.FileMode(0755))
 	if err != nil {
 		logger.WithFields(map[string]interface{}{
 			"time": time.Now(),
@@ -41,7 +41,7 @@ func (f FSStorage) Upload(fileName string, content io.Reader) (output *PutObject
 		}).Debug("failed writing creating directory before writing file")
 		return nil, err
 	}
-	err = os.WriteFile(filePath, all, 666)
+	err = os.WriteFile(filePath, all, os.FileMode(0755))
 	if err != nil {
 		logger.WithFields(map[string]interface{}{
 			"time": time.Now(),
