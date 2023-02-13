@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    sidecar.jaegertracing.io/inject: 'true'
+  labels:
+    app: toktik-comment-api
+  name: toktik-comment-api
+  namespace: toktik-service-bundle
+spec:
+  selector:
+    matchLabels:
+      name: toktik-comment-api
+  template:
+    metadata:
+      labels:
+        app: toktik-comment-api
+        branch: dev
+        version: ${BUILD_NUMBER}-${CI_COMMIT_ID}
+        name: toktik-comment-api
+        dream-app: toktik-comment-api
+        dream-unit: toktik-comment-api
+    spec:
+      imagePullSecrets:
+        - name: regcred
+      containers:
+        - image: ${IMAGE}
+          imagePullPolicy: IfNotPresent
+          name: toktik-comment-api
+          command:
+            - /bin/bash
+          args:
+            - bootstrap-comment.sh
+          envFrom:
+            - configMapRef:
+                name: env-config
+            - configMapRef:
+                name: config
+          ports:
+            - name: grpc-40131
+              containerPort: 40131
+              protocol: TCP
+          resources:
+            limits:
+              cpu: 500m
+              memory: 256Mi
+            requests:
+              cpu: 100m
+              memory: 8Mi
+      terminationGracePeriodSeconds: 30
