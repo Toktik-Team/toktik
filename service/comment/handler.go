@@ -87,14 +87,6 @@ func (s *CommentServiceImpl) ActionComment(ctx context.Context, req *comment.Act
 			StatusCode: biz.VideoNotFoundStatusCode,
 			StatusMsg:  &biz.BadRequestStatusMsg,
 		}, nil
-	} else if pVideo.UserId != req.ActorId {
-		logger.WithFields(map[string]interface{}{
-			"time": time.Now(),
-		}).Debug("video id and actor id not match")
-		return &comment.ActionCommentResponse{
-			StatusCode: biz.ActorIDNotMatchStatusCode,
-			StatusMsg:  &biz.ForbiddenStatusMsg,
-		}, nil
 	}
 
 	userResponse, err := UserClient.GetUser(ctx, &user.UserRequest{
@@ -118,7 +110,7 @@ func (s *CommentServiceImpl) ActionComment(ctx context.Context, req *comment.Act
 	case comment.ActionCommentType_ACTION_COMMENT_TYPE_ADD:
 		resp, err = addComment(ctx, logger, pUser, pVideo.ID, pCommentText)
 	case comment.ActionCommentType_ACTION_COMMENT_TYPE_DELETE:
-		resp, err = deleteComment(ctx, logger, pCommentID)
+		resp, err = deleteComment(ctx, logger, pUser, pVideo.ID, pCommentID)
 	}
 	if err != nil {
 		return resp, err
@@ -133,11 +125,26 @@ func (s *CommentServiceImpl) ActionComment(ctx context.Context, req *comment.Act
 }
 
 func addComment(ctx context.Context, logger *logrus.Entry, pUser *user.User, pVideoID uint32, pCommentText string) (resp *comment.ActionCommentResponse, err error) {
-	rComment := model.Comment{
-		VideoId: pVideoID,
-		UserId:  pUser.Id,
-		Content: pCommentText,
+	count, err := gen.Q.Comment.WithContext(ctx).Count()
+	if err != nil {
+		logger.WithFields(map[string]interface{}{
+			"time": time.Now(),
+			"err":  err,
+		}).Debug("failed to query db entry")
+		resp = &comment.ActionCommentResponse{
+			StatusCode: biz.UnableToQueryCommentStatusCode,
+			StatusMsg:  &biz.InternalServerErrorStatusMsg,
+		}
+		return
 	}
+
+	rComment := model.Comment{
+		VideoId:   pVideoID,
+		CommentId: uint32(count + 1),
+		UserId:    pUser.Id,
+		Content:   pCommentText,
+	}
+
 	err = gen.Q.Comment.WithContext(ctx).Create(&rComment)
 	if err != nil {
 		logger.WithFields(map[string]interface{}{
@@ -154,7 +161,7 @@ func addComment(ctx context.Context, logger *logrus.Entry, pUser *user.User, pVi
 		StatusCode: biz.OkStatusCode,
 		StatusMsg:  &biz.OkStatusMsg,
 		Comment: &comment.Comment{
-			Id:         rComment.ID,
+			Id:         rComment.CommentId,
 			User:       pUser,
 			Content:    rComment.Content,
 			CreateDate: rComment.CreatedAt.Format("01-02"),
@@ -163,12 +170,36 @@ func addComment(ctx context.Context, logger *logrus.Entry, pUser *user.User, pVi
 	return
 }
 
-func deleteComment(ctx context.Context, logger *logrus.Entry, commentID uint32) (resp *comment.ActionCommentResponse, err error) {
-	_, err = gen.Q.Comment.WithContext(ctx).Delete(&model.Comment{
-		Model: model.Model{
-			ID: commentID,
-		},
-	})
+func deleteComment(ctx context.Context, logger *logrus.Entry, pUser *user.User, videoID uint32, commentID uint32) (resp *comment.ActionCommentResponse, err error) {
+	qComment := gen.Q.Comment
+
+	rComment, err := qComment.WithContext(ctx).
+		Where(qComment.VideoId.Eq(videoID), qComment.CommentId.Eq(commentID)).
+		First()
+
+	if err != nil {
+		logger.WithFields(map[string]interface{}{
+			"time": time.Now(),
+			"err":  err,
+		}).Debug("failed to query db entry")
+		resp = &comment.ActionCommentResponse{
+			StatusCode: biz.UnableToQueryCommentStatusCode,
+			StatusMsg:  &biz.InternalServerErrorStatusMsg,
+		}
+		return
+	}
+
+	if rComment.UserId != pUser.Id {
+		logger.WithFields(map[string]interface{}{
+			"time": time.Now(),
+		}).Debug("comment creator and actor not match")
+		return &comment.ActionCommentResponse{
+			StatusCode: biz.ActorIDNotMatchStatusCode,
+			StatusMsg:  &biz.ForbiddenStatusMsg,
+		}, nil
+	}
+
+	_, err = qComment.WithContext(ctx).Delete(rComment)
 	if err != nil {
 		logger.WithFields(map[string]interface{}{
 			"time": time.Now(),
@@ -253,7 +284,7 @@ func (s *CommentServiceImpl) ListComment(ctx context.Context, req *comment.ListC
 		}
 
 		rCommentList = append(rCommentList, &comment.Comment{
-			Id:         pComment.ID,
+			Id:         pComment.CommentId,
 			User:       userResponse.User,
 			Content:    pComment.Content,
 			CreateDate: pComment.CreatedAt.Format("01-02"),
