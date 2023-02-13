@@ -8,3 +8,7 @@ const (
 	Unable2UploadCover     = 500004
 	Unable2CreateDBEntry   = 500005
 )
+
+var (
+	PublishActionSuccess = "Uploaded successfully!"
+)

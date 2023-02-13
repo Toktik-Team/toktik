@@ -1,8 +1,10 @@
 package storage
 
 import (
+	"github.com/sirupsen/logrus"
 	"io"
 	"toktik/constant/config"
+	"toktik/logging"
 )
 
 var Instance storageProvider = S3Storage{}
@@ -11,6 +13,9 @@ func init() {
 	if config.EnvConfig.STORAGE_TYPE == "fs" {
 		Instance = FsStorage{}
 	}
+	logging.Logger.WithFields(logrus.Fields{
+		"storage_type": config.EnvConfig.STORAGE_TYPE,
+	}).Info("storage init")
 }
 
 type PutObjectOutput struct {
