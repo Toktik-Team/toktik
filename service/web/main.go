@@ -16,7 +16,10 @@ import (
 )
 
 func main() {
-	h := server.Default(server.WithHostPorts(config.WebServiceAddr))
+	h := server.Default(
+		server.WithHostPorts(config.WebServiceAddr),
+		server.WithMaxRequestBodySize(config.EnvConfig.MAX_REQUEST_BODY_SIZE),
+	)
 	h.Use(gzip.Gzip(gzip.DefaultCompression))
 	h.Use(mw.AuthMiddleware())
 	pprof.Register(h)

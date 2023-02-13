@@ -43,7 +43,8 @@ var defaultConfig = envConfigSchema{
 	REDIS_PASSWORD: "",
 	REDIS_DB:       "0",
 
-	STORAGE_TYPE: "s3",
+	STORAGE_TYPE:          "s3",
+	MAX_REQUEST_BODY_SIZE: 200 * 1024 * 1024,
 
 	LOCAL_FS_LOCATION: "/tmp",
 	LOCAL_FS_BASEURL:  "http://localhost/",
@@ -71,7 +72,8 @@ type envConfigSchema struct {
 	REDIS_PASSWORD string
 	REDIS_DB       string
 
-	STORAGE_TYPE string
+	STORAGE_TYPE          string
+	MAX_REQUEST_BODY_SIZE int
 
 	LOCAL_FS_LOCATION string
 	LOCAL_FS_BASEURL  string
