@@ -2,6 +2,7 @@ package storage
 
 import (
 	"io"
+	"net/url"
 	"os"
 	"path"
 	"time"
@@ -9,13 +10,13 @@ import (
 	"toktik/logging"
 )
 
-type FsStorage struct {
+type FSStorage struct {
 }
 
-func (f FsStorage) Upload(fileName string, content io.Reader) (output *PutObjectOutput, err error) {
+func (f FSStorage) Upload(fileName string, content io.Reader) (output *PutObjectOutput, err error) {
 	logger := logging.Logger.WithFields(map[string]interface{}{
 		"time":      time.Now(),
-		"function":  "FsStorage.Upload",
+		"function":  "FSStorage.Upload",
 		"file_name": fileName,
 	})
 	logger.Debug("Process start")
@@ -38,6 +39,6 @@ func (f FsStorage) Upload(fileName string, content io.Reader) (output *PutObject
 	return &PutObjectOutput{}, nil
 }
 
-func (f FsStorage) GetLink(fileName string) (string, error) {
-	return path.Join(config.EnvConfig.LOCAL_FS_BASEURL, fileName), nil
+func (f FSStorage) GetLink(fileName string) (string, error) {
+	return url.JoinPath(config.EnvConfig.LOCAL_FS_BASEURL, fileName)
 }

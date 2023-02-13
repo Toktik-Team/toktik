@@ -11,7 +11,7 @@ var Instance storageProvider = S3Storage{}
 
 func init() {
 	if config.EnvConfig.STORAGE_TYPE == "fs" {
-		Instance = FsStorage{}
+		Instance = FSStorage{}
 	}
 	logging.Logger.WithFields(logrus.Fields{
 		"storage_type": config.EnvConfig.STORAGE_TYPE,
