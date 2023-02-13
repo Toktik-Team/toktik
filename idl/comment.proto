@@ -42,7 +42,7 @@ message ListCommentRequest {
 message ListCommentResponse {
   uint32 status_code = 1;
   optional string status_msg = 2;
-  repeated Comment comments = 3;
+  repeated Comment comment_list = 3;
 }
 
 

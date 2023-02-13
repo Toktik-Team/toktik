@@ -280,7 +280,7 @@ func (x *ListCommentResponse) fastReadField3(buf []byte, _type int8) (offset int
 	if err != nil {
 		return offset, err
 	}
-	x.Comments = append(x.Comments, &v)
+	x.CommentList = append(x.CommentList, &v)
 	return offset, nil
 }
 
@@ -465,11 +465,11 @@ func (x *ListCommentResponse) fastWriteField2(buf []byte) (offset int) {
 }
 
 func (x *ListCommentResponse) fastWriteField3(buf []byte) (offset int) {
-	if x.Comments == nil {
+	if x.CommentList == nil {
 		return offset
 	}
-	for i := range x.Comments {
-		offset += fastpb.WriteMessage(buf[offset:], 3, x.Comments[i])
+	for i := range x.CommentList {
+		offset += fastpb.WriteMessage(buf[offset:], 3, x.CommentList[i])
 	}
 	return offset
 }
@@ -655,11 +655,11 @@ func (x *ListCommentResponse) sizeField2() (n int) {
 }
 
 func (x *ListCommentResponse) sizeField3() (n int) {
-	if x.Comments == nil {
+	if x.CommentList == nil {
 		return n
 	}
-	for i := range x.Comments {
-		n += fastpb.SizeMessage(3, x.Comments[i])
+	for i := range x.CommentList {
+		n += fastpb.SizeMessage(3, x.CommentList[i])
 	}
 	return n
 }
@@ -693,7 +693,7 @@ var fieldIDToName_ListCommentRequest = map[int32]string{
 var fieldIDToName_ListCommentResponse = map[int32]string{
 	1: "StatusCode",
 	2: "StatusMsg",
-	3: "Comments",
+	3: "CommentList",
 }
 
 var _ = user.File_user_proto
