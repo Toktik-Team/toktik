@@ -35,7 +35,7 @@ type CommentServiceImpl struct{}
 
 // ActionComment implements the CommentServiceImpl interface.
 func (s *CommentServiceImpl) ActionComment(ctx context.Context, req *comment.ActionCommentRequest) (resp *comment.ActionCommentResponse, err error) {
-	logger := logging.Logger.WithFields(map[string]interface{}{
+	logger := logging.Logger.WithFields(logrus.Fields{
 		"user_id":      req.ActorId,
 		"video_id":     req.VideoId,
 		"action_type":  req.ActionType,
@@ -56,7 +56,7 @@ func (s *CommentServiceImpl) ActionComment(ctx context.Context, req *comment.Act
 	case comment.ActionCommentType_ACTION_COMMENT_TYPE_UNSPECIFIED:
 		fallthrough
 	default:
-		logger.WithFields(map[string]interface{}{
+		logger.WithFields(logrus.Fields{
 			"time": time.Now(),
 		}).Debug("invalid action type")
 		return &comment.ActionCommentResponse{
@@ -71,7 +71,7 @@ func (s *CommentServiceImpl) ActionComment(ctx context.Context, req *comment.Act
 		Where(qVideo.ID.Eq(req.VideoId)).
 		First()
 	if err != nil {
-		logger.WithFields(map[string]interface{}{
+		logger.WithFields(logrus.Fields{
 			"time": time.Now(),
 		}).Debug("video query error")
 		return &comment.ActionCommentResponse{
@@ -80,7 +80,7 @@ func (s *CommentServiceImpl) ActionComment(ctx context.Context, req *comment.Act
 		}, nil
 	}
 	if pVideo == nil {
-		logger.WithFields(map[string]interface{}{
+		logger.WithFields(logrus.Fields{
 			"time": time.Now(),
 		}).Debug("video not found")
 		return &comment.ActionCommentResponse{
@@ -95,7 +95,7 @@ func (s *CommentServiceImpl) ActionComment(ctx context.Context, req *comment.Act
 	})
 
 	if err != nil || userResponse.StatusCode != biz.OkStatusCode {
-		logger.WithFields(map[string]interface{}{
+		logger.WithFields(logrus.Fields{
 			"time": time.Now(),
 		}).Debug("user service error")
 		return &comment.ActionCommentResponse{
@@ -116,7 +116,7 @@ func (s *CommentServiceImpl) ActionComment(ctx context.Context, req *comment.Act
 		return resp, err
 	}
 
-	logger.WithFields(map[string]interface{}{
+	logger.WithFields(logrus.Fields{
 		"time":     time.Now(),
 		"response": resp,
 	}).Debug("all process done, ready to launch response")
@@ -127,7 +127,7 @@ func (s *CommentServiceImpl) ActionComment(ctx context.Context, req *comment.Act
 func addComment(ctx context.Context, logger *logrus.Entry, pUser *user.User, pVideoID uint32, pCommentText string) (resp *comment.ActionCommentResponse, err error) {
 	count, err := gen.Q.Comment.WithContext(ctx).Count()
 	if err != nil {
-		logger.WithFields(map[string]interface{}{
+		logger.WithFields(logrus.Fields{
 			"time": time.Now(),
 			"err":  err,
 		}).Debug("failed to query db entry")
@@ -147,7 +147,7 @@ func addComment(ctx context.Context, logger *logrus.Entry, pUser *user.User, pVi
 
 	err = gen.Q.Comment.WithContext(ctx).Create(&rComment)
 	if err != nil {
-		logger.WithFields(map[string]interface{}{
+		logger.WithFields(logrus.Fields{
 			"time": time.Now(),
 			"err":  err,
 		}).Debug("failed to create db entry")
@@ -178,7 +178,7 @@ func deleteComment(ctx context.Context, logger *logrus.Entry, pUser *user.User, 
 		First()
 
 	if err != nil {
-		logger.WithFields(map[string]interface{}{
+		logger.WithFields(logrus.Fields{
 			"time": time.Now(),
 			"err":  err,
 		}).Debug("failed to query db entry")
@@ -190,7 +190,7 @@ func deleteComment(ctx context.Context, logger *logrus.Entry, pUser *user.User, 
 	}
 
 	if rComment.UserId != pUser.Id {
-		logger.WithFields(map[string]interface{}{
+		logger.WithFields(logrus.Fields{
 			"time": time.Now(),
 		}).Debug("comment creator and actor not match")
 		return &comment.ActionCommentResponse{
@@ -201,7 +201,7 @@ func deleteComment(ctx context.Context, logger *logrus.Entry, pUser *user.User, 
 
 	_, err = qComment.WithContext(ctx).Delete(rComment)
 	if err != nil {
-		logger.WithFields(map[string]interface{}{
+		logger.WithFields(logrus.Fields{
 			"time": time.Now(),
 			"err":  err,
 		}).Debug("failed to delete db entry")
@@ -221,7 +221,7 @@ func deleteComment(ctx context.Context, logger *logrus.Entry, pUser *user.User, 
 
 // ListComment implements the CommentServiceImpl interface.
 func (s *CommentServiceImpl) ListComment(ctx context.Context, req *comment.ListCommentRequest) (resp *comment.ListCommentResponse, err error) {
-	logger := logging.Logger.WithFields(map[string]interface{}{
+	logger := logging.Logger.WithFields(logrus.Fields{
 		"user_id":  req.ActorId,
 		"video_id": req.VideoId,
 		"time":     time.Now(),
@@ -234,7 +234,7 @@ func (s *CommentServiceImpl) ListComment(ctx context.Context, req *comment.ListC
 		Where(qVideo.ID.Eq(req.VideoId)).
 		First()
 	if err != nil {
-		logger.WithFields(map[string]interface{}{
+		logger.WithFields(logrus.Fields{
 			"time": time.Now(),
 		}).Debug("video query error")
 		return &comment.ListCommentResponse{
@@ -243,7 +243,7 @@ func (s *CommentServiceImpl) ListComment(ctx context.Context, req *comment.ListC
 		}, nil
 	}
 	if pVideo == nil {
-		logger.WithFields(map[string]interface{}{
+		logger.WithFields(logrus.Fields{
 			"time": time.Now(),
 		}).Debug("video not found")
 		return &comment.ListCommentResponse{
@@ -259,7 +259,7 @@ func (s *CommentServiceImpl) ListComment(ctx context.Context, req *comment.ListC
 		Find()
 
 	if err != nil {
-		logger.WithFields(map[string]interface{}{
+		logger.WithFields(logrus.Fields{
 			"time": time.Now(),
 		}).Debug("comment query error")
 		return &comment.ListCommentResponse{
@@ -276,7 +276,7 @@ func (s *CommentServiceImpl) ListComment(ctx context.Context, req *comment.ListC
 		})
 
 		if err != nil || userResponse.StatusCode != biz.OkStatusCode {
-			logger.WithFields(map[string]interface{}{
+			logger.WithFields(logrus.Fields{
 				"pComment": pComment,
 				"err":      err,
 				"time":     time.Now(),
@@ -291,7 +291,7 @@ func (s *CommentServiceImpl) ListComment(ctx context.Context, req *comment.ListC
 		})
 	}
 
-	logger.WithFields(map[string]interface{}{
+	logger.WithFields(logrus.Fields{
 		"time":     time.Now(),
 		"response": resp,
 	}).Debug("all process done, ready to launch response")
