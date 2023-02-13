@@ -5,6 +5,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/sirupsen/logrus"
 	"io"
 	"net/http"
 	"time"
@@ -41,7 +42,7 @@ type PublishServiceImpl struct{}
 
 // CreateVideo implements the PublishServiceImpl interface.
 func (s *PublishServiceImpl) CreateVideo(ctx context.Context, req *publish.CreateVideoRequest) (resp *publish.CreateVideoResponse, err error) {
-	logger := logging.Logger.WithFields(map[string]interface{}{
+	logger := logging.Logger.WithFields(logrus.Fields{
 		"user_id":  req.UserId,
 		"title":    req.Title,
 		"time":     time.Now(),

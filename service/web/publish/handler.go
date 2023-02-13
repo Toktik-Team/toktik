@@ -3,58 +3,66 @@ package publish
 import (
 	"context"
 	"fmt"
-	"log"
 	"mime/multipart"
-	"toktik/constant/config"
+	"time"
+	bizConstant "toktik/constant/biz"
+	bizConfig "toktik/constant/config"
 	"toktik/kitex_gen/douyin/publish"
 	publishService "toktik/kitex_gen/douyin/publish/publishservice"
+	"toktik/logging"
 	"toktik/service/web/mw"
 
 	"github.com/cloudwego/hertz/pkg/app"
-	"github.com/cloudwego/hertz/pkg/protocol/consts"
+	httpStatus "github.com/cloudwego/hertz/pkg/protocol/consts"
 	"github.com/cloudwego/kitex/client"
 	consul "github.com/kitex-contrib/registry-consul"
+	"github.com/sirupsen/logrus"
 )
 
 var publishClient publishService.Client
 
 func init() {
-	r, err := consul.NewConsulResolver(config.EnvConfig.CONSUL_ADDR)
+	r, err := consul.NewConsulResolver(bizConfig.EnvConfig.CONSUL_ADDR)
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
-	publishClient, err = publishService.NewClient(config.PublishServiceName, client.WithResolver(r))
+	publishClient, err = publishService.NewClient(bizConfig.PublishServiceName, client.WithResolver(r))
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
 }
 
 func paramValidate(ctx context.Context, c *app.RequestContext) (err error) {
+	var wrappedError error
 	form, err := c.Request.MultipartForm()
 	if err != nil {
-		return fmt.Errorf("invalid form: %w", err)
+		wrappedError = fmt.Errorf("invalid form: %w", err)
 	}
 	title := form.Value["title"]
 	if len(title) <= 0 {
-		return fmt.Errorf("not title")
+		wrappedError = fmt.Errorf("not title")
 	}
 
 	data := form.File["data"]
 	if len(data) <= 0 {
-		return fmt.Errorf("not data")
+		wrappedError = fmt.Errorf("not data")
+	}
+	if wrappedError != nil {
+		return wrappedError
 	}
 	return nil
 }
 
 func Action(ctx context.Context, c *app.RequestContext) {
+	methodFields := logrus.Fields{
+		"time":   time.Now(),
+		"method": "PublishAction",
+	}
+	logger := logging.Logger.WithFields(methodFields)
+	logger.Debugf("Process start")
+
 	if err := paramValidate(ctx, c); err != nil {
-		c.JSON(
-			consts.StatusBadRequest,
-			&publish.CreateVideoResponse{
-				StatusCode: 1,
-				StatusMsg:  err.Error(),
-			},
-		)
+		bizConstant.InvalidFormError.WithCause(err).WithFields(&methodFields).LaunchError(c)
 		return
 	}
 
@@ -65,49 +73,42 @@ func Action(ctx context.Context, c *app.RequestContext) {
 	defer func(opened multipart.File) {
 		err := opened.Close()
 		if err != nil {
-			log.Println(err)
+			logger.WithFields(logrus.Fields{
+				"error": err,
+			}).Errorf("opened.Close() failed")
 		}
 	}(opened)
 	var data = make([]byte, file[0].Size)
 	readSize, err := opened.Read(data)
 	if err != nil {
-		c.JSON(
-			consts.StatusBadRequest,
-			&publish.CreateVideoResponse{
-				StatusCode: 1,
-				StatusMsg:  err.Error(),
-			},
-		)
+		bizConstant.OpenFileFailedError.WithCause(err).WithFields(&methodFields).LaunchError(c)
 		return
 	}
 	if readSize != int(file[0].Size) {
-		c.JSON(
-			consts.StatusBadRequest,
-			&publish.CreateVideoResponse{
-				StatusCode: 1,
-				StatusMsg:  "read size not equal to file size",
-			},
-		)
+		bizConstant.SizeNotMatchError.WithCause(err).WithFields(&methodFields).LaunchError(c)
 		return
 	}
-	userId := c.GetUint32(mw.USER_ID_KEY)
+	userId := mw.GetAuthActorId(c)
+
+	logger.WithFields(logrus.Fields{
+		"userId": userId,
+		"title":  title,
+		"data":   data,
+	}).Debugf("Executing create video")
 	publishResp, err := publishClient.CreateVideo(ctx, &publish.CreateVideoRequest{
 		UserId: userId,
 		Data:   data,
 		Title:  title,
 	})
 	if err != nil {
-		c.JSON(
-			consts.StatusOK,
-			&publish.CreateVideoResponse{
-				StatusCode: 1,
-				StatusMsg:  err.Error(),
-			},
-		)
+		bizConstant.RPCCallError.WithCause(err).WithFields(&methodFields).LaunchError(c)
 		return
 	}
+	logger.WithFields(logrus.Fields{
+		"response": publishResp,
+	}).Debugf("Create video success")
 	c.JSON(
-		consts.StatusOK,
+		httpStatus.StatusOK,
 		publishResp,
 	)
 }
