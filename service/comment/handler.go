@@ -277,7 +277,7 @@ func (s *CommentServiceImpl) ListComment(ctx context.Context, req *comment.ListC
 	rCommentList := make([]*comment.Comment, 0, len(pCommentList))
 	for _, pComment := range pCommentList {
 		userResponse, err := UserClient.GetUser(ctx, &user.UserRequest{
-			UserId:  req.ActorId,
+			UserId:  pComment.UserId,
 			ActorId: req.ActorId,
 		})
 
