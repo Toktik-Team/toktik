@@ -44,7 +44,7 @@ func (s *CommentServiceImpl) ActionComment(ctx context.Context, req *comment.Act
 		"time":         time.Now(),
 		"function":     "ActionComment",
 	})
-	logger.Debug("Process start")
+	logger.Debugf("Process start")
 
 	var pCommentText string
 	var pCommentID uint32
@@ -58,9 +58,9 @@ func (s *CommentServiceImpl) ActionComment(ctx context.Context, req *comment.Act
 	default:
 		logger.WithFields(logrus.Fields{
 			"time": time.Now(),
-		}).Debug("invalid action type")
+		}).Warnf("invalid action type")
 		return &comment.ActionCommentResponse{
-			StatusCode: biz.InvalidCommentActionTypeStatusCode,
+			StatusCode: biz.InvalidCommentActionType,
 			StatusMsg:  &biz.BadRequestStatusMsg,
 		}, nil
 	}
@@ -73,18 +73,19 @@ func (s *CommentServiceImpl) ActionComment(ctx context.Context, req *comment.Act
 	if err != nil {
 		logger.WithFields(logrus.Fields{
 			"time": time.Now(),
-		}).Debug("video query error")
+			"err":  err,
+		}).Warnf("video query error")
 		return &comment.ActionCommentResponse{
-			StatusCode: biz.UnableToQueryVideoStatusCode,
+			StatusCode: biz.UnableToQueryVideo,
 			StatusMsg:  &biz.InternalServerErrorStatusMsg,
 		}, nil
 	}
 	if pVideo == nil {
 		logger.WithFields(logrus.Fields{
 			"time": time.Now(),
-		}).Debug("video not found")
+		}).Warnf("video not found")
 		return &comment.ActionCommentResponse{
-			StatusCode: biz.VideoNotFoundStatusCode,
+			StatusCode: biz.VideoNotFound,
 			StatusMsg:  &biz.BadRequestStatusMsg,
 		}, nil
 	}
@@ -97,9 +98,10 @@ func (s *CommentServiceImpl) ActionComment(ctx context.Context, req *comment.Act
 	if err != nil || userResponse.StatusCode != biz.OkStatusCode {
 		logger.WithFields(logrus.Fields{
 			"time": time.Now(),
-		}).Debug("user service error")
+			"err":  err,
+		}).Warnf("user service error")
 		return &comment.ActionCommentResponse{
-			StatusCode: biz.InternalUserServiceErrorStatusCode,
+			StatusCode: biz.UnableToQueryUser,
 			StatusMsg:  &biz.InternalServerErrorStatusMsg,
 		}, nil
 	}
@@ -132,7 +134,7 @@ func addComment(ctx context.Context, logger *logrus.Entry, pUser *user.User, pVi
 			"err":  err,
 		}).Debug("failed to query db entry")
 		resp = &comment.ActionCommentResponse{
-			StatusCode: biz.UnableToQueryCommentStatusCode,
+			StatusCode: biz.UnableToQueryComment,
 			StatusMsg:  &biz.InternalServerErrorStatusMsg,
 		}
 		return
@@ -152,7 +154,7 @@ func addComment(ctx context.Context, logger *logrus.Entry, pUser *user.User, pVi
 			"err":  err,
 		}).Debug("failed to create db entry")
 		resp = &comment.ActionCommentResponse{
-			StatusCode: biz.UnableToCreateCommentStatusCode,
+			StatusCode: biz.UnableToCreateComment,
 			StatusMsg:  &biz.InternalServerErrorStatusMsg,
 		}
 		return
@@ -183,7 +185,7 @@ func deleteComment(ctx context.Context, logger *logrus.Entry, pUser *user.User, 
 			"err":  err,
 		}).Debug("failed to query db entry")
 		resp = &comment.ActionCommentResponse{
-			StatusCode: biz.UnableToQueryCommentStatusCode,
+			StatusCode: biz.UnableToQueryComment,
 			StatusMsg:  &biz.InternalServerErrorStatusMsg,
 		}
 		return
@@ -194,7 +196,7 @@ func deleteComment(ctx context.Context, logger *logrus.Entry, pUser *user.User, 
 			"time": time.Now(),
 		}).Debug("comment creator and actor not match")
 		return &comment.ActionCommentResponse{
-			StatusCode: biz.ActorIDNotMatchStatusCode,
+			StatusCode: biz.ActorIDNotMatch,
 			StatusMsg:  &biz.ForbiddenStatusMsg,
 		}, nil
 	}
@@ -206,7 +208,7 @@ func deleteComment(ctx context.Context, logger *logrus.Entry, pUser *user.User, 
 			"err":  err,
 		}).Debug("failed to delete db entry")
 		resp = &comment.ActionCommentResponse{
-			StatusCode: biz.UnableToDeleteCommentStatusCode,
+			StatusCode: biz.UnableToDeleteComment,
 			StatusMsg:  &biz.InternalServerErrorStatusMsg,
 		}
 		return
@@ -236,9 +238,10 @@ func (s *CommentServiceImpl) ListComment(ctx context.Context, req *comment.ListC
 	if err != nil {
 		logger.WithFields(logrus.Fields{
 			"time": time.Now(),
+			"err":  err,
 		}).Debug("video query error")
 		return &comment.ListCommentResponse{
-			StatusCode: biz.UnableToQueryVideoStatusCode,
+			StatusCode: biz.UnableToQueryVideo,
 			StatusMsg:  &biz.InternalServerErrorStatusMsg,
 		}, nil
 	}
@@ -247,7 +250,7 @@ func (s *CommentServiceImpl) ListComment(ctx context.Context, req *comment.ListC
 			"time": time.Now(),
 		}).Debug("video not found")
 		return &comment.ListCommentResponse{
-			StatusCode: biz.VideoNotFoundStatusCode,
+			StatusCode: biz.VideoNotFound,
 			StatusMsg:  &biz.BadRequestStatusMsg,
 		}, nil
 	}
@@ -261,9 +264,10 @@ func (s *CommentServiceImpl) ListComment(ctx context.Context, req *comment.ListC
 	if err != nil {
 		logger.WithFields(logrus.Fields{
 			"time": time.Now(),
+			"err":  err,
 		}).Debug("comment query error")
 		return &comment.ListCommentResponse{
-			StatusCode: biz.UnableToQueryCommentStatusCode,
+			StatusCode: biz.UnableToQueryComment,
 			StatusMsg:  &biz.InternalServerErrorStatusMsg,
 		}, nil
 	}

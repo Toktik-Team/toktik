@@ -8,12 +8,15 @@ import (
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
 	"github.com/cloudwego/kitex/client"
 	consul "github.com/kitex-contrib/registry-consul"
+	"github.com/sirupsen/logrus"
 	"log"
 	"strconv"
+	"time"
 	"toktik/constant/biz"
 	"toktik/constant/config"
 	"toktik/kitex_gen/douyin/comment"
 	"toktik/kitex_gen/douyin/comment/commentservice"
+	"toktik/logging"
 )
 
 var commentClient commentservice.Client
@@ -30,6 +33,13 @@ func init() {
 }
 
 func Action(ctx context.Context, c *app.RequestContext) {
+	methodFields := logrus.Fields{
+		"time":   time.Now(),
+		"method": "CommentAction",
+	}
+	logger := logging.Logger.WithFields(methodFields)
+	logger.Debugf("Process start")
+
 	actorId := c.GetUint32("user_id")
 	videoId, videoIdExists := c.GetQuery("video_id")
 	actionType, actionTypeExists := c.GetQuery("action_type")
@@ -37,24 +47,12 @@ func Action(ctx context.Context, c *app.RequestContext) {
 	commentId := c.Query("comment_id")
 
 	if actorId == 0 {
-		c.JSON(
-			consts.StatusBadRequest,
-			&comment.ActionCommentResponse{
-				StatusCode: 1,
-				StatusMsg:  &biz.BadRequestStatusMsg,
-			},
-		)
+		biz.UnauthorizedError.WithFields(&methodFields).LaunchError(c)
 		return
 	}
 
 	if !videoIdExists || !actionTypeExists {
-		c.JSON(
-			consts.StatusBadRequest,
-			&comment.ActionCommentResponse{
-				StatusCode: 1,
-				StatusMsg:  &biz.BadRequestStatusMsg,
-			},
-		)
+		biz.BadRequestError.WithFields(&methodFields).LaunchError(c)
 		return
 	}
 
@@ -63,13 +61,7 @@ func Action(ctx context.Context, c *app.RequestContext) {
 	pCommentId, err := strconv.ParseUint(commentId, 10, 32)
 
 	if err != nil {
-		c.JSON(
-			consts.StatusBadRequest,
-			&comment.ActionCommentResponse{
-				StatusCode: 1,
-				StatusMsg:  &biz.BadRequestStatusMsg,
-			},
-		)
+		biz.BadRequestError.WithFields(&methodFields).WithCause(err).LaunchError(c)
 		return
 	}
 
@@ -91,6 +83,9 @@ func Action(ctx context.Context, c *app.RequestContext) {
 			rErr = err
 			break
 		}
+		logger.WithFields(logrus.Fields{
+			"response": resp,
+		}).Debugf("add comment success")
 		c.JSON(
 			consts.StatusOK,
 			resp,
@@ -107,6 +102,9 @@ func Action(ctx context.Context, c *app.RequestContext) {
 			rErr = err
 			break
 		}
+		logger.WithFields(logrus.Fields{
+			"response": resp,
+		}).Debugf("delete comment success")
 		c.JSON(
 			consts.StatusOK,
 			resp,
@@ -119,53 +117,36 @@ func Action(ctx context.Context, c *app.RequestContext) {
 	}
 
 	if rErr != nil {
-		c.JSON(
-			consts.StatusInternalServerError,
-			&comment.ActionCommentResponse{
-				StatusCode: 1,
-				StatusMsg:  &biz.InternalServerErrorStatusMsg,
-			},
-		)
+		biz.InternalServerError.WithCause(rErr).WithFields(&methodFields).LaunchError(c)
 		return
 	}
 }
 
 func List(ctx context.Context, c *app.RequestContext) {
+	methodFields := logrus.Fields{
+		"time":   time.Now(),
+		"method": "CommentList",
+	}
+	logger := logging.Logger.WithFields(methodFields)
+	logger.Debugf("Process start")
+
 	actorId := c.GetUint32("user_id")
 	videoId, videoIdExists := c.GetQuery("video_id")
 
 	if actorId == 0 {
-		c.JSON(
-			consts.StatusBadRequest,
-			&comment.ActionCommentResponse{
-				StatusCode: 1,
-				StatusMsg:  &biz.BadRequestStatusMsg,
-			},
-		)
+		biz.UnauthorizedError.WithFields(&methodFields).LaunchError(c)
 		return
 	}
 
 	if !videoIdExists {
-		c.JSON(
-			consts.StatusBadRequest,
-			&comment.ActionCommentResponse{
-				StatusCode: 1,
-				StatusMsg:  &biz.BadRequestStatusMsg,
-			},
-		)
+		biz.BadRequestError.WithFields(&methodFields).LaunchError(c)
 		return
 	}
 
 	pVideoId, err := strconv.ParseUint(videoId, 10, 32)
 
 	if err != nil {
-		c.JSON(
-			consts.StatusBadRequest,
-			&comment.ActionCommentResponse{
-				StatusCode: 1,
-				StatusMsg:  &biz.BadRequestStatusMsg,
-			},
-		)
+		biz.BadRequestError.WithFields(&methodFields).WithCause(err).LaunchError(c)
 		return
 	}
 
@@ -175,13 +156,7 @@ func List(ctx context.Context, c *app.RequestContext) {
 	})
 
 	if err != nil {
-		c.JSON(
-			consts.StatusInternalServerError,
-			&comment.ActionCommentResponse{
-				StatusCode: 1,
-				StatusMsg:  &biz.InternalServerErrorStatusMsg,
-			},
-		)
+		biz.InternalServerError.WithCause(err).WithFields(&methodFields).LaunchError(c)
 		return
 	}
 
