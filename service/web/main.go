@@ -27,8 +27,6 @@ func main() {
 
 	douyin := h.Group("/douyin")
 
-	douyin.Any("/authenticate", auth.Authenticate)
-
 	// feed service
 	douyin.GET("/feed", feed.Action)
 

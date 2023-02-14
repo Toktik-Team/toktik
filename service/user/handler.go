@@ -11,6 +11,21 @@ type UserServiceImpl struct{}
 
 // GetUser implements the UserServiceImpl interface.
 func (s *UserServiceImpl) GetUser(ctx context.Context, req *user.UserRequest) (resp *user.UserResponse, err error) {
+	if req == nil {
+		resp = &user.UserResponse{
+			StatusCode: 0,
+			StatusMsg:  "user does exist",
+			User: &user.User{
+				Id:            0,
+				Name:          "anonymous",
+				FollowCount:   0,
+				FollowerCount: 0,
+				IsFollow:      false,
+			},
+		}
+		return
+	}
+
 	userInfo := repo.User
 	u, err := userInfo.WithContext(ctx).Where(userInfo.ID.Eq(req.UserId)).First()
 
