@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 	"reflect"
+	"strconv"
 	"strings"
 	"toktik/logging"
 )
@@ -136,7 +137,17 @@ func envInit() {
 					fmt.Printf("Reading field[ %s ] default: %v env: %s\n", fieldName, configDefaultValue, envValue)
 				}
 				if len(envValue) > 0 {
-					reflect.ValueOf(&EnvConfig).Elem().Field(i).SetInt(int64(configDefaultValue))
+					envValueInteger, err := strconv.ParseInt(envValue, 10, 64)
+					if err != nil {
+						logging.Logger.WithFields(map[string]interface{}{
+							"field": fieldName,
+							"type":  "int",
+							"value": fieldValue,
+							"env":   envNameAlt,
+						}).Warningf("Failed to parse env value, ignored")
+						continue
+					}
+					reflect.ValueOf(&EnvConfig).Elem().Field(i).SetInt(int64(envValueInteger))
 				}
 				continue
 			}
