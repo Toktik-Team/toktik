@@ -201,7 +201,9 @@ func deleteComment(ctx context.Context, logger *logrus.Entry, pUser *user.User, 
 		}, nil
 	}
 
-	_, err = qComment.WithContext(ctx).Delete(rComment)
+	_, err = qComment.WithContext(ctx).
+		Where(qComment.ID.Eq(rComment.ID)).
+		Delete()
 	if err != nil {
 		logger.WithFields(logrus.Fields{
 			"time": time.Now(),
@@ -272,7 +274,7 @@ func (s *CommentServiceImpl) ListComment(ctx context.Context, req *comment.ListC
 		}, nil
 	}
 
-	rCommentList := make([]*comment.Comment, len(pCommentList))
+	rCommentList := make([]*comment.Comment, 0, len(pCommentList))
 	for _, pComment := range pCommentList {
 		userResponse, err := UserClient.GetUser(ctx, &user.UserRequest{
 			UserId:  req.ActorId,
