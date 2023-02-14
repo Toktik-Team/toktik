@@ -43,8 +43,8 @@ func Action(ctx context.Context, c *app.RequestContext) {
 	actorId := c.GetUint32("user_id")
 	videoId, videoIdExists := c.GetQuery("video_id")
 	actionType, actionTypeExists := c.GetQuery("action_type")
-	commentText := c.Query("comment_text")
-	commentId := c.Query("comment_id")
+	commentText, commentTextExists := c.GetQuery("comment_text")
+	commentId, commentIdExists := c.GetQuery("comment_id")
 
 	if actorId == 0 {
 		biz.UnauthorizedError.WithFields(&methodFields).LaunchError(c)
@@ -58,7 +58,6 @@ func Action(ctx context.Context, c *app.RequestContext) {
 
 	pVideoId, err := strconv.ParseUint(videoId, 10, 32)
 	pActionType, err := strconv.ParseInt(actionType, 10, 32)
-	pCommentId, err := strconv.ParseUint(commentId, 10, 32)
 
 	if err != nil {
 		biz.BadRequestError.WithFields(&methodFields).WithCause(err).LaunchError(c)
@@ -73,6 +72,10 @@ func Action(ctx context.Context, c *app.RequestContext) {
 
 	switch rActionType {
 	case comment.ActionCommentType_ACTION_COMMENT_TYPE_ADD:
+		if !commentTextExists {
+			rErr = errors.New("comment text is required")
+			break
+		}
 		resp, err := commentClient.ActionComment(ctx, &comment.ActionCommentRequest{
 			ActorId:    actorId,
 			VideoId:    uint32(pVideoId),
@@ -92,6 +95,15 @@ func Action(ctx context.Context, c *app.RequestContext) {
 		)
 		return
 	case comment.ActionCommentType_ACTION_COMMENT_TYPE_DELETE:
+		if !commentIdExists {
+			rErr = errors.New("comment id is required")
+			break
+		}
+		pCommentId, err := strconv.ParseUint(commentId, 10, 32)
+		if err != nil {
+			rErr = err
+			break
+		}
 		resp, err := commentClient.ActionComment(ctx, &comment.ActionCommentRequest{
 			ActorId:    actorId,
 			VideoId:    uint32(pVideoId),
