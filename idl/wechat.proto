@@ -1,0 +1,37 @@
+syntax = "proto3";
+package douyin.wechat;
+option go_package = "douyin/wechat";
+
+message MessageChatRequest {
+  uint32 sender_id = 1;
+  uint32 receiver_id = 2;
+}
+
+message Message {
+  uint32 id = 1;
+  string content = 2;
+  string create_time = 3;
+}
+
+message MessageChatResponse {
+  uint32 status_code = 1;
+  string status_msg = 2;
+  repeated Message message_list = 3;
+}
+
+message MessageActionRequest {
+  uint32 sender_id = 1;
+  uint32 receiver_id = 2;
+  uint32 action_type = 3;
+  string content = 4;
+}
+
+message MessageActionResponse {
+  uint32 status_code = 1;
+  string status_msg = 2;
+}
+
+service WechatService {
+  rpc WechatChat(MessageChatRequest) returns (MessageChatResponse) {}
+  rpc WechatAction(MessageActionRequest) returns (MessageActionResponse) {}
+}
