@@ -2,66 +2,65 @@ package user
 
 import (
 	"context"
+	"strconv"
+	"time"
+	bizConstant "toktik/constant/biz"
+	bizConfig "toktik/constant/config"
+	"toktik/kitex_gen/douyin/user"
+	userService "toktik/kitex_gen/douyin/user/userservice"
+	"toktik/logging"
+
 	"github.com/cloudwego/hertz/pkg/app"
-	"github.com/cloudwego/hertz/pkg/protocol/consts"
+	httpStatus "github.com/cloudwego/hertz/pkg/protocol/consts"
 	"github.com/cloudwego/kitex/client"
 	consul "github.com/kitex-contrib/registry-consul"
-	"log"
-	"strconv"
-	"toktik/constant/config"
-	"toktik/kitex_gen/douyin/user"
-	"toktik/kitex_gen/douyin/user/userservice"
+	"github.com/sirupsen/logrus"
 )
 
-var userClient userservice.Client
+var userClient userService.Client
 
 func init() {
-	r, err := consul.NewConsulResolver(config.EnvConfig.CONSUL_ADDR)
+	r, err := consul.NewConsulResolver(bizConfig.EnvConfig.CONSUL_ADDR)
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
-	userClient, err = userservice.NewClient(config.UserServiceName, client.WithResolver(r))
+	userClient, err = userService.NewClient(bizConfig.UserServiceName, client.WithResolver(r))
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
 }
 
 func GetUserInfo(ctx context.Context, c *app.RequestContext) {
+	methodFields := logrus.Fields{
+		"time":   time.Now(),
+		"method": "GetUserInfo",
+	}
+	logger := logging.Logger.WithFields(methodFields)
+	logger.Debugf("Process start")
+
 	userId, idExist := c.GetQuery("user_id")
 	actorId := c.GetUint32("user_id")
 	id, err := strconv.Atoi(userId)
 
 	if !idExist || err != nil {
-		c.JSON(
-			consts.StatusBadRequest,
-			&user.UserResponse{
-				StatusCode: 1,
-				StatusMsg:  "invalid request",
-				User:       nil,
-			},
-		)
+		bizConstant.InvalidUserID.WithCause(err).WithFields(&methodFields).LaunchError(c)
 		return
 	}
 
+	logger.WithField("user_id", id).Debugf("Executing get user info")
 	resp, err := userClient.GetUser(ctx, &user.UserRequest{
 		UserId:  uint32(id),
 		ActorId: actorId,
 	})
 
 	if err != nil {
-		c.JSON(
-			consts.StatusOK,
-			&user.UserResponse{
-				StatusCode: 1,
-				StatusMsg:  err.Error(),
-				User:       nil,
-			},
-		)
+		bizConstant.RPCCallError.WithCause(err).WithFields(&methodFields).LaunchError(c)
 		return
 	}
 
+	logger.WithField("response", resp).Debugf("Get user info success")
 	c.JSON(
-		consts.StatusOK,
+		httpStatus.StatusOK,
 		resp,
 	)
 }

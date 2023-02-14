@@ -36,10 +36,11 @@ type FeedServiceImpl struct{}
 
 // ListVideos implements the FeedServiceImpl interface.
 func (s *FeedServiceImpl) ListVideos(ctx context.Context, req *feed.ListFeedRequest) (resp *feed.ListFeedResponse, err error) {
+	now := time.Now().UnixMilli()
 	latestTime, err := strconv.ParseInt(*req.LatestTime, 10, 64)
 	if err != nil {
 		if _, ok := err.(*strconv.NumError); ok {
-			latestTime = time.Now().UnixMilli()
+			latestTime = now
 		} else {
 			resp = &feed.ListFeedResponse{
 				StatusCode: biz.Unable2ParseLatestTimeStatusCode,
@@ -56,7 +57,7 @@ func (s *FeedServiceImpl) ListVideos(ctx context.Context, req *feed.ListFeedRequ
 		resp = &feed.ListFeedResponse{
 			StatusCode: biz.SQLQueryErrorStatusCode,
 			StatusMsg:  &biz.InternalServerErrorStatusMsg,
-			NextTime:   nil,
+			NextTime:   &now,
 			VideoList:  nil,
 		}
 		return resp, nil

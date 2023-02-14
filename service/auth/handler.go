@@ -2,27 +2,18 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"github.com/segmentio/ksuid"
+	"github.com/sirupsen/logrus"
 	"golang.org/x/crypto/bcrypt"
+	"time"
+	"toktik/constant/biz"
 	"toktik/kitex_gen/douyin/auth"
+	"toktik/logging"
 	"toktik/repo"
 	commonModel "toktik/repo/model"
 	authModel "toktik/service/auth/model"
 	"toktik/service/web/mw"
 )
-
-var StatusCodes = struct {
-	UserNameExist       uint32
-	ServiceNotAvailable uint32
-	UserNotFound        uint32
-	PasswordIncorrect   uint32
-}{
-	400101,
-	503101,
-	400102,
-	401103,
-}
 
 func HashPassword(password string) (string, error) {
 	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 14)
@@ -39,13 +30,27 @@ type AuthServiceImpl struct{}
 
 // Authenticate implements the AuthServiceImpl interface.
 func (s *AuthServiceImpl) Authenticate(ctx context.Context, req *auth.AuthenticateRequest) (resp *auth.AuthenticateResponse, err error) {
+	logger := logging.Logger.WithFields(logrus.Fields{
+		"time":   time.Now(),
+		"method": "Authenticate",
+		"token":  req.Token,
+	})
+	logger.Debugf("Process start")
 	if req == nil {
-		return nil, fmt.Errorf("failed")
+		logger.Warningf("request is nil")
+		return &auth.AuthenticateResponse{
+			StatusCode: biz.RequestIsNil,
+			StatusMsg:  biz.InternalServerErrorStatusMsg,
+		}, nil
 	}
 	userToken := repo.Q.UserToken
 	first, err := userToken.WithContext(ctx).Where(userToken.Token.Eq(req.Token)).First()
 	if err != nil {
-		return nil, fmt.Errorf("failed")
+		logger.Warningf(biz.TokenNotFoundMessage)
+		return &auth.AuthenticateResponse{
+			StatusCode: biz.TokenNotFound,
+			StatusMsg:  biz.TokenNotFoundMessage,
+		}, nil
 	}
 	resp = &auth.AuthenticateResponse{
 		StatusCode: 0,
@@ -63,14 +68,14 @@ func (s *AuthServiceImpl) Register(ctx context.Context, req *auth.RegisterReques
 	dbUser, err := user.WithContext(ctx).Where(user.Username.Eq(req.Username)).Select().Find()
 	if err != nil {
 		resp = &auth.RegisterResponse{
-			StatusCode: StatusCodes.ServiceNotAvailable,
+			StatusCode: biz.ServiceNotAvailable,
 			StatusMsg:  "数据库查询失败",
 		}
 		return
 	}
 	if len(dbUser) > 0 {
 		resp = &auth.RegisterResponse{
-			StatusCode: StatusCodes.UserNameExist,
+			StatusCode: biz.UserNameExist,
 			StatusMsg:  "用户名已存在",
 		}
 		return
@@ -78,7 +83,7 @@ func (s *AuthServiceImpl) Register(ctx context.Context, req *auth.RegisterReques
 	hashedPwd, err := HashPassword(req.Password)
 	if err != nil {
 		resp = &auth.RegisterResponse{
-			StatusCode: StatusCodes.ServiceNotAvailable,
+			StatusCode: biz.ServiceNotAvailable,
 			StatusMsg:  "密码加密失败",
 		}
 		return
@@ -96,7 +101,7 @@ func (s *AuthServiceImpl) Register(ctx context.Context, req *auth.RegisterReques
 		&newUser)
 	if err != nil {
 		resp = &auth.RegisterResponse{
-			StatusCode: StatusCodes.ServiceNotAvailable,
+			StatusCode: biz.ServiceNotAvailable,
 			StatusMsg:  "数据库保存失败",
 		}
 		return
@@ -111,7 +116,7 @@ func (s *AuthServiceImpl) Register(ctx context.Context, req *auth.RegisterReques
 
 	if err != nil {
 		resp = &auth.RegisterResponse{
-			StatusCode: StatusCodes.ServiceNotAvailable,
+			StatusCode: biz.ServiceNotAvailable,
 			StatusMsg:  "数据库保存失败",
 		}
 		return
@@ -131,21 +136,21 @@ func (s *AuthServiceImpl) Login(ctx context.Context, req *auth.LoginRequest) (re
 	dbUser, err := user.WithContext(ctx).Where(user.Username.Eq(req.Username)).Select().Find()
 	if err != nil {
 		resp = &auth.LoginResponse{
-			StatusCode: StatusCodes.ServiceNotAvailable,
+			StatusCode: biz.ServiceNotAvailable,
 			StatusMsg:  "数据库查询失败",
 		}
 		return
 	}
 	if len(dbUser) != 1 {
 		resp = &auth.LoginResponse{
-			StatusCode: StatusCodes.UserNotFound,
+			StatusCode: biz.UserNotFound,
 			StatusMsg:  "用户不存在",
 		}
 		return
 	}
 	if !CheckPasswordHash(req.Password, *dbUser[0].Password) {
 		resp = &auth.LoginResponse{
-			StatusCode: StatusCodes.PasswordIncorrect,
+			StatusCode: biz.PasswordIncorrect,
 			StatusMsg:  "密码错误",
 		}
 		return
@@ -172,7 +177,7 @@ func (s *AuthServiceImpl) Login(ctx context.Context, req *auth.LoginRequest) (re
 
 	if err != nil {
 		resp = &auth.LoginResponse{
-			StatusCode: StatusCodes.ServiceNotAvailable,
+			StatusCode: biz.ServiceNotAvailable,
 			StatusMsg:  "数据库保存失败",
 		}
 		return
