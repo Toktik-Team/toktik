@@ -3,6 +3,7 @@ package main
 import (
 	"toktik/constant/config"
 	"toktik/service/web/auth"
+	"toktik/service/web/comment"
 	"toktik/service/web/feed"
 	"toktik/service/web/mw"
 	"toktik/service/web/publish"
@@ -47,8 +48,8 @@ func main() {
 
 	// comment service
 	commentGroup := douyin.Group("/comment")
-	commentGroup.POST("/action")
-	commentGroup.GET("/list")
+	commentGroup.POST("/action/", comment.Action)
+	commentGroup.GET("/list/", comment.List)
 
 	// relation service
 	relationGroup := douyin.Group("/relation")

@@ -14,3 +14,6 @@ const FeedServiceAddr = ":40129"
 
 const UserServiceName = "toktik-user"
 const UserServiceAddr = ":40130"
+
+const CommentServiceName = "toktik-comment-api"
+const CommentServiceAddr = ":40131"

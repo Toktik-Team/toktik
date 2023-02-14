@@ -1,0 +1,52 @@
+syntax = "proto3";
+package douyin.comment;
+option go_package = "douyin/comment";
+
+import "user.proto";
+
+message Comment {
+  uint32 id = 1;
+  user.User user = 2;
+  string content = 3;
+  string create_date = 4;
+}
+
+enum ActionCommentType {
+  ACTION_COMMENT_TYPE_UNSPECIFIED = 0; // Only for protobuf compatibility
+  ACTION_COMMENT_TYPE_ADD = 1;
+  ACTION_COMMENT_TYPE_DELETE = 2;
+}
+
+message ActionCommentRequest {
+  uint32 actor_id = 1;
+  uint32 video_id = 2;
+  ActionCommentType action_type = 3;
+  oneof action {
+    string comment_text = 4;
+    uint32 comment_id = 5;
+  }
+}
+
+message ActionCommentResponse {
+  uint32 status_code = 1;
+  optional string status_msg = 2;
+  optional Comment comment = 3;
+}
+
+
+message ListCommentRequest {
+  uint32 actor_id = 1;
+  uint32 video_id = 2;
+}
+
+message ListCommentResponse {
+  uint32 status_code = 1;
+  optional string status_msg = 2;
+  repeated Comment comment_list = 3;
+}
+
+
+service CommentService {
+  rpc ActionComment(ActionCommentRequest) returns (ActionCommentResponse);
+  rpc ListComment(ListCommentRequest) returns (ListCommentResponse);
+}
