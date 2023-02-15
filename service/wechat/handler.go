@@ -50,11 +50,28 @@ func (s *WechatServiceImpl) WechatAction(ctx context.Context, req *wechat.Messag
 	}
 	senderID := req.SenderId
 	receiverID := req.ReceiverId
+
+	// 0 means chat with GPT
+	if receiverID == 0 {
+		err := s.handleChatGPT(ctx, senderID, req.Content, false, startTime.UnixMilli())
+		if err != nil {
+			logger.Warningf("handleChatGPT error: %v", err)
+			return &wechat.MessageActionResponse{
+				StatusCode: biz.ServiceNotAvailable,
+				StatusMsg:  err.Error(),
+			}, nil
+		}
+		return &wechat.MessageActionResponse{
+			StatusCode: 0,
+			StatusMsg:  "success",
+		}, nil
+	}
+
 	msg := &db.ChatMessage{
 		Msg:  req.Content,
 		Time: startTime.UnixMilli(),
 	}
-	// get proto binary data
+
 	msgStr, err := proto.Marshal(msg)
 	if err != nil {
 		logger.Warningf("proto marshal error: %v", err)
@@ -158,5 +175,30 @@ func (s *WechatServiceImpl) WechatChat(ctx context.Context, req *wechat.MessageC
 	logger.WithFields(logrus.Fields{
 		"message_list": respMessageList,
 	}).Debugf("Process end")
+	return
+}
+
+func (s *WechatServiceImpl) handleChatGPT(ctx context.Context, senderID uint32, content string, resetSession bool, time int64) (err error) {
+	logger := logging.Logger.WithFields(logrus.Fields{
+		"time":   time,
+		"method": "handleChatGPT",
+	})
+	logger.Debugf("Process start")
+	chatGPTMessage := db.ChatGPTMessage{
+		SenderId:     senderID,
+		Msg:          content,
+		ResetSession: resetSession,
+		Time:         time,
+	}
+	msgStr, err := proto.Marshal(&chatGPTMessage)
+	if err != nil {
+		logger.Warningf("proto marshal error: %v", err)
+		return err
+	}
+	cmd := rdb.Publish(ctx, "chatgpt", msgStr)
+	if cmd.Err() != nil {
+		logger.Warningf("redis publish error: %v", cmd.Err())
+		return cmd.Err()
+	}
 	return
 }
