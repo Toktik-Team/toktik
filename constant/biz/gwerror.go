@@ -68,5 +68,7 @@ func (G GWError) WithFields(fields *logrus.Fields) GWError {
 }
 
 var (
-	RPCCallError = GWError{HTTPStatusCode: consts.StatusInternalServerError, StatusCode: 500001, StatusMsg: "RPC call error"}
+	RPCCallError     = GWError{HTTPStatusCode: consts.StatusInternalServerError, StatusCode: 500001, StatusMsg: "RPC call error"}
+	UnAuthorized     = GWError{HTTPStatusCode: consts.StatusUnauthorized, StatusCode: 401001, StatusMsg: "Unauthorized"}
+	InvalidArguments = GWError{HTTPStatusCode: consts.StatusBadRequest, StatusCode: 400002, StatusMsg: "Invalid arguments"}
 )

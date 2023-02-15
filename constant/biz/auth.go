@@ -11,7 +11,6 @@ const (
 	ServiceNotAvailable = 503001
 	UserNotFound        = 400002
 	PasswordIncorrect   = 401003
-	RequestIsNil        = 500001
 	TokenNotFound       = 401001
 )
 

@@ -16,8 +16,6 @@ var (
 )
 
 var (
-	InvalidFormError = GWError{HTTPStatusCode: consts.StatusBadRequest, StatusCode: 400002, StatusMsg: "Invalid form"}
-
 	OpenFileFailedError = GWError{HTTPStatusCode: consts.StatusInternalServerError, StatusCode: 400005, StatusMsg: "Open file failed"}
 
 	SizeNotMatchError = GWError{HTTPStatusCode: consts.StatusInternalServerError, StatusCode: 400006, StatusMsg: "Size not match"}

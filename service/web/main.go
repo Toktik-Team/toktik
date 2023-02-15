@@ -8,6 +8,7 @@ import (
 	"toktik/service/web/mw"
 	"toktik/service/web/publish"
 	"toktik/service/web/user"
+	"toktik/service/web/wechat"
 
 	"github.com/cloudwego/hertz/pkg/app/server"
 	"github.com/hertz-contrib/gzip"
@@ -59,8 +60,8 @@ func main() {
 
 	// message service
 	messageGroup := douyin.Group("/message")
-	messageGroup.POST("/action")
-	messageGroup.GET("/chat")
+	messageGroup.POST("/action", wechat.MessageAction)
+	messageGroup.GET("/chat", wechat.MessageChat)
 
 	url := swagger.URL("http://localhost:8080/swagger/doc.json") // The url pointing to API definition
 	h.GET("/swagger/*any", swagger.WrapHandler(swaggerFiles.Handler, url))
