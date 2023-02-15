@@ -26,7 +26,7 @@ func ProtoJsonMiddleware() app.HandlerFunc {
 	}
 }
 
-func marshal(v interface{}) ([]byte, error) {
+func marshal(v any) ([]byte, error) {
 	switch v := v.(type) {
 	case proto.Message:
 		return m.Marshal(v)

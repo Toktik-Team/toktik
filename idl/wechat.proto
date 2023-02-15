@@ -11,6 +11,8 @@ message Message {
   uint32 id = 1;
   string content = 2;
   string create_time = 3;
+  optional uint32 from_user_id = 4;
+  optional uint32 to_user_id = 5;
 }
 
 message MessageChatResponse {

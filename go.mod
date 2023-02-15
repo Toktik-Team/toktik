@@ -14,6 +14,7 @@ require (
 	github.com/cloudwego/hertz v0.5.2
 	github.com/cloudwego/kitex v0.4.4
 	github.com/gofrs/uuid v4.4.0+incompatible
+	github.com/golang/protobuf v1.5.2
 	github.com/hertz-contrib/gzip v0.0.1
 	github.com/hertz-contrib/pprof v0.1.0
 	github.com/hertz-contrib/swagger v0.0.0-20220711030440-b6402d4709f0
@@ -72,7 +73,6 @@ require (
 	github.com/go-openapi/spec v0.20.4 // indirect
 	github.com/go-openapi/swag v0.19.15 // indirect
 	github.com/go-sql-driver/mysql v1.6.0 // indirect
-	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/google/go-cmp v0.5.9 // indirect
 	github.com/google/pprof v0.0.0-20220608213341-c488b8fa1db3 // indirect
 	github.com/hashicorp/consul/api v1.12.0 // indirect

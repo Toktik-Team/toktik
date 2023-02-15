@@ -6,6 +6,7 @@ import (
 	"github.com/golang/protobuf/proto"
 	"github.com/redis/go-redis/v9"
 	"github.com/sirupsen/logrus"
+	"strconv"
 	"time"
 	"toktik/constant/biz"
 	"toktik/constant/config"
@@ -30,6 +31,60 @@ type WechatServiceImpl struct{}
 func (s *WechatServiceImpl) generateKey(sender, receiver *uint32) *string {
 	key := fmt.Sprintf("chat:%d:%d", *sender, *receiver)
 	return &key
+}
+
+// WechatAction implements the WechatServiceImpl interface.
+func (s *WechatServiceImpl) WechatAction(ctx context.Context, req *wechat.MessageActionRequest) (resp *wechat.MessageActionResponse, err error) {
+	startTime := time.Now()
+	logger := logging.Logger.WithFields(logrus.Fields{
+		"time":   startTime,
+		"method": "WechatAction",
+	})
+	logger.Debugf("Process start")
+	if req == nil {
+		logger.Warningf("request is nil")
+		return &wechat.MessageActionResponse{
+			StatusCode: biz.RequestIsNil,
+			StatusMsg:  "request is nil",
+		}, nil
+	}
+	senderID := req.SenderId
+	receiverID := req.ReceiverId
+	msg := &db.ChatMessage{
+		Msg:  req.Content,
+		Time: startTime.UnixMilli(),
+	}
+	// get proto binary data
+	msgStr, err := proto.Marshal(msg)
+	if err != nil {
+		logger.Warningf("proto marshal error: %v", err)
+		resp = &wechat.MessageActionResponse{
+			StatusCode: biz.ProtoMarshalError,
+			StatusMsg:  err.Error(),
+		}
+		return
+	}
+	key := *s.generateKey(&senderID, &receiverID)
+	cmd := rdb.LPush(ctx, key, msgStr)
+	if cmd.Err() != nil {
+		logger.Warningf("redis error: %v", cmd.Err())
+		resp = &wechat.MessageActionResponse{
+			StatusCode: biz.RedisError,
+			StatusMsg:  cmd.Err().Error(),
+		}
+		return
+	}
+	resp = &wechat.MessageActionResponse{
+		StatusCode: 0,
+		StatusMsg:  "success",
+	}
+	logger.WithFields(logrus.Fields{
+		"sender_id":   senderID,
+		"receiver_id": receiverID,
+		"content":     req.Content,
+		"cost_time":   time.Since(startTime).Milliseconds(),
+	}).Debugf("Process end")
+	return
 }
 
 // WechatChat implements the WechatServiceImpl interface.
@@ -81,13 +136,17 @@ func (s *WechatServiceImpl) WechatChat(ctx context.Context, req *wechat.MessageC
 			respMessageList = append(respMessageList, &wechat.Message{
 				Id:         uint32(i),
 				Content:    "[消息解析Message broken]",
-				CreateTime: time.Unix(0, time.Now().UnixNano()).Format("2006-01-02 15:04:05"),
+				CreateTime: strconv.FormatInt(time.Now().UnixMilli(), 10),
+				FromUserId: &senderID,
+				ToUserId:   &receiverID,
 			})
 		} else {
 			respMessageList = append(respMessageList, &wechat.Message{
 				Id:         uint32(i),
 				Content:    msg.Msg,
-				CreateTime: time.Unix(0, msg.Time*int64(time.Millisecond)).Format("2006-01-02 15:04:05"),
+				CreateTime: strconv.FormatInt(msg.Time, 10),
+				FromUserId: &senderID,
+				ToUserId:   &receiverID,
 			})
 		}
 	}
@@ -96,52 +155,8 @@ func (s *WechatServiceImpl) WechatChat(ctx context.Context, req *wechat.MessageC
 		StatusMsg:   "success",
 		MessageList: respMessageList,
 	}
+	logger.WithFields(logrus.Fields{
+		"message_list": respMessageList,
+	}).Debugf("Process end")
 	return
-}
-
-// WechatAction implements the WechatServiceImpl interface.
-func (s *WechatServiceImpl) WechatAction(ctx context.Context, req *wechat.MessageActionRequest) (resp *wechat.MessageActionResponse, err error) {
-	startTime := time.Now()
-	logger := logging.Logger.WithFields(logrus.Fields{
-		"time":   startTime,
-		"method": "WechatAction",
-	})
-	logger.Debugf("Process start")
-	if req == nil {
-		logger.Warningf("request is nil")
-		return &wechat.MessageActionResponse{
-			StatusCode: biz.RequestIsNil,
-			StatusMsg:  "request is nil",
-		}, nil
-	}
-	senderID := req.SenderId
-	receiverID := req.ReceiverId
-	msg := &db.ChatMessage{
-		Msg:  req.Content,
-		Time: startTime.UnixMilli(),
-	}
-	// get proto binary data
-	msgStr, err := proto.Marshal(msg)
-	if err != nil {
-		logger.Warningf("proto marshal error: %v", err)
-		resp = &wechat.MessageActionResponse{
-			StatusCode: biz.ProtoMarshalError,
-			StatusMsg:  err.Error(),
-		}
-		return
-	}
-	key := *s.generateKey(&senderID, &receiverID)
-	cmd := rdb.LPush(ctx, key, msgStr)
-	if cmd.Err() != nil {
-		logger.Warningf("redis error: %v", cmd.Err())
-		resp = &wechat.MessageActionResponse{
-			StatusCode: biz.RedisError,
-			StatusMsg:  cmd.Err().Error(),
-		}
-		return
-	}
-	return &wechat.MessageActionResponse{
-		StatusCode: 0,
-		StatusMsg:  "success",
-	}, nil
 }

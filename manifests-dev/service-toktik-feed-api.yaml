@@ -1,17 +1,17 @@
 apiVersion: v1
 kind: Service
 metadata:
-  labels:
-    app: toktik-feed-api
-  name: toktik-feed-api
-  namespace: toktik-service-bundle
-spec:
-  ports:
-    - name: grpc
-      port: 40129
-      protocol: TCP
-      targetPort: 40129
-  selector:
+    labels:
+        app: toktik-feed-api
     name: toktik-feed-api
-    branch: dev
-  type: ClusterIP
+    namespace: toktik-service-bundle
+spec:
+    ports:
+        -   name: grpc
+            port: 40129
+            protocol: TCP
+            targetPort: 40129
+    selector:
+        name: toktik-feed-api
+        branch: dev
+    type: ClusterIP

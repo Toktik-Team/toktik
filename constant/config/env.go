@@ -3,6 +3,7 @@ package config
 import (
 	"fmt"
 	"github.com/joho/godotenv"
+	"github.com/sirupsen/logrus"
 	"log"
 	"os"
 	"reflect"
@@ -124,7 +125,7 @@ func envInit() {
 			{
 				configDefaultValue, ok := fieldValue.(int)
 				if !ok {
-					logging.Logger.WithFields(map[string]interface{}{
+					logging.Logger.WithFields(logrus.Fields{
 						"field": fieldName,
 						"type":  "int",
 						"value": fieldValue,
@@ -139,7 +140,7 @@ func envInit() {
 				if len(envValue) > 0 {
 					envValueInteger, err := strconv.ParseInt(envValue, 10, 64)
 					if err != nil {
-						logging.Logger.WithFields(map[string]interface{}{
+						logging.Logger.WithFields(logrus.Fields{
 							"field": fieldName,
 							"type":  "int",
 							"value": fieldValue,
@@ -155,7 +156,7 @@ func envInit() {
 			{
 				configDefaultValue, ok := fieldValue.(string)
 				if !ok {
-					logging.Logger.WithFields(map[string]interface{}{
+					logging.Logger.WithFields(logrus.Fields{
 						"field": fieldName,
 						"type":  "int",
 						"value": fieldValue,

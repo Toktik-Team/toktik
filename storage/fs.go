@@ -35,7 +35,7 @@ func (f FSStorage) Upload(fileName string, content io.Reader) (output *PutObject
 	dir := path.Dir(filePath)
 	err = os.MkdirAll(dir, os.FileMode(0755))
 	if err != nil {
-		logger.WithFields(map[string]interface{}{
+		logger.WithFields(logrus.Fields{
 			"time": time.Now(),
 			"err":  err,
 		}).Debug("failed writing creating directory before writing file")
@@ -43,7 +43,7 @@ func (f FSStorage) Upload(fileName string, content io.Reader) (output *PutObject
 	}
 	err = os.WriteFile(filePath, all, os.FileMode(0755))
 	if err != nil {
-		logger.WithFields(map[string]interface{}{
+		logger.WithFields(logrus.Fields{
 			"time": time.Now(),
 			"err":  err,
 		}).Debug("failed writing content to file")

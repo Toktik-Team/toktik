@@ -25,7 +25,7 @@ func init() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	Client, err = wechatservice.NewClient(bizConfig.AuthServiceName, client.WithResolver(r))
+	Client, err = wechatservice.NewClient(bizConfig.WechatServiceName, client.WithResolver(r))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -113,24 +113,24 @@ func MessageChat(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	receiverID, exist := c.GetQuery("to_user_id")
+	senderId, exist := c.GetQuery("to_user_id")
 	if !exist {
 		bizConstant.InvalidArguments.WithFields(&methodFields).LaunchError(c)
 		return
 	}
-	receiverIDInt, err := strconv.ParseInt(receiverID, 10, 32)
+	senderIdInt, err := strconv.ParseInt(senderId, 10, 32)
 	if err != nil {
 		bizConstant.InvalidArguments.WithCause(err).WithFields(&methodFields).LaunchError(c)
 		return
 	}
 
 	logger.WithFields(logrus.Fields{
-		"to_user_id": receiverIDInt,
+		"to_user_id": senderIdInt,
 	}).Debugf("Executing message chat")
 
 	messageActionResponse, err := Client.WechatChat(ctx, &wechat.MessageChatRequest{
-		SenderId:   userId,
-		ReceiverId: uint32(receiverIDInt),
+		SenderId:   uint32(senderIdInt),
+		ReceiverId: userId,
 	})
 
 	if err != nil {

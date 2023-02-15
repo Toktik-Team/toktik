@@ -24,7 +24,7 @@ func (G GWError) Error() string {
 
 // extractFieldsFromRequest extracts important fields from request context for debugging purpose.
 func extractFieldsFromRequest(c *app.RequestContext) logrus.Fields {
-	return logrus.Fields{"request_context_info": map[string]interface{}{
+	return logrus.Fields{"request_context_info": map[string]any{
 		"request_id":   c.Request.Header.Get("X-Request-Id"),
 		"method":       c.Method(),
 		"host":         c.Host(),
@@ -49,7 +49,7 @@ func (G GWError) LaunchError(c *app.RequestContext) {
 		logger = logger.WithField("cause", *G.Cause)
 	}
 	logger.Debugf("launch error: %v", G)
-	c.JSON(G.HTTPStatusCode, map[string]interface{}{
+	c.JSON(G.HTTPStatusCode, map[string]any{
 		"status_code": G.StatusCode,
 		"status_msg":  G.StatusMsg,
 	})

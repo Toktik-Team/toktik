@@ -1,17 +1,17 @@
 apiVersion: v1
 kind: Service
 metadata:
-  labels:
-    app: toktik-http-api
-  name: toktik-http-api
-  namespace: toktik-service-bundle
-spec:
-  ports:
-    - name: http
-      port: 40126
-      protocol: TCP
-      targetPort: 40126
-  selector:
+    labels:
+        app: toktik-http-api
     name: toktik-http-api
-    branch: dev
-  type: ClusterIP
+    namespace: toktik-service-bundle
+spec:
+    ports:
+        -   name: http
+            port: 40126
+            protocol: TCP
+            targetPort: 40126
+    selector:
+        name: toktik-http-api
+        branch: dev
+    type: ClusterIP

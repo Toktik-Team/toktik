@@ -4,9 +4,6 @@ import "github.com/cloudwego/hertz/pkg/protocol/consts"
 
 const (
 	VideoCount = 30
-
-	Unable2ParseLatestTimeStatusCode = 400001
-	SQLQueryErrorStatusCode          = 500001
 )
 
 var (

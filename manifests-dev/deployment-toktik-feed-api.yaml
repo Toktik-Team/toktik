@@ -1,50 +1,50 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  annotations:
-    sidecar.jaegertracing.io/inject: 'true'
-  labels:
-    app: toktik-feed-api
-  name: toktik-feed-api
-  namespace: toktik-service-bundle
-spec:
-  selector:
-    matchLabels:
-      name: toktik-feed-api
-  template:
-    metadata:
-      labels:
+    annotations:
+        sidecar.jaegertracing.io/inject: 'true'
+    labels:
         app: toktik-feed-api
-        branch: dev
-        version: ${BUILD_NUMBER}-${CI_COMMIT_ID}
-        name: toktik-feed-api
-        dream-app: toktik-feed-api
-        dream-unit: toktik-feed-api
-    spec:
-      imagePullSecrets:
-        - name: regcred
-      containers:
-        - image: ${IMAGE}
-          imagePullPolicy: IfNotPresent
-          name: toktik-feed-api
-          command:
-            - /bin/bash
-          args:
-            - bootstrap-feed.sh
-          envFrom:
-            - configMapRef:
-                name: env-config
-            - configMapRef:
-                name: config
-          ports:
-            - name: grpc-40129
-              containerPort: 40129
-              protocol: TCP
-          resources:
-            limits:
-              cpu: 500m
-              memory: 256Mi
-            requests:
-              cpu: 100m
-              memory: 8Mi
-      terminationGracePeriodSeconds: 30
+    name: toktik-feed-api
+    namespace: toktik-service-bundle
+spec:
+    selector:
+        matchLabels:
+            name: toktik-feed-api
+    template:
+        metadata:
+            labels:
+                app: toktik-feed-api
+                branch: dev
+                version: ${BUILD_NUMBER}-${CI_COMMIT_ID}
+                name: toktik-feed-api
+                dream-app: toktik-feed-api
+                dream-unit: toktik-feed-api
+        spec:
+            imagePullSecrets:
+                -   name: regcred
+            containers:
+                -   image: ${IMAGE}
+                    imagePullPolicy: IfNotPresent
+                    name: toktik-feed-api
+                    command:
+                        - /bin/bash
+                    args:
+                        - bootstrap-feed.sh
+                    envFrom:
+                        -   configMapRef:
+                                name: env-config
+                        -   configMapRef:
+                                name: config
+                    ports:
+                        -   name: grpc-40129
+                            containerPort: 40129
+                            protocol: TCP
+                    resources:
+                        limits:
+                            cpu: 500m
+                            memory: 256Mi
+                        requests:
+                            cpu: 100m
+                            memory: 8Mi
+            terminationGracePeriodSeconds: 30

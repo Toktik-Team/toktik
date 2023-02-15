@@ -1,48 +1,48 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  annotations:
-    sidecar.jaegertracing.io/inject: 'true'
-  labels:
-    app: toktik-http-api
-  name: toktik-http-api
-  namespace: toktik-service-bundle
-spec:
-  selector:
-    matchLabels:
-      name: toktik-http-api
-  template:
-    metadata:
-      labels:
+    annotations:
+        sidecar.jaegertracing.io/inject: 'true'
+    labels:
         app: toktik-http-api
-        branch: dev
-        version: ${BUILD_NUMBER}-${CI_COMMIT_ID}
-        name: toktik-http-api
-        dream-app: toktik-http-api
-        dream-unit: toktik-http-api
-    spec:
-      imagePullSecrets:
-        - name: regcred
-      containers:
-        - image: ${IMAGE}
-          imagePullPolicy: IfNotPresent
-          name: toktik-http-api
-          command:
-            - bin/web
-          envFrom:
-            - configMapRef:
-                name: env-config
-            - configMapRef:
-                name: config
-          ports:
-            - name: http-40126
-              containerPort: 40126
-              protocol: TCP
-          resources:
-            limits:
-              cpu: 500m
-              memory: 256Mi
-            requests:
-              cpu: 100m
-              memory: 8Mi
-      terminationGracePeriodSeconds: 30
+    name: toktik-http-api
+    namespace: toktik-service-bundle
+spec:
+    selector:
+        matchLabels:
+            name: toktik-http-api
+    template:
+        metadata:
+            labels:
+                app: toktik-http-api
+                branch: dev
+                version: ${BUILD_NUMBER}-${CI_COMMIT_ID}
+                name: toktik-http-api
+                dream-app: toktik-http-api
+                dream-unit: toktik-http-api
+        spec:
+            imagePullSecrets:
+                -   name: regcred
+            containers:
+                -   image: ${IMAGE}
+                    imagePullPolicy: IfNotPresent
+                    name: toktik-http-api
+                    command:
+                        - bin/web
+                    envFrom:
+                        -   configMapRef:
+                                name: env-config
+                        -   configMapRef:
+                                name: config
+                    ports:
+                        -   name: http-40126
+                            containerPort: 40126
+                            protocol: TCP
+                    resources:
+                        limits:
+                            cpu: 500m
+                            memory: 256Mi
+                        requests:
+                            cpu: 100m
+                            memory: 8Mi
+            terminationGracePeriodSeconds: 30

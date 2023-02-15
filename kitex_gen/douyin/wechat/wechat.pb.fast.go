@@ -64,6 +64,16 @@ func (x *Message) FastRead(buf []byte, _type int8, number int32) (offset int, er
 		if err != nil {
 			goto ReadFieldError
 		}
+	case 4:
+		offset, err = x.fastReadField4(buf, _type)
+		if err != nil {
+			goto ReadFieldError
+		}
+	case 5:
+		offset, err = x.fastReadField5(buf, _type)
+		if err != nil {
+			goto ReadFieldError
+		}
 	default:
 		offset, err = fastpb.Skip(buf, _type, number)
 		if err != nil {
@@ -89,6 +99,18 @@ func (x *Message) fastReadField2(buf []byte, _type int8) (offset int, err error)
 
 func (x *Message) fastReadField3(buf []byte, _type int8) (offset int, err error) {
 	x.CreateTime, offset, err = fastpb.ReadString(buf, _type)
+	return offset, err
+}
+
+func (x *Message) fastReadField4(buf []byte, _type int8) (offset int, err error) {
+	tmp, offset, err := fastpb.ReadUint32(buf, _type)
+	x.FromUserId = &tmp
+	return offset, err
+}
+
+func (x *Message) fastReadField5(buf []byte, _type int8) (offset int, err error) {
+	tmp, offset, err := fastpb.ReadUint32(buf, _type)
+	x.ToUserId = &tmp
 	return offset, err
 }
 
@@ -264,6 +286,8 @@ func (x *Message) FastWrite(buf []byte) (offset int) {
 	offset += x.fastWriteField1(buf[offset:])
 	offset += x.fastWriteField2(buf[offset:])
 	offset += x.fastWriteField3(buf[offset:])
+	offset += x.fastWriteField4(buf[offset:])
+	offset += x.fastWriteField5(buf[offset:])
 	return offset
 }
 
@@ -288,6 +312,22 @@ func (x *Message) fastWriteField3(buf []byte) (offset int) {
 		return offset
 	}
 	offset += fastpb.WriteString(buf[offset:], 3, x.CreateTime)
+	return offset
+}
+
+func (x *Message) fastWriteField4(buf []byte) (offset int) {
+	if x.FromUserId == nil {
+		return offset
+	}
+	offset += fastpb.WriteUint32(buf[offset:], 4, *x.FromUserId)
+	return offset
+}
+
+func (x *Message) fastWriteField5(buf []byte) (offset int) {
+	if x.ToUserId == nil {
+		return offset
+	}
+	offset += fastpb.WriteUint32(buf[offset:], 5, *x.ToUserId)
 	return offset
 }
 
@@ -427,6 +467,8 @@ func (x *Message) Size() (n int) {
 	n += x.sizeField1()
 	n += x.sizeField2()
 	n += x.sizeField3()
+	n += x.sizeField4()
+	n += x.sizeField5()
 	return n
 }
 
@@ -451,6 +493,22 @@ func (x *Message) sizeField3() (n int) {
 		return n
 	}
 	n += fastpb.SizeString(3, x.CreateTime)
+	return n
+}
+
+func (x *Message) sizeField4() (n int) {
+	if x.FromUserId == nil {
+		return n
+	}
+	n += fastpb.SizeUint32(4, *x.FromUserId)
+	return n
+}
+
+func (x *Message) sizeField5() (n int) {
+	if x.ToUserId == nil {
+		return n
+	}
+	n += fastpb.SizeUint32(5, *x.ToUserId)
 	return n
 }
 
@@ -567,6 +625,8 @@ var fieldIDToName_Message = map[int32]string{
 	1: "Id",
 	2: "Content",
 	3: "CreateTime",
+	4: "FromUserId",
+	5: "ToUserId",
 }
 
 var fieldIDToName_MessageChatResponse = map[int32]string{

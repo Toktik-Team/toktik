@@ -14,6 +14,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
-    - name: Build services into one image
-      run: docker build . -f Dockerfile --tag toktik-srv:$(date +%s)
+      - uses: actions/checkout@v3
+      - name: Build services into one image
+        run: docker build . -f Dockerfile --tag toktik-srv:$(date +%s)

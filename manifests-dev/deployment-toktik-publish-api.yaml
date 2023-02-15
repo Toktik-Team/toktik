@@ -1,57 +1,57 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  annotations:
-    sidecar.jaegertracing.io/inject: 'true'
-  labels:
-    app: toktik-publish-api
-  name: toktik-publish-api
-  namespace: toktik-service-bundle
-spec:
-  selector:
-    matchLabels:
-      name: toktik-publish-api
-  template:
-    metadata:
-      labels:
+    annotations:
+        sidecar.jaegertracing.io/inject: 'true'
+    labels:
         app: toktik-publish-api
-        branch: dev
-        version: ${BUILD_NUMBER}-${CI_COMMIT_ID}
-        name: toktik-publish-api
-        dream-app: toktik-publish-api
-        dream-unit: toktik-publish-api
-    spec:
-      volumes:
-        - name: volume-storage
-          persistentVolumeClaim:
-            claimName: storage
-      imagePullSecrets:
-        - name: regcred
-      containers:
-        - image: ${IMAGE}
-          imagePullPolicy: IfNotPresent
-          name: toktik-publish-api
-          command:
-            - /bin/bash
-          args:
-            - bootstrap-publish.sh
-          envFrom:
-            - configMapRef:
-                name: env-config
-            - configMapRef:
-                name: config
-          ports:
-            - name: grpc-40128
-              containerPort: 40128
-              protocol: TCP
-          resources:
-            limits:
-              cpu: 500m
-              memory: 256Mi
-            requests:
-              cpu: 100m
-              memory: 8Mi
-          volumeMounts:
-            - name: volume-storage
-              mountPath: /data/storage
-      terminationGracePeriodSeconds: 30
+    name: toktik-publish-api
+    namespace: toktik-service-bundle
+spec:
+    selector:
+        matchLabels:
+            name: toktik-publish-api
+    template:
+        metadata:
+            labels:
+                app: toktik-publish-api
+                branch: dev
+                version: ${BUILD_NUMBER}-${CI_COMMIT_ID}
+                name: toktik-publish-api
+                dream-app: toktik-publish-api
+                dream-unit: toktik-publish-api
+        spec:
+            volumes:
+                -   name: volume-storage
+                    persistentVolumeClaim:
+                        claimName: storage
+            imagePullSecrets:
+                -   name: regcred
+            containers:
+                -   image: ${IMAGE}
+                    imagePullPolicy: IfNotPresent
+                    name: toktik-publish-api
+                    command:
+                        - /bin/bash
+                    args:
+                        - bootstrap-publish.sh
+                    envFrom:
+                        -   configMapRef:
+                                name: env-config
+                        -   configMapRef:
+                                name: config
+                    ports:
+                        -   name: grpc-40128
+                            containerPort: 40128
+                            protocol: TCP
+                    resources:
+                        limits:
+                            cpu: 500m
+                            memory: 256Mi
+                        requests:
+                            cpu: 100m
+                            memory: 8Mi
+                    volumeMounts:
+                        -   name: volume-storage
+                            mountPath: /data/storage
+            terminationGracePeriodSeconds: 30
