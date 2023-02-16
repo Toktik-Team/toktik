@@ -6,6 +6,7 @@ import (
 	"github.com/golang/protobuf/proto"
 	"github.com/redis/go-redis/v9"
 	"github.com/sirupsen/logrus"
+	"google.golang.org/protobuf/encoding/protojson"
 	"strconv"
 	"time"
 	"toktik/constant/biz"
@@ -146,13 +147,9 @@ func (s *WechatServiceImpl) WechatChat(ctx context.Context, req *wechat.MessageC
 		err = proto.Unmarshal([]byte(message), msg)
 		if err != nil {
 			logger.Warningf("proto unmarshal error: %v", err)
-			resp = &wechat.MessageChatResponse{
-				StatusCode: biz.ProtoUnmarshalError,
-				StatusMsg:  err.Error(),
-			}
 			respMessageList = append(respMessageList, &wechat.Message{
 				Id:         uint32(i),
-				Content:    "[消息解析Message broken]",
+				Content:    fmt.Sprintf("%s", message),
 				CreateTime: strconv.FormatInt(time.Now().UnixMilli(), 10),
 				FromUserId: &senderID,
 				ToUserId:   &receiverID,
@@ -175,7 +172,7 @@ func (s *WechatServiceImpl) WechatChat(ctx context.Context, req *wechat.MessageC
 	logger.WithFields(logrus.Fields{
 		"message_list": respMessageList,
 	}).Debugf("Process end")
-	return
+	return resp, nil
 }
 
 func (s *WechatServiceImpl) handleChatGPT(ctx context.Context, senderID uint32, content string, resetSession bool, time int64) (err error) {
@@ -190,7 +187,7 @@ func (s *WechatServiceImpl) handleChatGPT(ctx context.Context, senderID uint32, 
 		ResetSession: resetSession,
 		Time:         time,
 	}
-	msgStr, err := proto.Marshal(&chatGPTMessage)
+	msgStr, err := protojson.Marshal(&chatGPTMessage)
 	if err != nil {
 		logger.Warningf("proto marshal error: %v", err)
 		return err
