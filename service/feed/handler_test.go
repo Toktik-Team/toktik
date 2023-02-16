@@ -154,14 +154,18 @@ func (m MockUserClient) GetUser(ctx context.Context, Req *user.UserRequest, call
 type MockCommentClient struct {
 }
 
+func (m MockCommentClient) CountComment(ctx context.Context, Req *comment.CountCommentRequest, callOptions ...callopt.Option) (r *comment.CountCommentResponse, err error) {
+	return &comment.CountCommentResponse{
+		StatusCode:   biz.OkStatusCode,
+		StatusMsg:    &biz.OkStatusMsg,
+		CommentCount: 0,
+	}, nil
+}
+
 func (m MockCommentClient) ActionComment(ctx context.Context, Req *comment.ActionCommentRequest, callOptions ...callopt.Option) (r *comment.ActionCommentResponse, err error) {
 	panic("unimplemented")
 }
 
 func (m MockCommentClient) ListComment(ctx context.Context, Req *comment.ListCommentRequest, callOptions ...callopt.Option) (r *comment.ListCommentResponse, err error) {
-	return &comment.ListCommentResponse{
-		StatusCode:  biz.OkStatusCode,
-		StatusMsg:   &biz.OkStatusMsg,
-		CommentList: []*comment.Comment{},
-	}, nil
+	panic("unimplemented")
 }

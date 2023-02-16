@@ -110,7 +110,7 @@ func (s *FeedServiceImpl) ListVideos(ctx context.Context, req *feed.ListFeedRequ
 			continue
 		}
 
-		commentCount, err := CommentClient.ListComment(ctx, &comment.ListCommentRequest{
+		commentCount, err := CommentClient.CountComment(ctx, &comment.CountCommentRequest{
 			ActorId: actorId,
 			VideoId: m.ID,
 		})
@@ -126,7 +126,7 @@ func (s *FeedServiceImpl) ListVideos(ctx context.Context, req *feed.ListFeedRequ
 			CoverUrl: coverUrl,
 			// TODO: finish this
 			FavoriteCount: 0,
-			CommentCount:  uint32(len(commentCount.CommentList)),
+			CommentCount:  commentCount.CommentCount,
 			// TODO: finish this
 			IsFavorite: false,
 			Title:      m.Title,
