@@ -72,7 +72,7 @@ func TestCommentServiceImpl_ActionComment_Add(t *testing.T) {
 		WillReturnRows(videoRows)
 
 	mock.DBMock.
-		ExpectQuery(regexp.QuoteMeta(`SELECT count(*) FROM "comments" WHERE "comments"."deleted_at" IS NULL`)).
+		ExpectQuery(regexp.QuoteMeta(`SELECT count(*) FROM "comments" WHERE "comments"."video_id" = $1 AND "comments"."deleted_at" IS NULL`)).
 		WillReturnRows(sqlmock.NewRows([]string{"count"}).AddRow(0))
 
 	mock.DBMock.ExpectBegin()

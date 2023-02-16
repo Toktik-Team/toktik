@@ -9,6 +9,7 @@ import (
 	"testing"
 	"time"
 	"toktik/constant/biz"
+	"toktik/kitex_gen/douyin/comment"
 	"toktik/kitex_gen/douyin/feed"
 	"toktik/kitex_gen/douyin/user"
 	"toktik/repo/model"
@@ -47,8 +48,8 @@ func TestMain(m *testing.M) {
 			Author:        &mockUser,
 			PlayUrl:       "https://test.com/test_video_file_" + strconv.Itoa(i) + ".mp4",
 			CoverUrl:      "https://test.com/test_video_cover_file_" + strconv.Itoa(i) + ".png",
-			FavoriteCount: 0,     // TODO
-			CommentCount:  0,     // TODO
+			FavoriteCount: 0, // TODO
+			CommentCount:  0,
 			IsFavorite:    false, // TODO
 			Title:         "Test Video " + strconv.Itoa(i),
 		}
@@ -81,6 +82,7 @@ func TestFeedServiceImpl_ListVideos(t *testing.T) {
 	}
 
 	UserClient = MockUserClient{}
+	CommentClient = MockCommentClient{}
 
 	monkey.Patch(storage.GetLink, func(fileName string) (string, error) {
 		return "https://test.com/" + fileName, nil
@@ -147,4 +149,23 @@ type MockUserClient struct {
 
 func (m MockUserClient) GetUser(ctx context.Context, Req *user.UserRequest, callOptions ...callopt.Option) (r *user.UserResponse, err error) {
 	return &user.UserResponse{StatusCode: biz.OkStatusCode, User: &mockUser}, nil
+}
+
+type MockCommentClient struct {
+}
+
+func (m MockCommentClient) CountComment(ctx context.Context, Req *comment.CountCommentRequest, callOptions ...callopt.Option) (r *comment.CountCommentResponse, err error) {
+	return &comment.CountCommentResponse{
+		StatusCode:   biz.OkStatusCode,
+		StatusMsg:    &biz.OkStatusMsg,
+		CommentCount: 0,
+	}, nil
+}
+
+func (m MockCommentClient) ActionComment(ctx context.Context, Req *comment.ActionCommentRequest, callOptions ...callopt.Option) (r *comment.ActionCommentResponse, err error) {
+	panic("unimplemented")
+}
+
+func (m MockCommentClient) ListComment(ctx context.Context, Req *comment.ListCommentRequest, callOptions ...callopt.Option) (r *comment.ListCommentResponse, err error) {
+	panic("unimplemented")
 }

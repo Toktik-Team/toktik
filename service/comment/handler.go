@@ -127,7 +127,7 @@ func (s *CommentServiceImpl) ActionComment(ctx context.Context, req *comment.Act
 }
 
 func addComment(ctx context.Context, logger *logrus.Entry, pUser *user.User, pVideoID uint32, pCommentText string) (resp *comment.ActionCommentResponse, err error) {
-	count, err := gen.Q.Comment.WithContext(ctx).Count()
+	count, err := count(ctx, pVideoID)
 	if err != nil {
 		logger.WithFields(logrus.Fields{
 			"time": time.Now(),
@@ -306,4 +306,44 @@ func (s *CommentServiceImpl) ListComment(ctx context.Context, req *comment.ListC
 		StatusMsg:   &biz.OkStatusMsg,
 		CommentList: rCommentList,
 	}, nil
+}
+
+// CountComment implements the CommentServiceImpl interface.
+func (s *CommentServiceImpl) CountComment(ctx context.Context, req *comment.CountCommentRequest) (resp *comment.CountCommentResponse, err error) {
+	logger := logging.Logger.WithFields(logrus.Fields{
+		"user_id":  req.ActorId,
+		"video_id": req.VideoId,
+		"time":     time.Now(),
+		"function": "CountComment",
+	})
+	logger.Debug("Process start")
+
+	rCount, err := count(ctx, req.VideoId)
+	if err != nil {
+		logger.WithFields(logrus.Fields{
+			"time": time.Now(),
+			"err":  err,
+		}).Debug("failed to count comment")
+		return &comment.CountCommentResponse{
+			StatusCode: biz.UnableToQueryComment,
+			StatusMsg:  &biz.InternalServerErrorStatusMsg,
+		}, nil
+	}
+
+	logger.WithFields(logrus.Fields{
+		"time":     time.Now(),
+		"response": resp,
+	}).Debug("all process done, ready to launch response")
+	return &comment.CountCommentResponse{
+		StatusCode:   biz.OkStatusCode,
+		StatusMsg:    &biz.OkStatusMsg,
+		CommentCount: rCount,
+	}, nil
+}
+
+func count(ctx context.Context, videoId uint32) (count uint32, err error) {
+	rCount, err := gen.Q.Comment.WithContext(ctx).
+		Where(gen.Q.Comment.VideoId.Eq(videoId)).
+		Count()
+	return uint32(rCount), err
 }
