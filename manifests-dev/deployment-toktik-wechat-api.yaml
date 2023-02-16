@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    sidecar.jaegertracing.io/inject: 'true'
+  labels:
+    app: toktik-wechat-api
+  name: toktik-wechat-api
+  namespace: toktik-service-bundle
+spec:
+  selector:
+    matchLabels:
+      name: toktik-wechat-api
+  template:
+    metadata:
+      labels:
+        app: toktik-wechat-api
+        branch: dev
+        version: ${BUILD_NUMBER}-${CI_COMMIT_ID}
+        name: toktik-wechat-api
+        dream-app: toktik-wechat-api
+        dream-unit: toktik-wechat-api
+    spec:
+      imagePullSecrets:
+        - name: regcred
+      containers:
+        - image: ${IMAGE}
+          imagePullPolicy: IfNotPresent
+          name: toktik-wechat-api
+          command:
+            - /bin/bash
+          args:
+            - bootstrap-wechat.sh
+          envFrom:
+            - configMapRef:
+                name: env-config
+            - configMapRef:
+                name: config
+          ports:
+            - name: grpc-40132
+              containerPort: 40132
+              protocol: TCP
+          resources:
+            limits:
+              cpu: 500m
+              memory: 256Mi
+            requests:
+              cpu: 100m
+              memory: 8Mi
+      terminationGracePeriodSeconds: 30

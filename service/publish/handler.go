@@ -53,7 +53,7 @@ func (s *PublishServiceImpl) CreateVideo(ctx context.Context, req *publish.Creat
 
 	detectedContentType := http.DetectContentType(req.Data)
 	if detectedContentType != "video/mp4" {
-		logger.WithFields(map[string]interface{}{
+		logger.WithFields(logrus.Fields{
 			"time":         time.Now(),
 			"content_type": detectedContentType,
 		}).Debug("invalid content type")
@@ -68,7 +68,7 @@ func (s *PublishServiceImpl) CreateVideo(ctx context.Context, req *publish.Creat
 	// V7 based on timestamp
 	generatedUUID, err := uuid.NewV7()
 	if err != nil {
-		logger.WithFields(map[string]interface{}{
+		logger.WithFields(logrus.Fields{
 			"time": time.Now(),
 			"err":  err,
 		}).Debug("error generating uuid")
@@ -77,10 +77,10 @@ func (s *PublishServiceImpl) CreateVideo(ctx context.Context, req *publish.Creat
 			StatusMsg:  biz.InternalServerErrorStatusMsg,
 		}, nil
 	}
-	logger = logger.WithFields(map[string]interface{}{
+	logger = logger.WithFields(logrus.Fields{
 		"uuid": generatedUUID,
 	})
-	logger.WithFields(map[string]interface{}{
+	logger.WithFields(logrus.Fields{
 		"time": time.Now(),
 	}).Debug("generated uuid")
 
@@ -88,7 +88,7 @@ func (s *PublishServiceImpl) CreateVideo(ctx context.Context, req *publish.Creat
 	fileName := fmt.Sprintf("%d/%s.%s", req.UserId, generatedUUID.String(), "mp4")
 	_, err = storage.Upload(fileName, reader)
 	if err != nil {
-		logger.WithFields(map[string]interface{}{
+		logger.WithFields(logrus.Fields{
 			"time":      time.Now(),
 			"file_name": fileName,
 			"err":       err,
@@ -98,7 +98,7 @@ func (s *PublishServiceImpl) CreateVideo(ctx context.Context, req *publish.Creat
 			StatusMsg:  biz.InternalServerErrorStatusMsg,
 		}, nil
 	}
-	logger.WithFields(map[string]interface{}{
+	logger.WithFields(logrus.Fields{
 		"time":      time.Now(),
 		"file_name": fileName,
 	}).Debug("uploaded video")
@@ -107,7 +107,7 @@ func (s *PublishServiceImpl) CreateVideo(ctx context.Context, req *publish.Creat
 	coverName := fmt.Sprintf("%d/%s.%s", req.UserId, generatedUUID.String(), "jpg")
 	thumbData, err := getThumbnail(reader)
 	if err != nil {
-		logger.WithFields(map[string]interface{}{
+		logger.WithFields(logrus.Fields{
 			"time":       time.Now(),
 			"file_name":  fileName,
 			"cover_name": coverName,
@@ -118,7 +118,7 @@ func (s *PublishServiceImpl) CreateVideo(ctx context.Context, req *publish.Creat
 			StatusMsg:  biz.InternalServerErrorStatusMsg,
 		}, nil
 	}
-	logger.WithFields(map[string]interface{}{
+	logger.WithFields(logrus.Fields{
 		"time":       time.Now(),
 		"cover_name": coverName,
 		"data_size":  len(thumbData),
@@ -127,7 +127,7 @@ func (s *PublishServiceImpl) CreateVideo(ctx context.Context, req *publish.Creat
 	// Upload thumbnail
 	_, err = storage.Upload(coverName, bytes.NewReader(thumbData))
 	if err != nil {
-		logger.WithFields(map[string]interface{}{
+		logger.WithFields(logrus.Fields{
 			"time":       time.Now(),
 			"file_name":  fileName,
 			"cover_name": coverName,
@@ -138,7 +138,7 @@ func (s *PublishServiceImpl) CreateVideo(ctx context.Context, req *publish.Creat
 			StatusMsg:  biz.InternalServerErrorStatusMsg,
 		}, nil
 	}
-	logger.WithFields(map[string]interface{}{
+	logger.WithFields(logrus.Fields{
 		"time":       time.Now(),
 		"cover_name": coverName,
 		"data_size":  len(thumbData),
@@ -153,7 +153,7 @@ func (s *PublishServiceImpl) CreateVideo(ctx context.Context, req *publish.Creat
 
 	err = gen.Q.Video.WithContext(ctx).Create(&publishModel)
 	if err != nil {
-		logger.WithFields(map[string]interface{}{
+		logger.WithFields(logrus.Fields{
 			"time":       time.Now(),
 			"file_name":  fileName,
 			"cover_name": coverName,
@@ -164,13 +164,13 @@ func (s *PublishServiceImpl) CreateVideo(ctx context.Context, req *publish.Creat
 			StatusMsg:  biz.InternalServerErrorStatusMsg,
 		}, nil
 	}
-	logger.WithFields(map[string]interface{}{
+	logger.WithFields(logrus.Fields{
 		"time":  time.Now(),
 		"entry": publishModel,
 	}).Debug("saved db entry")
 
 	resp = &publish.CreateVideoResponse{StatusCode: 0, StatusMsg: biz.PublishActionSuccess}
-	logger.WithFields(map[string]interface{}{
+	logger.WithFields(logrus.Fields{
 		"time":     time.Now(),
 		"response": resp,
 	}).Debug("all process done, ready to launch response")

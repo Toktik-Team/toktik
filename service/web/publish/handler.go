@@ -62,7 +62,7 @@ func Action(ctx context.Context, c *app.RequestContext) {
 	logger.Debugf("Process start")
 
 	if err := paramValidate(ctx, c); err != nil {
-		bizConstant.InvalidFormError.WithCause(err).WithFields(&methodFields).LaunchError(c)
+		bizConstant.InvalidArguments.WithCause(err).WithFields(&methodFields).LaunchError(c)
 		return
 	}
 
