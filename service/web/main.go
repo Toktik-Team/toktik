@@ -4,6 +4,7 @@ import (
 	"toktik/constant/config"
 	"toktik/service/web/auth"
 	"toktik/service/web/comment"
+	"toktik/service/web/favorite"
 	"toktik/service/web/feed"
 	"toktik/service/web/mw"
 	"toktik/service/web/publish"
@@ -43,8 +44,8 @@ func main() {
 
 	// favorite service
 	favoriteGroup := douyin.Group("/favorite")
-	favoriteGroup.POST("/action")
-	favoriteGroup.GET("/list")
+	favoriteGroup.POST("/action/", favorite.Action)
+	favoriteGroup.GET("/list/", favorite.List)
 
 	// comment service
 	commentGroup := douyin.Group("/comment")

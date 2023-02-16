@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: toktik-favorite-api
+  name: toktik-favorite-api
+  namespace: toktik-service-bundle
+spec:
+  ports:
+    - name: grpc
+      port: 40133
+      protocol: TCP
+      targetPort: 40133
+  selector:
+    name: toktik-favorite-api
+    branch: dev
+  type: ClusterIP

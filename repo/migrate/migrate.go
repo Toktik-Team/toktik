@@ -15,9 +15,7 @@ func main() {
 		postgres.New(
 			postgres.Config{
 				DSN: config.EnvConfig.GetDSN(),
-			}), &gorm.Config{
-			DisableForeignKeyConstraintWhenMigrating: true,
-		})
+			}), &gorm.Config{})
 	if err != nil {
 		panic(fmt.Errorf("db connection failed: %v", err))
 	}

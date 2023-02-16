@@ -104,12 +104,11 @@ func (s *FeedServiceImpl) ListVideos(ctx context.Context, req *feed.ListFeedRequ
 		}
 
 		videos = append(videos, &feed.Video{
-			Id:       m.ID,
-			Author:   userResponse.User,
-			PlayUrl:  playUrl,
-			CoverUrl: coverUrl,
-			// TODO: finish this
-			FavoriteCount: 0,
+			Id:            m.ID,
+			Author:        userResponse.User,
+			PlayUrl:       playUrl,
+			CoverUrl:      coverUrl,
+			FavoriteCount: m.FavoriteCount,
 			// TODO: finish this
 			CommentCount: 0,
 			// TODO: finish this

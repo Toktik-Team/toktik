@@ -36,6 +36,7 @@ func newVideo(db *gorm.DB, opts ...gen.DOOption) video {
 	_video.Title = field.NewString(tableName, "title")
 	_video.FileName = field.NewString(tableName, "file_name")
 	_video.CoverName = field.NewString(tableName, "cover_name")
+	_video.FavoriteCount = field.NewUint32(tableName, "favorite_count")
 
 	_video.fillFieldMap()
 
@@ -45,15 +46,16 @@ func newVideo(db *gorm.DB, opts ...gen.DOOption) video {
 type video struct {
 	videoDo
 
-	ALL       field.Asterisk
-	ID        field.Uint32
-	CreatedAt field.Time
-	UpdatedAt field.Time
-	DeletedAt field.Field
-	UserId    field.Uint32
-	Title     field.String
-	FileName  field.String
-	CoverName field.String
+	ALL           field.Asterisk
+	ID            field.Uint32
+	CreatedAt     field.Time
+	UpdatedAt     field.Time
+	DeletedAt     field.Field
+	UserId        field.Uint32
+	Title         field.String
+	FileName      field.String
+	CoverName     field.String
+	FavoriteCount field.Uint32
 
 	fieldMap map[string]field.Expr
 }
@@ -78,6 +80,7 @@ func (v *video) updateTableName(table string) *video {
 	v.Title = field.NewString(table, "title")
 	v.FileName = field.NewString(table, "file_name")
 	v.CoverName = field.NewString(table, "cover_name")
+	v.FavoriteCount = field.NewUint32(table, "favorite_count")
 
 	v.fillFieldMap()
 
@@ -94,7 +97,7 @@ func (v *video) GetFieldByName(fieldName string) (field.OrderExpr, bool) {
 }
 
 func (v *video) fillFieldMap() {
-	v.fieldMap = make(map[string]field.Expr, 8)
+	v.fieldMap = make(map[string]field.Expr, 9)
 	v.fieldMap["id"] = v.ID
 	v.fieldMap["created_at"] = v.CreatedAt
 	v.fieldMap["updated_at"] = v.UpdatedAt
@@ -103,6 +106,7 @@ func (v *video) fillFieldMap() {
 	v.fieldMap["title"] = v.Title
 	v.fieldMap["file_name"] = v.FileName
 	v.fieldMap["cover_name"] = v.CoverName
+	v.fieldMap["favorite_count"] = v.FavoriteCount
 }
 
 func (v video) clone(db *gorm.DB) video {
