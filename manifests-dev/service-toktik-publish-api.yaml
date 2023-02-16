@@ -1,17 +1,17 @@
 apiVersion: v1
 kind: Service
 metadata:
-    labels:
-        app: toktik-publish-api
-    name: toktik-publish-api
-    namespace: toktik-service-bundle
+  labels:
+    app: toktik-publish-api
+  name: toktik-publish-api
+  namespace: toktik-service-bundle
 spec:
-    ports:
-        -   name: grpc
-            port: 40128
-            protocol: TCP
-            targetPort: 40128
-    selector:
-        name: toktik-publish-api
-        branch: dev
-    type: ClusterIP
+  ports:
+    - name: grpc
+      port: 40128
+      protocol: TCP
+      targetPort: 40128
+  selector:
+    name: toktik-publish-api
+    branch: dev
+  type: ClusterIP

@@ -1,50 +1,50 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-    annotations:
-        sidecar.jaegertracing.io/inject: 'true'
-    labels:
-        app: toktik-auth-api
-    name: toktik-auth-api
-    namespace: toktik-service-bundle
+  annotations:
+    sidecar.jaegertracing.io/inject: 'true'
+  labels:
+    app: toktik-auth-api
+  name: toktik-auth-api
+  namespace: toktik-service-bundle
 spec:
-    selector:
-        matchLabels:
-            name: toktik-auth-api
-    template:
-        metadata:
-            labels:
-                app: toktik-auth-api
-                branch: dev
-                version: ${BUILD_NUMBER}-${CI_COMMIT_ID}
-                name: toktik-auth-api
-                dream-app: toktik-auth-api
-                dream-unit: toktik-auth-api
-        spec:
-            imagePullSecrets:
-                -   name: regcred
-            containers:
-                -   image: ${IMAGE}
-                    imagePullPolicy: IfNotPresent
-                    name: toktik-auth-api
-                    command:
-                        - /bin/bash
-                    args:
-                        - bootstrap-auth.sh
-                    envFrom:
-                        -   configMapRef:
-                                name: env-config
-                        -   configMapRef:
-                                name: config
-                    ports:
-                        -   name: grpc-40127
-                            containerPort: 40127
-                            protocol: TCP
-                    resources:
-                        limits:
-                            cpu: 500m
-                            memory: 256Mi
-                        requests:
-                            cpu: 100m
-                            memory: 8Mi
-            terminationGracePeriodSeconds: 30
+  selector:
+    matchLabels:
+      name: toktik-auth-api
+  template:
+    metadata:
+      labels:
+        app: toktik-auth-api
+        branch: dev
+        version: ${BUILD_NUMBER}-${CI_COMMIT_ID}
+        name: toktik-auth-api
+        dream-app: toktik-auth-api
+        dream-unit: toktik-auth-api
+    spec:
+      imagePullSecrets:
+        - name: regcred
+      containers:
+        - image: ${IMAGE}
+          imagePullPolicy: IfNotPresent
+          name: toktik-auth-api
+          command:
+            - /bin/bash
+          args:
+            - bootstrap-auth.sh
+          envFrom:
+            - configMapRef:
+                name: env-config
+            - configMapRef:
+                name: config
+          ports:
+            - name: grpc-40127
+              containerPort: 40127
+              protocol: TCP
+          resources:
+            limits:
+              cpu: 500m
+              memory: 256Mi
+            requests:
+              cpu: 100m
+              memory: 8Mi
+      terminationGracePeriodSeconds: 30

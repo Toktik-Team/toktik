@@ -1,50 +1,50 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-    annotations:
-        sidecar.jaegertracing.io/inject: 'true'
-    labels:
-        app: toktik-user-api
-    name: toktik-user-api
-    namespace: toktik-service-bundle
+  annotations:
+    sidecar.jaegertracing.io/inject: 'true'
+  labels:
+    app: toktik-user-api
+  name: toktik-user-api
+  namespace: toktik-service-bundle
 spec:
-    selector:
-        matchLabels:
-            name: toktik-user-api
-    template:
-        metadata:
-            labels:
-                app: toktik-user-api
-                branch: dev
-                version: ${BUILD_NUMBER}-${CI_COMMIT_ID}
-                name: toktik-user-api
-                dream-app: toktik-user-api
-                dream-unit: toktik-user-api
-        spec:
-            imagePullSecrets:
-                -   name: regcred
-            containers:
-                -   image: ${IMAGE}
-                    imagePullPolicy: IfNotPresent
-                    name: toktik-user-api
-                    command:
-                        - /bin/bash
-                    args:
-                        - bootstrap-user.sh
-                    envFrom:
-                        -   configMapRef:
-                                name: env-config
-                        -   configMapRef:
-                                name: config
-                    ports:
-                        -   name: grpc-40130
-                            containerPort: 40130
-                            protocol: TCP
-                    resources:
-                        limits:
-                            cpu: 500m
-                            memory: 256Mi
-                        requests:
-                            cpu: 100m
-                            memory: 8Mi
-            terminationGracePeriodSeconds: 30
+  selector:
+    matchLabels:
+      name: toktik-user-api
+  template:
+    metadata:
+      labels:
+        app: toktik-user-api
+        branch: dev
+        version: ${BUILD_NUMBER}-${CI_COMMIT_ID}
+        name: toktik-user-api
+        dream-app: toktik-user-api
+        dream-unit: toktik-user-api
+    spec:
+      imagePullSecrets:
+        - name: regcred
+      containers:
+        - image: ${IMAGE}
+          imagePullPolicy: IfNotPresent
+          name: toktik-user-api
+          command:
+            - /bin/bash
+          args:
+            - bootstrap-user.sh
+          envFrom:
+            - configMapRef:
+                name: env-config
+            - configMapRef:
+                name: config
+          ports:
+            - name: grpc-40130
+              containerPort: 40130
+              protocol: TCP
+          resources:
+            limits:
+              cpu: 500m
+              memory: 256Mi
+            requests:
+              cpu: 100m
+              memory: 8Mi
+      terminationGracePeriodSeconds: 30
