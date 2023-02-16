@@ -133,11 +133,6 @@ func List(ctx context.Context, c *app.RequestContext) {
 	actorId := c.GetUint32("user_id")
 	videoId, videoIdExists := c.GetQuery("video_id")
 
-	if actorId == 0 {
-		biz.UnauthorizedError.WithFields(&methodFields).LaunchError(c)
-		return
-	}
-
 	if !videoIdExists {
 		biz.BadRequestError.WithFields(&methodFields).LaunchError(c)
 		return
