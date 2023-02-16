@@ -10,15 +10,13 @@ import (
 )
 
 // AuthResult Authentication result enum
-type AuthResult string
-
 const (
 	// AUTH_RESULT_SUCCESS Authentication success
-	AUTH_RESULT_SUCCESS AuthResult = "success"
+	AUTH_RESULT_SUCCESS string = "success"
 	// AUTH_RESULT_NO_TOKEN Authentication failed due to no token
-	AUTH_RESULT_NO_TOKEN AuthResult = "no_token"
+	AUTH_RESULT_NO_TOKEN string = "no_token"
 	// AUTH_RESULT_UNKNOWN Authentication failed due to unknown reason
-	AUTH_RESULT_UNKNOWN AuthResult = "unknown"
+	AUTH_RESULT_UNKNOWN string = "unknown"
 )
 
 const (
@@ -64,12 +62,12 @@ func AuthMiddleware() app.HandlerFunc {
 	}
 }
 
-func GetAuthResult(c *app.RequestContext) AuthResult {
+func GetAuthResult(c *app.RequestContext) string {
 	authResult := c.GetString(authResultKey)
 	if authResult == "" {
 		return AUTH_RESULT_UNKNOWN
 	}
-	return AuthResult(authResult)
+	return authResult
 }
 
 func GetAuthActorId(c *app.RequestContext) uint32 {
