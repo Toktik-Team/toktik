@@ -10,6 +10,8 @@ import (
 	"time"
 	"toktik/constant/biz"
 	"toktik/constant/config"
+	"toktik/kitex_gen/douyin/comment"
+	"toktik/kitex_gen/douyin/comment/commentservice"
 	"toktik/kitex_gen/douyin/feed"
 	"toktik/kitex_gen/douyin/user"
 	"toktik/kitex_gen/douyin/user/userservice"
@@ -19,6 +21,7 @@ import (
 )
 
 var UserClient userservice.Client
+var CommentClient commentservice.Client
 
 func init() {
 	r, err := consul.NewConsulResolver(config.EnvConfig.CONSUL_ADDR)
@@ -26,6 +29,10 @@ func init() {
 		log.Fatal(err)
 	}
 	UserClient, err = userservice.NewClient(config.UserServiceName, client.WithResolver(r))
+	if err != nil {
+		log.Fatal(err)
+	}
+	CommentClient, err = commentservice.NewClient(config.CommentServiceName, client.WithResolver(r))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -103,6 +110,15 @@ func (s *FeedServiceImpl) ListVideos(ctx context.Context, req *feed.ListFeedRequ
 			continue
 		}
 
+		commentCount, err := CommentClient.ListComment(ctx, &comment.ListCommentRequest{
+			ActorId: actorId,
+			VideoId: m.ID,
+		})
+		if err != nil {
+			log.Println(fmt.Errorf("failed to fetch comment count: %w", err))
+			continue
+		}
+
 		videos = append(videos, &feed.Video{
 			Id:       m.ID,
 			Author:   userResponse.User,
@@ -110,8 +126,7 @@ func (s *FeedServiceImpl) ListVideos(ctx context.Context, req *feed.ListFeedRequ
 			CoverUrl: coverUrl,
 			// TODO: finish this
 			FavoriteCount: 0,
-			// TODO: finish this
-			CommentCount: 0,
+			CommentCount:  uint32(len(commentCount.CommentList)),
 			// TODO: finish this
 			IsFavorite: false,
 			Title:      m.Title,
