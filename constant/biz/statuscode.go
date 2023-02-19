@@ -27,6 +27,9 @@ const (
 	Unable2UploadCover
 	Unable2CreateDBEntry
 	RequestIsNil
+	UnableToQueryFollowList
+	UnableToCreateRelation
+	UnableToDeleteRelation
 )
 
 // Bad Request
@@ -37,6 +40,9 @@ const (
 	VideoNotFound                    = 400002
 	Unable2ParseLatestTimeStatusCode = 400001
 	InvalidContentType               = 400101
+	TargetUserNotFound               = 400101
+	RelationNotFound                 = 400102
+	RelationAlreadyExists            = 400103
 )
 
 // Unauthorized

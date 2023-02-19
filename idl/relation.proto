@@ -1,0 +1,49 @@
+syntax = "proto3";
+
+package douyin.user;
+option go_package = "douyin/relation";
+
+import "user.proto";
+
+message RelationActionRequest {
+  uint32 user_id = 1; // 用户鉴权token
+  uint32 to_user_id = 2; // 对方用户id
+}
+
+message RelationActionResponse {
+  uint32 status_code = 1; // 状态码，0-成功，其他值-失败
+  string status_msg = 2; // 返回状态描述
+}
+
+
+message FollowListRequest {
+  uint32 user_id = 1; // 用户id
+}
+
+message FollowListResponse {
+  int32 status_code = 1; // 状态码，0-成功，其他值-失败
+  string status_msg = 2; // 返回状态描述
+  repeated User user_list = 3; // 用户信息列表
+}
+
+message FollowerListRequest {
+  uint32 user_id = 1; // 用户id
+}
+
+message FollowerListResponse {
+  int32 status_code = 1; // 状态码，0-成功，其他值-失败
+  string status_msg = 2; // 返回状态描述
+  repeated User user_list = 3; // 用户列表
+}
+
+service RelationService {
+  rpc Follow (RelationActionRequest) returns (RelationActionResponse) {
+  }
+  rpc Unfollow (RelationActionRequest) returns (RelationActionResponse) {
+  }
+
+  rpc GetFollowList (FollowListRequest) returns (FollowListResponse) {
+  }
+  rpc GetFollowerList (FollowerListRequest) returns (FollowerListResponse) {
+  }
+}

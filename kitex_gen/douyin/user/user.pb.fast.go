@@ -124,6 +124,36 @@ func (x *User) FastRead(buf []byte, _type int8, number int32) (offset int, err e
 		if err != nil {
 			goto ReadFieldError
 		}
+	case 6:
+		offset, err = x.fastReadField6(buf, _type)
+		if err != nil {
+			goto ReadFieldError
+		}
+	case 7:
+		offset, err = x.fastReadField7(buf, _type)
+		if err != nil {
+			goto ReadFieldError
+		}
+	case 8:
+		offset, err = x.fastReadField8(buf, _type)
+		if err != nil {
+			goto ReadFieldError
+		}
+	case 9:
+		offset, err = x.fastReadField9(buf, _type)
+		if err != nil {
+			goto ReadFieldError
+		}
+	case 10:
+		offset, err = x.fastReadField10(buf, _type)
+		if err != nil {
+			goto ReadFieldError
+		}
+	case 11:
+		offset, err = x.fastReadField11(buf, _type)
+		if err != nil {
+			goto ReadFieldError
+		}
 	default:
 		offset, err = fastpb.Skip(buf, _type, number)
 		if err != nil {
@@ -159,6 +189,42 @@ func (x *User) fastReadField4(buf []byte, _type int8) (offset int, err error) {
 
 func (x *User) fastReadField5(buf []byte, _type int8) (offset int, err error) {
 	x.IsFollow, offset, err = fastpb.ReadBool(buf, _type)
+	return offset, err
+}
+
+func (x *User) fastReadField6(buf []byte, _type int8) (offset int, err error) {
+	tmp, offset, err := fastpb.ReadString(buf, _type)
+	x.Avatar = &tmp
+	return offset, err
+}
+
+func (x *User) fastReadField7(buf []byte, _type int8) (offset int, err error) {
+	tmp, offset, err := fastpb.ReadString(buf, _type)
+	x.BackgroundImage = &tmp
+	return offset, err
+}
+
+func (x *User) fastReadField8(buf []byte, _type int8) (offset int, err error) {
+	tmp, offset, err := fastpb.ReadString(buf, _type)
+	x.Signature = &tmp
+	return offset, err
+}
+
+func (x *User) fastReadField9(buf []byte, _type int8) (offset int, err error) {
+	tmp, offset, err := fastpb.ReadInt64(buf, _type)
+	x.TotalFavorited = &tmp
+	return offset, err
+}
+
+func (x *User) fastReadField10(buf []byte, _type int8) (offset int, err error) {
+	tmp, offset, err := fastpb.ReadInt64(buf, _type)
+	x.WorkCount = &tmp
+	return offset, err
+}
+
+func (x *User) fastReadField11(buf []byte, _type int8) (offset int, err error) {
+	tmp, offset, err := fastpb.ReadInt64(buf, _type)
+	x.FavoriteCount = &tmp
 	return offset, err
 }
 
@@ -230,6 +296,12 @@ func (x *User) FastWrite(buf []byte) (offset int) {
 	offset += x.fastWriteField3(buf[offset:])
 	offset += x.fastWriteField4(buf[offset:])
 	offset += x.fastWriteField5(buf[offset:])
+	offset += x.fastWriteField6(buf[offset:])
+	offset += x.fastWriteField7(buf[offset:])
+	offset += x.fastWriteField8(buf[offset:])
+	offset += x.fastWriteField9(buf[offset:])
+	offset += x.fastWriteField10(buf[offset:])
+	offset += x.fastWriteField11(buf[offset:])
 	return offset
 }
 
@@ -270,6 +342,54 @@ func (x *User) fastWriteField5(buf []byte) (offset int) {
 		return offset
 	}
 	offset += fastpb.WriteBool(buf[offset:], 5, x.IsFollow)
+	return offset
+}
+
+func (x *User) fastWriteField6(buf []byte) (offset int) {
+	if x.Avatar == nil {
+		return offset
+	}
+	offset += fastpb.WriteString(buf[offset:], 6, *x.Avatar)
+	return offset
+}
+
+func (x *User) fastWriteField7(buf []byte) (offset int) {
+	if x.BackgroundImage == nil {
+		return offset
+	}
+	offset += fastpb.WriteString(buf[offset:], 7, *x.BackgroundImage)
+	return offset
+}
+
+func (x *User) fastWriteField8(buf []byte) (offset int) {
+	if x.Signature == nil {
+		return offset
+	}
+	offset += fastpb.WriteString(buf[offset:], 8, *x.Signature)
+	return offset
+}
+
+func (x *User) fastWriteField9(buf []byte) (offset int) {
+	if x.TotalFavorited == nil {
+		return offset
+	}
+	offset += fastpb.WriteInt64(buf[offset:], 9, *x.TotalFavorited)
+	return offset
+}
+
+func (x *User) fastWriteField10(buf []byte) (offset int) {
+	if x.WorkCount == nil {
+		return offset
+	}
+	offset += fastpb.WriteInt64(buf[offset:], 10, *x.WorkCount)
+	return offset
+}
+
+func (x *User) fastWriteField11(buf []byte) (offset int) {
+	if x.FavoriteCount == nil {
+		return offset
+	}
+	offset += fastpb.WriteInt64(buf[offset:], 11, *x.FavoriteCount)
 	return offset
 }
 
@@ -341,6 +461,12 @@ func (x *User) Size() (n int) {
 	n += x.sizeField3()
 	n += x.sizeField4()
 	n += x.sizeField5()
+	n += x.sizeField6()
+	n += x.sizeField7()
+	n += x.sizeField8()
+	n += x.sizeField9()
+	n += x.sizeField10()
+	n += x.sizeField11()
 	return n
 }
 
@@ -384,6 +510,54 @@ func (x *User) sizeField5() (n int) {
 	return n
 }
 
+func (x *User) sizeField6() (n int) {
+	if x.Avatar == nil {
+		return n
+	}
+	n += fastpb.SizeString(6, *x.Avatar)
+	return n
+}
+
+func (x *User) sizeField7() (n int) {
+	if x.BackgroundImage == nil {
+		return n
+	}
+	n += fastpb.SizeString(7, *x.BackgroundImage)
+	return n
+}
+
+func (x *User) sizeField8() (n int) {
+	if x.Signature == nil {
+		return n
+	}
+	n += fastpb.SizeString(8, *x.Signature)
+	return n
+}
+
+func (x *User) sizeField9() (n int) {
+	if x.TotalFavorited == nil {
+		return n
+	}
+	n += fastpb.SizeInt64(9, *x.TotalFavorited)
+	return n
+}
+
+func (x *User) sizeField10() (n int) {
+	if x.WorkCount == nil {
+		return n
+	}
+	n += fastpb.SizeInt64(10, *x.WorkCount)
+	return n
+}
+
+func (x *User) sizeField11() (n int) {
+	if x.FavoriteCount == nil {
+		return n
+	}
+	n += fastpb.SizeInt64(11, *x.FavoriteCount)
+	return n
+}
+
 var fieldIDToName_UserRequest = map[int32]string{
 	1: "UserId",
 	2: "ActorId",
@@ -396,9 +570,15 @@ var fieldIDToName_UserResponse = map[int32]string{
 }
 
 var fieldIDToName_User = map[int32]string{
-	1: "Id",
-	2: "Name",
-	3: "FollowCount",
-	4: "FollowerCount",
-	5: "IsFollow",
+	1:  "Id",
+	2:  "Name",
+	3:  "FollowCount",
+	4:  "FollowerCount",
+	5:  "IsFollow",
+	6:  "Avatar",
+	7:  "BackgroundImage",
+	8:  "Signature",
+	9:  "TotalFavorited",
+	10: "WorkCount",
+	11: "FavoriteCount",
 }
