@@ -45,7 +45,6 @@ func TestRelationServiceImpl_GetFollowList(t *testing.T) {
 
 	videoRows := sqlmock.NewRows([]string{"user_id", "target_id"})
 	videoRows.AddRow(mockUserA.Id, mockUserB.Id)
-	defer mock.MockConn.Close()
 
 	mock.DBMock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "relations" WHERE "relations"."user_id" = $1 AND "relations"."deleted_at" IS NULL`)).
 		WithArgs(mockUserA.Id).
@@ -110,7 +109,6 @@ func TestRelationServiceImpl_GetFollowerList(t *testing.T) {
 
 	relationRows := sqlmock.NewRows([]string{"user_id", "target_id"})
 	relationRows.AddRow(mockUserA.Id, mockUserB.Id)
-	defer mock.MockConn.Close()
 
 	mock.DBMock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "relations" WHERE "relations"."target_id" = $1 AND "relations"."deleted_at" IS NULL`)).
 		WithArgs(mockUserA.Id).
@@ -199,8 +197,6 @@ func TestRelationServiceImpl_Follow(t *testing.T) {
 
 	UserClient = MockUserClient{}
 
-	defer mock.MockConn.Close()
-
 	mock.DBMock.ExpectBegin()
 
 	mock.DBMock.ExpectQuery(regexp.QuoteMeta(`INSERT INTO "relations" ("created_at","updated_at","deleted_at","user_id","target_id") VALUES ($1,$2,$3,$4,$5) RETURNING "id"`)).
@@ -282,8 +278,6 @@ func TestRelationServiceImpl_Unfollow(t *testing.T) {
 	}
 
 	UserClient = MockUserClient{}
-
-	defer mock.MockConn.Close()
 
 	relationRows := sqlmock.NewRows([]string{"user_id", "target_id"})
 	relationRows.AddRow(mockUserA.Id, mockUserB.Id)
