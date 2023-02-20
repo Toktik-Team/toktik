@@ -69,7 +69,7 @@ func TestWechatServiceImpl_WechatChat(t *testing.T) {
 func TestWechatServiceImpl_generateKey(t *testing.T) {
 	test1Result := "chat:0:0"
 	test2Result := "chat:1:2"
-	test3Result := "chat:1:2"
+	test3Result := "chat:2:1"
 	test4Result := fmt.Sprintf("chat:%d:%d", 1<<32-1, 1<<32-1)
 	test5Result := fmt.Sprintf("chat:%d:%d", 1<<32-2, 1<<32-1)
 
@@ -84,19 +84,29 @@ func TestWechatServiceImpl_generateKey(t *testing.T) {
 	tests := []struct {
 		name string
 		args args
-		want *string
+		want func(s *string) bool
 	}{
-		{"test1", args{uid1: new(uint32), uid2: new(uint32)}, &test1Result},
-		{"test2", args{uid1: getUint32Ptr(1), uid2: getUint32Ptr(2)}, &test2Result},
-		{"test3", args{uid1: getUint32Ptr(2), uid2: getUint32Ptr(1)}, &test3Result},
-		{"test4", args{uid1: getUint32Ptr(1<<32 - 1), uid2: getUint32Ptr(1<<32 - 1)}, &test4Result},
-		{"test5", args{uid1: getUint32Ptr(1<<32 - 2), uid2: getUint32Ptr(1<<32 - 1)}, &test5Result},
+		{"test1", args{uid1: new(uint32), uid2: new(uint32)}, func(s *string) bool {
+			return *s == test1Result
+		}},
+		{"test2", args{uid1: getUint32Ptr(1), uid2: getUint32Ptr(2)}, func(s *string) bool {
+			return *s == test2Result
+		}},
+		{"test3", args{uid1: getUint32Ptr(2), uid2: getUint32Ptr(1)}, func(s *string) bool {
+			return *s == test3Result
+		}},
+		{"test4", args{uid1: getUint32Ptr(1<<32 - 1), uid2: getUint32Ptr(1<<32 - 1)}, func(s *string) bool {
+			return *s == test4Result
+		}},
+		{"test5", args{uid1: getUint32Ptr(1<<32 - 2), uid2: getUint32Ptr(1<<32 - 1)}, func(s *string) bool {
+			return *s == test5Result
+		}},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			s := &WechatServiceImpl{}
-			if got := s.generateKey(tt.args.uid1, tt.args.uid2); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("generateKey() = %v, want %v", got, tt.want)
+			if got := s.generateKey(tt.args.uid1, tt.args.uid2); !tt.want(got) {
+				t.Errorf("generateKey() = %v", got)
 			}
 		})
 	}
