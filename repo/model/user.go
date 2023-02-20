@@ -83,12 +83,14 @@ func getImageFromUnsplash(query string) (url string, err error) {
 	req.Header.Add("Authorization", "Client-ID "+config.EnvConfig.UNSPLASH_ACCESS_KEY)
 	resp, _ := client.Do(req)
 
-	defer func(Body io.ReadCloser) {
-		err := Body.Close()
-		if err != nil {
-			logging.Logger.Errorf("getImageFromUnsplash: %v", err)
-		}
-	}(resp.Body)
+	if resp.Body != nil {
+		defer func(Body io.ReadCloser) {
+			err := Body.Close()
+			if err != nil {
+				logging.Logger.Errorf("getImageFromUnsplash: %v", err)
+			}
+		}(resp.Body)
+	}
 	body, _ := io.ReadAll(resp.Body)
 
 	var response unsplashResponse
