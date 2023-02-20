@@ -5,7 +5,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/sirupsen/logrus"
 	"io"
 	"log"
 	"net/http"
@@ -18,6 +17,8 @@ import (
 	"toktik/kitex_gen/douyin/user/userservice"
 	"toktik/logging"
 	"toktik/repo/model"
+
+	"github.com/sirupsen/logrus"
 
 	"github.com/bakape/thumbnailer/v2"
 	"github.com/gofrs/uuid"
@@ -185,7 +186,7 @@ func (s *PublishServiceImpl) CreateVideo(ctx context.Context, req *publish.Creat
 		return &publish.CreateVideoResponse{
 			StatusCode: biz.Unable2CreateDBEntry,
 			StatusMsg:  biz.InternalServerErrorStatusMsg,
-		}, nil
+		}, err
 	}
 
 	resp = &publish.CreateVideoResponse{StatusCode: 0, StatusMsg: biz.PublishActionSuccess}

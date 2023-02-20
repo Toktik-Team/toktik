@@ -2,9 +2,6 @@ package main
 
 import (
 	"context"
-	"github.com/DATA-DOG/go-sqlmock"
-	"github.com/aws/aws-sdk-go-v2/service/s3"
-	"github.com/cloudwego/kitex/client/callopt"
 	"io"
 	"os"
 	"path"
@@ -23,7 +20,8 @@ import (
 	"toktik/storage"
 	"toktik/test/mock"
 
-	"bou.ke/monkey"
+	"github.com/DATA-DOG/go-sqlmock"
+	"github.com/cloudwego/kitex/client/callopt"
 )
 
 var testVideo []byte
@@ -61,6 +59,8 @@ func TestMain(m *testing.M) {
 		panic("Cannot find test resources.")
 	}
 
+	storage.Instance = MockStorageProvider{}
+
 	code := m.Run()
 	os.Exit(code)
 }
@@ -77,6 +77,7 @@ func TestPublishServiceImpl_CreateVideo(t *testing.T) {
 
 	var successResp = &publish.CreateVideoResponse{
 		StatusCode: biz.OkStatusCode,
+		StatusMsg:  biz.PublishActionSuccess,
 	}
 
 	var invalidContentArg = struct {
@@ -93,10 +94,6 @@ func TestPublishServiceImpl_CreateVideo(t *testing.T) {
 		StatusMsg:  biz.BadRequestStatusMsg,
 	}
 
-	monkey.Patch(storage.Upload, func(fileName string, content io.Reader) (*s3.PutObjectOutput, error) {
-		// TODO: nothing
-		return nil, nil
-	})
 	defer mock.MockConn.Close()
 	mock.DBMock.ExpectBegin()
 	mock.DBMock.ExpectQuery(regexp.QuoteMeta(`INSERT INTO "videos" 
@@ -158,10 +155,6 @@ func TestPublishServiceImpl_ListVideo(t *testing.T) {
 	UserClient = MockUserClient{}
 	CommentClient = MockCommentClient{}
 
-	monkey.Patch(storage.GetLink, func(fileName string) (string, error) {
-		return "https://test.com/" + fileName, nil
-	})
-
 	rows := sqlmock.NewRows([]string{"id", "created_at", "updated_at", "deleted_at", "user_id", "title", "file_name", "cover_name"})
 	rows.AddRow(mockVideoReq.ID, mockVideoReq.CreatedAt, nil, nil, mockVideoReq.UserId, mockVideoReq.Title, mockVideoReq.FileName, mockVideoReq.CoverName)
 
@@ -220,4 +213,16 @@ func (m MockCommentClient) ActionComment(ctx context.Context, Req *comment.Actio
 
 func (m MockCommentClient) ListComment(ctx context.Context, Req *comment.ListCommentRequest, callOptions ...callopt.Option) (r *comment.ListCommentResponse, err error) {
 	panic("unimplemented")
+}
+
+type MockStorageProvider struct {
+}
+
+func (m MockStorageProvider) Upload(fileName string, content io.Reader) (*storage.PutObjectOutput, error) {
+	// Nothing to do
+	return &storage.PutObjectOutput{}, nil
+}
+
+func (m MockStorageProvider) GetLink(fileName string) (string, error) {
+	return "https://test.com/" + fileName, nil
 }
