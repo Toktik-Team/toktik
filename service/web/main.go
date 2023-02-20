@@ -2,16 +2,18 @@ package main
 
 import (
 	"context"
-	"github.com/cloudwego/hertz/pkg/app"
-	httpStatus "github.com/cloudwego/hertz/pkg/protocol/consts"
 	"toktik/constant/config"
 	"toktik/service/web/auth"
 	"toktik/service/web/comment"
 	"toktik/service/web/feed"
 	"toktik/service/web/mw"
 	"toktik/service/web/publish"
+	"toktik/service/web/relation"
 	"toktik/service/web/user"
 	"toktik/service/web/wechat"
+
+	"github.com/cloudwego/hertz/pkg/app"
+	httpStatus "github.com/cloudwego/hertz/pkg/protocol/consts"
 
 	"github.com/cloudwego/hertz/pkg/app/server"
 	"github.com/hertz-contrib/gzip"
@@ -86,6 +88,7 @@ func main() {
 	}
 	// relation service
 	relationGroup := douyin.Group("/relation")
+	relationGroup.POST("/action/", relation.RelationAction)
 	relationGroup.GET("/follow/list", func(c context.Context, ctx *app.RequestContext) {
 		ctx.JSON(httpStatus.StatusOK, chatGPTUserList)
 	})
