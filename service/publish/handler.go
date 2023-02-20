@@ -186,3 +186,9 @@ func (s *PublishServiceImpl) CreateVideo(ctx context.Context, req *publish.Creat
 	}).Debug("all process done, ready to launch response")
 	return resp, nil
 }
+
+// ListVideo implements the PublishServiceImpl interface.
+func (s *PublishServiceImpl) ListVideo(ctx context.Context, req *publish.ListVideoRequest) (resp *publish.ListVideoResponse, err error) {
+	// TODO: Your code here...
+	return
+}
