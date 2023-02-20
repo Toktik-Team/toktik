@@ -79,9 +79,15 @@ func getImageFromUnsplash(query string) (url string, err error) {
 	unsplashUrl := fmt.Sprintf("https://api.unsplash.com/photos/random?query=%s&count=1", query)
 
 	client := &http.Client{}
-	req, _ := http.NewRequest("GET", unsplashUrl, nil)
+	req, err := http.NewRequest("GET", unsplashUrl, nil)
+	if err != nil {
+		return "", err
+	}
 	req.Header.Add("Authorization", "Client-ID "+config.EnvConfig.UNSPLASH_ACCESS_KEY)
-	resp, _ := client.Do(req)
+	resp, err := client.Do(req)
+	if err != nil {
+		return "", err
+	}
 
 	if resp.Body != nil {
 		defer func(Body io.ReadCloser) {
