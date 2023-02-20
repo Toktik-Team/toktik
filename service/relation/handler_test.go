@@ -94,14 +94,14 @@ func TestRelationServiceImpl_GetFollowerList(t *testing.T) {
 		ctx context.Context
 		req *relation.FollowerListRequest
 	}{ctx: context.Background(), req: &relation.FollowerListRequest{
-		UserId: mockUserA.Id,
+		UserId: mockUserB.Id,
 	}}
 
 	var successResp = &relation.FollowerListResponse{
 		StatusCode: biz.OkStatusCode,
 		StatusMsg:  biz.OkStatusMsg,
 		UserList: []*user.User{
-			mockUserB,
+			mockUserA,
 		},
 	}
 

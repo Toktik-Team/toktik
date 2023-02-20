@@ -129,7 +129,7 @@ func (s *RelationServiceImpl) GetFollowerList(ctx context.Context, req *relation
 	var userList []*user.User
 	for _, m := range relationModels {
 		userResponse, err := UserClient.GetUser(ctx, &user.UserRequest{
-			UserId:  m.TargetId,
+			UserId:  m.UserId,
 			ActorId: req.UserId,
 		})
 		if err != nil || userResponse.StatusCode != biz.OkStatusCode {
