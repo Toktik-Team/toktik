@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"io"
 	"os"
 	"reflect"
 	"regexp"
@@ -16,7 +17,6 @@ import (
 	"toktik/storage"
 	"toktik/test/mock"
 
-	"bou.ke/monkey"
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/cloudwego/kitex/client/callopt"
 )
@@ -31,6 +31,8 @@ var (
 var mockUser = user.User{Id: 65535}
 
 func TestMain(m *testing.M) {
+	storage.Instance = MockStorageProvider{}
+
 	now := time.Now().UnixMilli()
 	for i := 0; i < mockVideoCount; i++ {
 		test := &model.Video{
@@ -83,10 +85,6 @@ func TestFeedServiceImpl_ListVideos(t *testing.T) {
 
 	UserClient = MockUserClient{}
 	CommentClient = MockCommentClient{}
-
-	monkey.Patch(storage.GetLink, func(fileName string) (string, error) {
-		return "https://test.com/" + fileName, nil
-	})
 
 	rows := sqlmock.NewRows([]string{"id", "created_at", "updated_at", "deleted_at", "user_id", "title", "file_name", "cover_name"})
 	for _, v := range testVideos[:biz.VideoCount] {
@@ -168,4 +166,16 @@ func (m MockCommentClient) ActionComment(ctx context.Context, Req *comment.Actio
 
 func (m MockCommentClient) ListComment(ctx context.Context, Req *comment.ListCommentRequest, callOptions ...callopt.Option) (r *comment.ListCommentResponse, err error) {
 	panic("unimplemented")
+}
+
+type MockStorageProvider struct {
+}
+
+func (m MockStorageProvider) Upload(fileName string, content io.Reader) (*storage.PutObjectOutput, error) {
+	// Nothing to do
+	return &storage.PutObjectOutput{}, nil
+}
+
+func (m MockStorageProvider) GetLink(fileName string) (string, error) {
+	return "https://test.com/" + fileName, nil
 }
