@@ -39,7 +39,12 @@ for d in */ ; do
 
   # Execute the build.sh script
   echo "Executing build.sh..."
-  bash build.sh
+  if ! bash build.sh;
+  then
+    echo "Build failed"
+    exit 1
+  fi
+
 
   # Copy the binary to the output/binaries directory
   echo "Copying binary to output/bin..."
