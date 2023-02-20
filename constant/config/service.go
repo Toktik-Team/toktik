@@ -20,3 +20,6 @@ const CommentServiceAddr = ":40131"
 
 const WechatServiceName = "toktik-wechat"
 const WechatServiceAddr = ":40132"
+
+const RelationServiceName = "toktik-relation-api"
+const RelationServiceAddr = ":40133"

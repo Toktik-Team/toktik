@@ -2,16 +2,18 @@ package main
 
 import (
 	"context"
-	"github.com/cloudwego/hertz/pkg/app"
-	httpStatus "github.com/cloudwego/hertz/pkg/protocol/consts"
 	"toktik/constant/config"
 	"toktik/service/web/auth"
 	"toktik/service/web/comment"
 	"toktik/service/web/feed"
 	"toktik/service/web/mw"
 	"toktik/service/web/publish"
+	"toktik/service/web/relation"
 	"toktik/service/web/user"
 	"toktik/service/web/wechat"
+
+	"github.com/cloudwego/hertz/pkg/app"
+	httpStatus "github.com/cloudwego/hertz/pkg/protocol/consts"
 
 	"github.com/cloudwego/hertz/pkg/app/server"
 	"github.com/hertz-contrib/gzip"
@@ -66,29 +68,12 @@ func main() {
 	commentGroup.POST("/action/", comment.Action)
 	commentGroup.GET("/list/", comment.List)
 
-	chatGPTUserList := map[string]any{
-		"status_code": 0,
-		"message":     "ok",
-		"user_list": []map[string]any{{
-			"id":             0,
-			"name":           "ChatGPT",
-			"follow_count":   1000000,
-			"follower_count": 0,
-			"is_follow":      true,
-			"avatar":         "https://bkimg.cdn.bcebos.com/pic/8b13632762d0f703918f0d436fac463d269758ee6faf?x-bce-process=image/watermark,image_d2F0ZXIvYmFpa2U4MA==,g_7,xp_5,yp_5",
-		}},
-	}
 	// relation service
 	relationGroup := douyin.Group("/relation")
-	relationGroup.GET("/follow/list", func(c context.Context, ctx *app.RequestContext) {
-		ctx.JSON(httpStatus.StatusOK, chatGPTUserList)
-	})
-	relationGroup.GET("/follower/list", func(c context.Context, ctx *app.RequestContext) {
-		ctx.JSON(httpStatus.StatusOK, chatGPTUserList)
-	})
-	relationGroup.GET("/friend/list", func(c context.Context, ctx *app.RequestContext) {
-		ctx.JSON(httpStatus.StatusOK, chatGPTUserList)
-	})
+	relationGroup.POST("/action/", relation.RelationAction)
+	relationGroup.GET("/follow/list/", relation.GetFollowList)
+	relationGroup.GET("/follower/list/", relation.GetFollowerList)
+	relationGroup.GET("/friend/list/", relation.GetFriendList)
 
 	// message service
 	messageGroup := douyin.Group("/message")
