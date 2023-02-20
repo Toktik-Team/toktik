@@ -43,13 +43,7 @@ func main() {
 	// publish service
 	publishGroup := douyin.Group("/publish")
 	publishGroup.POST("/action/", publish.Action)
-	publishGroup.GET("/list", func(c context.Context, ctx *app.RequestContext) {
-		ctx.JSON(httpStatus.StatusOK, map[string]any{
-			"status_code": 0,
-			"message":     "ok",
-			"video_list":  []string{},
-		})
-	})
+	publishGroup.GET("/list", publish.List)
 
 	// favorite service
 	favoriteGroup := douyin.Group("/favorite")
