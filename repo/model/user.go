@@ -96,10 +96,14 @@ func getImageFromUnsplash(query string) (url string, err error) {
 	var response unsplashResponse
 	err = json.Unmarshal(body, &response)
 	if err != nil {
-		return
+		return "", err
 	}
 
 	url = response.Urls.Regular
+
+	if url == "" {
+		return "", fmt.Errorf("getImageFromUnsplash: url is empty")
+	}
 	return
 }
 
@@ -108,7 +112,7 @@ func getCravatarUrl(email string) string {
 }
 
 func (u *User) GetBackgroundImage() (url string) {
-	if u.BackgroundImage != nil {
+	if u.BackgroundImage != nil && *u.BackgroundImage != "" {
 		return *u.BackgroundImage
 	}
 
@@ -129,7 +133,7 @@ func (u *User) GetBackgroundImage() (url string) {
 }
 
 func (u *User) GetUserAvatar() (url string) {
-	if u.Avatar != nil {
+	if u.Avatar != nil && *u.Avatar != "" {
 		return *u.Avatar
 	}
 
