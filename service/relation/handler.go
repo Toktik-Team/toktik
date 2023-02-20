@@ -7,7 +7,7 @@ import (
 	"time"
 	"toktik/constant/biz"
 	"toktik/constant/config"
-	relation "toktik/kitex_gen/douyin/relation"
+	"toktik/kitex_gen/douyin/relation"
 	"toktik/kitex_gen/douyin/user"
 	"toktik/kitex_gen/douyin/user/userservice"
 	"toktik/logging"
@@ -186,17 +186,17 @@ func (s *RelationServiceImpl) GetFriendList(ctx context.Context, req *relation.F
 	}
 
 	var followerIds []uint32
-	for _, model := range followerModels {
-		followerIds = append(followerIds, model.UserId)
+	for _, followerModel := range followerModels {
+		followerIds = append(followerIds, followerModel.UserId)
 	}
 	var followIds []uint32
-	for _, model := range followModels {
-		followIds = append(followIds, model.TargetId)
+	for _, followModel := range followModels {
+		followIds = append(followIds, followModel.TargetId)
 	}
 
 	var ids = intersection(followerIds, followIds)
 
-	var userList []*user.User
+	var userList = []*user.User{biz.ChatGPTUser}
 	for _, m := range ids {
 		userResponse, err := UserClient.GetUser(ctx, &user.UserRequest{
 			UserId:  m,
@@ -242,8 +242,8 @@ func (s *RelationServiceImpl) Follow(ctx context.Context, req *relation.Relation
 	}
 
 	relationModel := model.Relation{
-		UserId:   uint32(req.UserId),
-		TargetId: uint32(req.ToUserId),
+		UserId:   req.UserId,
+		TargetId: req.ToUserId,
 	}
 
 	// make sure target id exists

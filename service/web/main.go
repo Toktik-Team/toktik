@@ -68,18 +68,6 @@ func main() {
 	commentGroup.POST("/action/", comment.Action)
 	commentGroup.GET("/list/", comment.List)
 
-	chatGPTUserList := map[string]any{
-		"status_code": 0,
-		"message":     "ok",
-		"user_list": []map[string]any{{
-			"id":             0,
-			"name":           "ChatGPT",
-			"follow_count":   1000000,
-			"follower_count": 0,
-			"is_follow":      true,
-			"avatar":         "https://bkimg.cdn.bcebos.com/pic/8b13632762d0f703918f0d436fac463d269758ee6faf?x-bce-process=image/watermark,image_d2F0ZXIvYmFpa2U4MA==,g_7,xp_5,yp_5",
-		}},
-	}
 	// relation service
 	relationGroup := douyin.Group("/relation")
 	relationGroup.POST("/action/", relation.RelationAction)
