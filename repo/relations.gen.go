@@ -6,7 +6,6 @@ package repo
 
 import (
 	"context"
-	"strings"
 
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
@@ -168,24 +167,6 @@ type IRelationDo interface {
 	Returning(value interface{}, columns ...string) IRelationDo
 	UnderlyingDB() *gorm.DB
 	schema.Tabler
-
-	GetFriends(userId uint32)
-}
-
-// SELECT a.* FROM (SELECT a.user_id FROM relations AS a INNER JOIN relations AS b ON a.target_id = @userId AND b.target_id = @userId) A GROUP BY a.user_id{{end}}
-func (r relationDo) GetFriends(userId uint32) {
-	var params []interface{}
-
-	var generateSQL strings.Builder
-	params = append(params, userId)
-	params = append(params, userId)
-	generateSQL.WriteString("SELECT a.* FROM (SELECT a.user_id FROM relations AS a INNER JOIN relations AS b ON a.target_id = ? AND b.target_id = ?) A GROUP BY a.user_id ")
-
-	var executeSQL *gorm.DB
-	executeSQL = r.UnderlyingDB().Exec(generateSQL.String(), params...) // ignore_security_alert
-	_ = executeSQL
-
-	return
 }
 
 func (r relationDo) Debug() IRelationDo {

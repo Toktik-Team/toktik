@@ -28,6 +28,7 @@ const (
 	Unable2CreateDBEntry
 	RequestIsNil
 	UnableToQueryFollowList
+	UnableToQueryFollowerList
 	UnableToCreateRelation
 	UnableToDeleteRelation
 )

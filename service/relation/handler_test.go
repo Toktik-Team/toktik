@@ -30,7 +30,7 @@ func TestRelationServiceImpl_GetFollowList(t *testing.T) {
 		ctx context.Context
 		req *relation.FollowListRequest
 	}{ctx: context.Background(), req: &relation.FollowListRequest{
-		UserId: 1,
+		UserId: mockUserA.Id,
 	}}
 
 	var successResp = &relation.FollowListResponse{
@@ -48,7 +48,7 @@ func TestRelationServiceImpl_GetFollowList(t *testing.T) {
 	defer mock.MockConn.Close()
 
 	mock.DBMock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "relations" WHERE "relations"."user_id" = $1 AND "relations"."deleted_at" IS NULL`)).
-		WithArgs(1).
+		WithArgs(mockUserA.Id).
 		WillReturnRows(videoRows)
 
 	type args struct {
@@ -95,7 +95,7 @@ func TestRelationServiceImpl_GetFollowerList(t *testing.T) {
 		ctx context.Context
 		req *relation.FollowerListRequest
 	}{ctx: context.Background(), req: &relation.FollowerListRequest{
-		UserId: 1,
+		UserId: mockUserA.Id,
 	}}
 
 	var successResp = &relation.FollowerListResponse{
@@ -113,7 +113,7 @@ func TestRelationServiceImpl_GetFollowerList(t *testing.T) {
 	defer mock.MockConn.Close()
 
 	mock.DBMock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "relations" WHERE "relations"."target_id" = $1 AND "relations"."deleted_at" IS NULL`)).
-		WithArgs(1).
+		WithArgs(mockUserA.Id).
 		WillReturnRows(relationRows)
 
 	type args struct {
@@ -328,6 +328,66 @@ func TestRelationServiceImpl_Unfollow(t *testing.T) {
 			}
 			if !reflect.DeepEqual(gotResp, tt.wantResp) {
 				t.Errorf("RelationServiceImpl.Follow() = %v, want %v", gotResp, tt.wantResp)
+			}
+		})
+	}
+}
+
+func TestRelationServiceImpl_GetFriendList(t *testing.T) {
+	var successArg = struct {
+		ctx context.Context
+		req *relation.FriendListRequest
+	}{ctx: context.Background(), req: &relation.FriendListRequest{
+		UserId: mockUserA.Id,
+	}}
+
+	var successResp = &relation.FriendListResponse{
+		StatusCode: biz.OkStatusCode,
+		StatusMsg:  biz.OkStatusMsg,
+		UserList: []*user.User{
+			mockUserB,
+		},
+	}
+
+	UserClient = MockUserClient{}
+
+	relationFollowerRows := sqlmock.NewRows([]string{"user_id", "target_id"})
+	relationFollowerRows.AddRow(mockUserB.Id, mockUserA.Id)
+
+	relationFollowRows := sqlmock.NewRows([]string{"user_id", "target_id"})
+	relationFollowRows.AddRow(mockUserA.Id, mockUserB.Id)
+
+	mock.DBMock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "relations" WHERE "relations"."target_id" = $1 AND "relations"."deleted_at" IS NULL`)).
+		WithArgs(mockUserA.Id).
+		WillReturnRows(relationFollowerRows)
+
+	mock.DBMock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "relations" WHERE "relations"."user_id" = $1 AND "relations"."deleted_at" IS NULL`)).
+		WithArgs(mockUserA.Id).
+		WillReturnRows(relationFollowRows)
+
+	type args struct {
+		ctx context.Context
+		req *relation.FriendListRequest
+	}
+	tests := []struct {
+		name     string
+		s        *RelationServiceImpl
+		args     args
+		wantResp *relation.FriendListResponse
+		wantErr  bool
+	}{
+		{name: "GetFriends Successful case", args: successArg, wantResp: successResp},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			s := &RelationServiceImpl{}
+			gotResp, err := s.GetFriendList(tt.args.ctx, tt.args.req)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("RelationServiceImpl.GetFriendList() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(gotResp, tt.wantResp) {
+				t.Errorf("RelationServiceImpl.GetFriendList() = %v, want %v", gotResp, tt.wantResp)
 			}
 		})
 	}
