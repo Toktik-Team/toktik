@@ -169,6 +169,16 @@ func (s *PublishServiceImpl) CreateVideo(ctx context.Context, req *publish.Creat
 		"entry": publishModel,
 	}).Debug("saved db entry")
 
+	u := gen.Q.User
+	_, err = u.WithContext(ctx).Where(u.ID.Eq(req.UserId)).Update(u.WorkCount, u.WorkCount.Add(1))
+	if err != nil {
+		logger.Debug("failed to update the number of user works")
+		return &publish.CreateVideoResponse{
+			StatusCode: biz.Unable2CreateDBEntry,
+			StatusMsg:  biz.InternalServerErrorStatusMsg,
+		}, nil
+	}
+
 	resp = &publish.CreateVideoResponse{StatusCode: 0, StatusMsg: biz.PublishActionSuccess}
 	logger.WithFields(logrus.Fields{
 		"time":     time.Now(),
