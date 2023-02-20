@@ -26,6 +26,7 @@ func NewServiceInfo() *kitex.ServiceInfo {
 		"Unfollow":        kitex.NewMethodInfo(unfollowHandler, newUnfollowArgs, newUnfollowResult, false),
 		"GetFollowList":   kitex.NewMethodInfo(getFollowListHandler, newGetFollowListArgs, newGetFollowListResult, false),
 		"GetFollowerList": kitex.NewMethodInfo(getFollowerListHandler, newGetFollowerListArgs, newGetFollowerListResult, false),
+		"GetFriendList":   kitex.NewMethodInfo(getFriendListHandler, newGetFriendListArgs, newGetFriendListResult, false),
 	}
 	extra := map[string]interface{}{
 		"PackageName": "douyin.user",
@@ -621,6 +622,151 @@ func (p *GetFollowerListResult) IsSetSuccess() bool {
 	return p.Success != nil
 }
 
+func getFriendListHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
+	switch s := arg.(type) {
+	case *streaming.Args:
+		st := s.Stream
+		req := new(relation.FriendListRequest)
+		if err := st.RecvMsg(req); err != nil {
+			return err
+		}
+		resp, err := handler.(relation.RelationService).GetFriendList(ctx, req)
+		if err != nil {
+			return err
+		}
+		if err := st.SendMsg(resp); err != nil {
+			return err
+		}
+	case *GetFriendListArgs:
+		success, err := handler.(relation.RelationService).GetFriendList(ctx, s.Req)
+		if err != nil {
+			return err
+		}
+		realResult := result.(*GetFriendListResult)
+		realResult.Success = success
+	}
+	return nil
+}
+func newGetFriendListArgs() interface{} {
+	return &GetFriendListArgs{}
+}
+
+func newGetFriendListResult() interface{} {
+	return &GetFriendListResult{}
+}
+
+type GetFriendListArgs struct {
+	Req *relation.FriendListRequest
+}
+
+func (p *GetFriendListArgs) FastRead(buf []byte, _type int8, number int32) (n int, err error) {
+	if !p.IsSetReq() {
+		p.Req = new(relation.FriendListRequest)
+	}
+	return p.Req.FastRead(buf, _type, number)
+}
+
+func (p *GetFriendListArgs) FastWrite(buf []byte) (n int) {
+	if !p.IsSetReq() {
+		return 0
+	}
+	return p.Req.FastWrite(buf)
+}
+
+func (p *GetFriendListArgs) Size() (n int) {
+	if !p.IsSetReq() {
+		return 0
+	}
+	return p.Req.Size()
+}
+
+func (p *GetFriendListArgs) Marshal(out []byte) ([]byte, error) {
+	if !p.IsSetReq() {
+		return out, fmt.Errorf("No req in GetFriendListArgs")
+	}
+	return proto.Marshal(p.Req)
+}
+
+func (p *GetFriendListArgs) Unmarshal(in []byte) error {
+	msg := new(relation.FriendListRequest)
+	if err := proto.Unmarshal(in, msg); err != nil {
+		return err
+	}
+	p.Req = msg
+	return nil
+}
+
+var GetFriendListArgs_Req_DEFAULT *relation.FriendListRequest
+
+func (p *GetFriendListArgs) GetReq() *relation.FriendListRequest {
+	if !p.IsSetReq() {
+		return GetFriendListArgs_Req_DEFAULT
+	}
+	return p.Req
+}
+
+func (p *GetFriendListArgs) IsSetReq() bool {
+	return p.Req != nil
+}
+
+type GetFriendListResult struct {
+	Success *relation.FriendListResponse
+}
+
+var GetFriendListResult_Success_DEFAULT *relation.FriendListResponse
+
+func (p *GetFriendListResult) FastRead(buf []byte, _type int8, number int32) (n int, err error) {
+	if !p.IsSetSuccess() {
+		p.Success = new(relation.FriendListResponse)
+	}
+	return p.Success.FastRead(buf, _type, number)
+}
+
+func (p *GetFriendListResult) FastWrite(buf []byte) (n int) {
+	if !p.IsSetSuccess() {
+		return 0
+	}
+	return p.Success.FastWrite(buf)
+}
+
+func (p *GetFriendListResult) Size() (n int) {
+	if !p.IsSetSuccess() {
+		return 0
+	}
+	return p.Success.Size()
+}
+
+func (p *GetFriendListResult) Marshal(out []byte) ([]byte, error) {
+	if !p.IsSetSuccess() {
+		return out, fmt.Errorf("No req in GetFriendListResult")
+	}
+	return proto.Marshal(p.Success)
+}
+
+func (p *GetFriendListResult) Unmarshal(in []byte) error {
+	msg := new(relation.FriendListResponse)
+	if err := proto.Unmarshal(in, msg); err != nil {
+		return err
+	}
+	p.Success = msg
+	return nil
+}
+
+func (p *GetFriendListResult) GetSuccess() *relation.FriendListResponse {
+	if !p.IsSetSuccess() {
+		return GetFriendListResult_Success_DEFAULT
+	}
+	return p.Success
+}
+
+func (p *GetFriendListResult) SetSuccess(x interface{}) {
+	p.Success = x.(*relation.FriendListResponse)
+}
+
+func (p *GetFriendListResult) IsSetSuccess() bool {
+	return p.Success != nil
+}
+
 type kClient struct {
 	c client.Client
 }
@@ -666,6 +812,16 @@ func (p *kClient) GetFollowerList(ctx context.Context, Req *relation.FollowerLis
 	_args.Req = Req
 	var _result GetFollowerListResult
 	if err = p.c.Call(ctx, "GetFollowerList", &_args, &_result); err != nil {
+		return
+	}
+	return _result.GetSuccess(), nil
+}
+
+func (p *kClient) GetFriendList(ctx context.Context, Req *relation.FriendListRequest) (r *relation.FriendListResponse, err error) {
+	var _args GetFriendListArgs
+	_args.Req = Req
+	var _result GetFriendListResult
+	if err = p.c.Call(ctx, "GetFriendList", &_args, &_result); err != nil {
 		return
 	}
 	return _result.GetSuccess(), nil

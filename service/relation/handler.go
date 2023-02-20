@@ -56,7 +56,7 @@ func (s *RelationServiceImpl) GetFollowList(ctx context.Context, req *relation.F
 		return
 	}
 	var userList []*user.User
-	for i, m := range relationModels {
+	for _, m := range relationModels {
 		userResponse, err := UserClient.GetUser(ctx, &user.UserRequest{
 			UserId:  m.TargetId,
 			ActorId: req.UserId,
@@ -65,13 +65,18 @@ func (s *RelationServiceImpl) GetFollowList(ctx context.Context, req *relation.F
 			log.Println(fmt.Errorf("failed to get user info: %w", err))
 			continue
 		}
-		userList[i] = userResponse.User
+		userList = append(userList, userResponse.User)
 	}
 
 	logger.WithFields(map[string]interface{}{
 		"time":     time.Now(),
 		"response": resp,
 	}).Debug("all process done, ready to launch response")
+	resp = &relation.FollowListResponse{
+		StatusCode: biz.OkStatusCode,
+		StatusMsg:  biz.OkStatusMsg,
+		UserList:   userList,
+	}
 	return
 }
 
@@ -96,7 +101,7 @@ func (s *RelationServiceImpl) GetFollowerList(ctx context.Context, req *relation
 		return
 	}
 	var userList []*user.User
-	for i, m := range relationModels {
+	for _, m := range relationModels {
 		userResponse, err := UserClient.GetUser(ctx, &user.UserRequest{
 			UserId:  m.TargetId,
 			ActorId: req.UserId,
@@ -105,13 +110,60 @@ func (s *RelationServiceImpl) GetFollowerList(ctx context.Context, req *relation
 			logger.Error("failed to get user info: %w", err)
 			continue
 		}
-		userList[i] = userResponse.User
+		userList = append(userList, userResponse.User)
 	}
 
 	logger.WithFields(map[string]interface{}{
 		"time":     time.Now(),
 		"response": resp,
 	}).Debug("all process done, ready to launch response")
+	resp = &relation.FollowerListResponse{
+		StatusCode: biz.OkStatusCode,
+		StatusMsg:  biz.OkStatusMsg,
+		UserList:   userList,
+	}
+	return
+}
+
+// GetFriendList implements the RelationServiceImpl interface.
+func (s *RelationServiceImpl) GetFriendList(ctx context.Context, req *relation.FriendListRequest) (resp *relation.FriendListResponse, err error) {
+	methodFields := logrus.Fields{
+		"user_id":  req.UserId,
+		"time":     time.Now(),
+		"function": "GetFriendList",
+	}
+	logger := logging.Logger.WithFields(methodFields)
+	logger.Debug("Process start")
+
+	// r := repo.Q.Relation
+	// repo.Relation.GetFriends(req.UserId)
+	// followerModels, err := r.Where(r.TargetId.Eq(req.UserId)).Find()
+	// if err != nil {
+	// 	resp = &relation.FriendListResponse{
+	// 		StatusCode: biz.UnableToQueryFollowList,
+	// 		StatusMsg:  biz.InternalServerErrorStatusMsg,
+	// 		UserList:   nil,
+	// 	}
+	// 	return
+	// }
+
+	// var userList []*user.User
+	// for i, m := range relationModels {
+	// 	userResponse, err := UserClient.GetUser(ctx, &user.UserRequest{
+	// 		UserId:  m.TargetId,
+	// 		ActorId: req.UserId,
+	// 	})
+	// 	if err != nil || userResponse.StatusCode != biz.OkStatusCode {
+	// 		logger.Error("failed to get user info: %w", err)
+	// 		continue
+	// 	}
+	// 	userList[i] = userResponse.User
+	// }
+
+	// logger.WithFields(map[string]interface{}{
+	// 	"time":     time.Now(),
+	// 	"response": resp,
+	// }).Debug("all process done, ready to launch response")
 	return
 }
 
@@ -126,6 +178,14 @@ func (s *RelationServiceImpl) Follow(ctx context.Context, req *relation.Relation
 	logger := logging.Logger.WithFields(methodFields)
 	logger.Debug("Process start")
 
+	if req.ToUserId == req.UserId {
+		resp = &relation.RelationActionResponse{
+			StatusCode: biz.InvalidToUserId,
+			StatusMsg:  biz.BadRequestStatusMsg,
+		}
+		return
+	}
+
 	relationModel := model.Relation{
 		UserId:   uint32(req.UserId),
 		TargetId: uint32(req.ToUserId),
@@ -138,6 +198,10 @@ func (s *RelationServiceImpl) Follow(ctx context.Context, req *relation.Relation
 	})
 	if err != nil || userResponse.StatusCode != biz.OkStatusCode || userResponse.User == nil {
 		logger.Error("failed to get user info: %w", err)
+		resp = &relation.RelationActionResponse{
+			StatusCode: biz.UserNotFound,
+			StatusMsg:  biz.BadRequestStatusMsg,
+		}
 		return
 	}
 	r := repo.Q.Relation
@@ -158,8 +222,8 @@ func (s *RelationServiceImpl) Follow(ctx context.Context, req *relation.Relation
 	}).Debug("create relation")
 
 	resp = &relation.RelationActionResponse{
-		StatusCode: 0,
-		StatusMsg:  biz.RelationActionSuccess,
+		StatusCode: biz.OkStatusCode,
+		StatusMsg:  biz.OkStatusMsg,
 	}
 
 	logger.WithFields(map[string]interface{}{
@@ -179,13 +243,17 @@ func (s *RelationServiceImpl) Unfollow(ctx context.Context, req *relation.Relati
 	}
 	logger := logging.Logger.WithFields(methodFields)
 	logger.Debug("Process start")
-
-	// TODO make sure target id exists
+	if req.ToUserId == req.UserId {
+		resp = &relation.RelationActionResponse{
+			StatusCode: biz.InvalidToUserId,
+			StatusMsg:  biz.BadRequestStatusMsg,
+		}
+		return
+	}
 
 	r := repo.Q.Relation
 
-	// Unfollow
-	relationModel, err := r.WithContext(ctx).Where(r.UserId.Eq(req.UserId)).First()
+	relationModel, err := r.WithContext(ctx).Where(r.UserId.Eq(req.UserId), r.TargetId.Eq(req.ToUserId)).First()
 	if err != nil {
 		// Unfollow a user that was not followed before
 		resp = &relation.RelationActionResponse{
@@ -195,10 +263,11 @@ func (s *RelationServiceImpl) Unfollow(ctx context.Context, req *relation.Relati
 		return
 	}
 
-	if _, err = r.Delete(relationModel); err != nil {
+	if _, err = r.Where(r.UserId.Eq(req.UserId), r.TargetId.Eq(req.ToUserId)).Delete(); err != nil {
 		logger.WithFields(map[string]interface{}{
 			"time":  time.Now(),
 			"entry": relationModel,
+			"err":   err,
 		}).Debug("failed to delete")
 
 		resp = &relation.RelationActionResponse{
@@ -212,14 +281,14 @@ func (s *RelationServiceImpl) Unfollow(ctx context.Context, req *relation.Relati
 		"time":  time.Now(),
 		"entry": relationModel,
 	}).Debug("deleted db entry")
-	resp = &relation.RelationActionResponse{
-		StatusCode: 0,
-		StatusMsg:  biz.RelationActionSuccess,
-	}
 
 	logger.WithFields(map[string]interface{}{
 		"time":     time.Now(),
 		"response": resp,
 	}).Debug("all process done, ready to launch response")
+	resp = &relation.RelationActionResponse{
+		StatusCode: biz.OkStatusCode,
+		StatusMsg:  biz.OkStatusMsg,
+	}
 	return
 }

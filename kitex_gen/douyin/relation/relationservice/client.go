@@ -15,6 +15,7 @@ type Client interface {
 	Unfollow(ctx context.Context, Req *relation.RelationActionRequest, callOptions ...callopt.Option) (r *relation.RelationActionResponse, err error)
 	GetFollowList(ctx context.Context, Req *relation.FollowListRequest, callOptions ...callopt.Option) (r *relation.FollowListResponse, err error)
 	GetFollowerList(ctx context.Context, Req *relation.FollowerListRequest, callOptions ...callopt.Option) (r *relation.FollowerListResponse, err error)
+	GetFriendList(ctx context.Context, Req *relation.FriendListRequest, callOptions ...callopt.Option) (r *relation.FriendListResponse, err error)
 }
 
 // NewClient creates a client for the service defined in IDL.
@@ -64,4 +65,9 @@ func (p *kRelationServiceClient) GetFollowList(ctx context.Context, Req *relatio
 func (p *kRelationServiceClient) GetFollowerList(ctx context.Context, Req *relation.FollowerListRequest, callOptions ...callopt.Option) (r *relation.FollowerListResponse, err error) {
 	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
 	return p.kClient.GetFollowerList(ctx, Req)
+}
+
+func (p *kRelationServiceClient) GetFriendList(ctx context.Context, Req *relation.FriendListRequest, callOptions ...callopt.Option) (r *relation.FriendListResponse, err error) {
+	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
+	return p.kClient.GetFriendList(ctx, Req)
 }

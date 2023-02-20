@@ -36,6 +36,17 @@ message FollowerListResponse {
   repeated User user_list = 3; // 用户列表
 }
 
+
+message FriendListRequest {
+  uint32 user_id = 1; // 用户id
+}
+
+message FriendListResponse {
+  int32 status_code = 1; // 状态码，0-成功，其他值-失败
+  string status_msg = 2; // 返回状态描述
+  repeated User user_list = 3; // 用户列表
+}
+
 service RelationService {
   rpc Follow (RelationActionRequest) returns (RelationActionResponse) {
   }
@@ -45,5 +56,8 @@ service RelationService {
   rpc GetFollowList (FollowListRequest) returns (FollowListResponse) {
   }
   rpc GetFollowerList (FollowerListRequest) returns (FollowerListResponse) {
+  }
+
+  rpc GetFriendList (FriendListRequest) returns (FriendListResponse) {
   }
 }

@@ -29,7 +29,8 @@ func main() {
 	g.ApplyBasic(auth.UserToken{}, model.Video{}, model.User{}, model.Comment{}, model.Relation{})
 
 	// Generate Type Safe API with Dynamic SQL defined on Querier interface
-	g.ApplyInterface(func(Querier) {}, auth.UserToken{}, model.Video{}, model.User{}, model.Comment{}, model.Relation{})
+	g.ApplyInterface(func(Querier) {}, auth.UserToken{}, model.Video{}, model.User{}, model.Comment{})
+	g.ApplyInterface(func(model.RelationQuerier) {}, model.Relation{})
 
 	// Generate the code
 	g.Execute()

@@ -169,24 +169,21 @@ type IRelationDo interface {
 	UnderlyingDB() *gorm.DB
 	schema.Tabler
 
-	FilterWithNameAndRole(name string, role string) (result []model.Relation, err error)
+	GetFriends(userId uint32)
 }
 
-// SELECT * FROM @@table WHERE name = @name{{if role !=""}} AND role = @role{{end}}
-func (r relationDo) FilterWithNameAndRole(name string, role string) (result []model.Relation, err error) {
+// SELECT a.* FROM (SELECT a.user_id FROM relations AS a INNER JOIN relations AS b ON a.target_id = @userId AND b.target_id = @userId) A GROUP BY a.user_id{{end}}
+func (r relationDo) GetFriends(userId uint32) {
 	var params []interface{}
 
 	var generateSQL strings.Builder
-	params = append(params, name)
-	generateSQL.WriteString("SELECT * FROM relations WHERE name = ? ")
-	if role != "" {
-		params = append(params, role)
-		generateSQL.WriteString("AND role = ? ")
-	}
+	params = append(params, userId)
+	params = append(params, userId)
+	generateSQL.WriteString("SELECT a.* FROM (SELECT a.user_id FROM relations AS a INNER JOIN relations AS b ON a.target_id = ? AND b.target_id = ?) A GROUP BY a.user_id ")
 
 	var executeSQL *gorm.DB
-	executeSQL = r.UnderlyingDB().Raw(generateSQL.String(), params...).Find(&result) // ignore_security_alert
-	err = executeSQL.Error
+	executeSQL = r.UnderlyingDB().Exec(generateSQL.String(), params...) // ignore_security_alert
+	_ = executeSQL
 
 	return
 }

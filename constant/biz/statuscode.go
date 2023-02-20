@@ -43,6 +43,7 @@ const (
 	TargetUserNotFound               = 400101
 	RelationNotFound                 = 400102
 	RelationAlreadyExists            = 400103
+	InvalidToUserId                  = 400104
 )
 
 // Unauthorized
