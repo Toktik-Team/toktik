@@ -31,6 +31,7 @@ func init() {
 	}
 }
 
+// RelationAction [POST] /relation/action/
 func RelationAction(ctx context.Context, c *app.RequestContext) {
 	var actionTypeInt int
 	var relationResp *relation.RelationActionResponse
@@ -102,5 +103,67 @@ func RelationAction(ctx context.Context, c *app.RequestContext) {
 	c.JSON(
 		httpStatus.StatusOK,
 		relationResp,
+	)
+}
+
+// FollowList [POST] /relation/follow/list/
+func GetFollowList(ctx context.Context, c *app.RequestContext) {
+
+	methodFields := logrus.Fields{
+		"time":   time.Now(),
+		"method": "GetFollowList",
+	}
+	logger := logging.Logger.WithFields(methodFields)
+	logger.Debugf("Process start")
+	userId := mw.GetAuthActorId(c)
+
+	logger.WithFields(logrus.Fields{
+		"userId": userId,
+	}).Debugf("Executing get follow list")
+	followListResp, err := relationClient.GetFollowList(ctx, &relation.FollowListRequest{
+		UserId: userId,
+	})
+
+	if err != nil {
+		bizConstant.RPCCallError.WithCause(err).WithFields(&methodFields).LaunchError(c)
+		return
+	}
+	logger.WithFields(logrus.Fields{
+		"response": followListResp,
+	}).Debugf("get follow list success")
+	c.JSON(
+		httpStatus.StatusOK,
+		followListResp,
+	)
+}
+
+// FollowList [POST] /relation/follower/list/
+func GetFollowerList(ctx context.Context, c *app.RequestContext) {
+
+	methodFields := logrus.Fields{
+		"time":   time.Now(),
+		"method": "GetFollowerList",
+	}
+	logger := logging.Logger.WithFields(methodFields)
+	logger.Debugf("Process start")
+	userId := mw.GetAuthActorId(c)
+
+	logger.WithFields(logrus.Fields{
+		"userId": userId,
+	}).Debugf("Executing get follow list")
+	followListResp, err := relationClient.GetFollowerList(ctx, &relation.FollowerListRequest{
+		UserId: userId,
+	})
+
+	if err != nil {
+		bizConstant.RPCCallError.WithCause(err).WithFields(&methodFields).LaunchError(c)
+		return
+	}
+	logger.WithFields(logrus.Fields{
+		"response": followListResp,
+	}).Debugf("get follower list success")
+	c.JSON(
+		httpStatus.StatusOK,
+		followListResp,
 	)
 }

@@ -89,12 +89,8 @@ func main() {
 	// relation service
 	relationGroup := douyin.Group("/relation")
 	relationGroup.POST("/action/", relation.RelationAction)
-	relationGroup.GET("/follow/list", func(c context.Context, ctx *app.RequestContext) {
-		ctx.JSON(httpStatus.StatusOK, chatGPTUserList)
-	})
-	relationGroup.GET("/follower/list", func(c context.Context, ctx *app.RequestContext) {
-		ctx.JSON(httpStatus.StatusOK, chatGPTUserList)
-	})
+	relationGroup.GET("/follow/list/", relation.GetFollowList)
+	relationGroup.GET("/follower/list", relation.GetFollowerList)
 	relationGroup.GET("/friend/list", func(c context.Context, ctx *app.RequestContext) {
 		ctx.JSON(httpStatus.StatusOK, chatGPTUserList)
 	})
