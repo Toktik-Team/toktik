@@ -7,9 +7,15 @@ import (
 	"fmt"
 	"github.com/sirupsen/logrus"
 	"io"
+	"log"
 	"net/http"
 	"time"
 	"toktik/constant/biz"
+	"toktik/kitex_gen/douyin/comment"
+	"toktik/kitex_gen/douyin/comment/commentservice"
+	"toktik/kitex_gen/douyin/feed"
+	"toktik/kitex_gen/douyin/user"
+	"toktik/kitex_gen/douyin/user/userservice"
 	"toktik/logging"
 	"toktik/repo/model"
 
@@ -22,6 +28,9 @@ import (
 	gen "toktik/repo"
 	"toktik/storage"
 )
+
+var UserClient userservice.Client
+var CommentClient commentservice.Client
 
 // getThumbnail Generate JPEG thumbnail from video
 func getThumbnail(input io.ReadSeeker) ([]byte, error) {
@@ -189,6 +198,84 @@ func (s *PublishServiceImpl) CreateVideo(ctx context.Context, req *publish.Creat
 
 // ListVideo implements the PublishServiceImpl interface.
 func (s *PublishServiceImpl) ListVideo(ctx context.Context, req *publish.ListVideoRequest) (resp *publish.ListVideoResponse, err error) {
-	// TODO: Your code here...
-	return
+	methodFields := logrus.Fields{
+		"user_id":  req.UserId,
+		"actor_id": req.ActorId,
+		"time":     time.Now(),
+		"function": "ListVideo",
+	}
+	logger := logging.Logger.WithFields(methodFields)
+	logger.Debug("Process start")
+
+	find, err := gen.Q.Video.WithContext(ctx).
+		Where(gen.Q.Video.UserId.Eq(req.UserId)).
+		Order(gen.Q.Video.CreatedAt.Desc()).
+		Find()
+	if err != nil {
+		logger.WithFields(logrus.Fields{
+			"time": time.Now(),
+			"err":  err,
+		}).Debug("failed to query video")
+		return &publish.ListVideoResponse{
+			StatusCode: biz.UnableToQueryVideo,
+			StatusMsg:  &biz.InternalServerErrorStatusMsg,
+		}, nil
+	}
+
+	rVideo := make([]*feed.Video, 0, len(find))
+	for _, m := range find {
+
+		userResponse, err := UserClient.GetUser(ctx, &user.UserRequest{
+			UserId:  m.UserId,
+			ActorId: req.ActorId,
+		})
+		if err != nil || userResponse.StatusCode != biz.OkStatusCode {
+			log.Println(fmt.Errorf("failed to get user info: %w", err))
+			continue
+		}
+
+		playUrl, err := storage.GetLink(m.FileName)
+		if err != nil {
+			log.Println(fmt.Errorf("failed to fetch play url: %w", err))
+			continue
+		}
+
+		coverUrl, err := storage.GetLink(m.CoverName)
+		if err != nil {
+			log.Println(fmt.Errorf("failed to fetch cover url: %w", err))
+			continue
+		}
+
+		commentCount, err := CommentClient.CountComment(ctx, &comment.CountCommentRequest{
+			ActorId: req.ActorId,
+			VideoId: m.ID,
+		})
+		if err != nil {
+			log.Println(fmt.Errorf("failed to fetch comment count: %w", err))
+			continue
+		}
+
+		rVideo = append(rVideo, &feed.Video{
+			Id:       m.ID,
+			Author:   userResponse.User,
+			PlayUrl:  playUrl,
+			CoverUrl: coverUrl,
+			// TODO: finish this
+			FavoriteCount: 0,
+			CommentCount:  commentCount.CommentCount,
+			// TODO: finish this
+			IsFavorite: false,
+			Title:      m.Title,
+		})
+	}
+
+	logger.WithFields(logrus.Fields{
+		"time":     time.Now(),
+		"response": resp,
+	}).Debug("all process done, ready to launch response")
+	return &publish.ListVideoResponse{
+		StatusCode: biz.OkStatusCode,
+		StatusMsg:  &biz.OkStatusMsg,
+		VideoList:  rVideo,
+	}, nil
 }
