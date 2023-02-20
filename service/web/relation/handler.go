@@ -150,8 +150,8 @@ func GetFollowerList(ctx context.Context, c *app.RequestContext) {
 
 	logger.WithFields(logrus.Fields{
 		"userId": userId,
-	}).Debugf("Executing get follow list")
-	followListResp, err := relationClient.GetFollowerList(ctx, &relation.FollowerListRequest{
+	}).Debugf("Executing get follower list")
+	followerListResp, err := relationClient.GetFollowerList(ctx, &relation.FollowerListRequest{
 		UserId: userId,
 	})
 
@@ -160,10 +160,41 @@ func GetFollowerList(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 	logger.WithFields(logrus.Fields{
-		"response": followListResp,
+		"response": followerListResp,
 	}).Debugf("get follower list success")
 	c.JSON(
 		httpStatus.StatusOK,
-		followListResp,
+		followerListResp,
+	)
+}
+
+// GetFriendList [POST] /relation/friends/list/
+func GetFriendList(ctx context.Context, c *app.RequestContext) {
+
+	methodFields := logrus.Fields{
+		"time":   time.Now(),
+		"method": "GetFriendList",
+	}
+	logger := logging.Logger.WithFields(methodFields)
+	logger.Debugf("Process start")
+	userId := mw.GetAuthActorId(c)
+
+	logger.WithFields(logrus.Fields{
+		"userId": userId,
+	}).Debugf("Executing get friend list")
+	friendListResp, err := relationClient.GetFriendList(ctx, &relation.FriendListRequest{
+		UserId: userId,
+	})
+
+	if err != nil {
+		bizConstant.RPCCallError.WithCause(err).WithFields(&methodFields).LaunchError(c)
+		return
+	}
+	logger.WithFields(logrus.Fields{
+		"response": friendListResp,
+	}).Debugf("get friends list success")
+	c.JSON(
+		httpStatus.StatusOK,
+		friendListResp,
 	)
 }
