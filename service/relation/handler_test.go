@@ -295,12 +295,13 @@ func TestRelationServiceImpl_Unfollow(t *testing.T) {
 	mock.DBMock.ExpectBegin()
 
 	mock.DBMock.ExpectExec(regexp.QuoteMeta(`UPDATE "relations" SET "deleted_at"=$1 WHERE "relations"."user_id" = $2 AND "relations"."target_id" = $3 AND "relations"."deleted_at" IS NULL`)).
-		WithArgs(sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg())
+		WithArgs(sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg()).
+		WillReturnResult(sqlmock.NewResult(1, 1))
 
 	mock.DBMock.ExpectCommit()
 
 	mock.DBMock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "relations" WHERE "relations"."user_id" = $1 AND "relations"."target_id" = $2 AND "relations"."deleted_at" IS NULL ORDER BY "relations"."id" LIMIT 1`)).
-		WithArgs(mockUserA.Id, mockUserB.Id).
+		WithArgs(mockUserA.Id, mockUserC.Id).
 		WillReturnRows(sqlmock.NewRows([]string{"user_id", "target_id"}))
 
 	type args struct {
@@ -315,14 +316,14 @@ func TestRelationServiceImpl_Unfollow(t *testing.T) {
 		wantErr  bool
 	}{
 		{name: "Unfollow Successful case", args: successArg, wantResp: successResp},
-		{name: "Unfollow not found", args: unfollowNotFoundArg, wantResp: unfollowNotFoundResp},
+		{name: "Unfollow not found", args: unfollowNotFoundArg, wantResp: unfollowNotFoundResp, wantErr: true},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			s := &RelationServiceImpl{}
 			gotResp, err := s.Unfollow(tt.args.ctx, tt.args.req)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("RelationServiceImpl.Follow() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("RelationServiceImpl.Unfollow() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if !reflect.DeepEqual(gotResp, tt.wantResp) {
