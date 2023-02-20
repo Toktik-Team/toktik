@@ -58,6 +58,8 @@ var defaultConfig = envConfigSchema{
 	S3_SECRET_ID:    "minio",
 	S3_SECRET_KEY:   "12345678",
 	S3_PATH_STYLE:   "true",
+
+	UNSPLASH_ACCESS_KEY: "access_key",
 }
 
 type envConfigSchema struct {
@@ -87,6 +89,8 @@ type envConfigSchema struct {
 	S3_SECRET_ID    string
 	S3_SECRET_KEY   string
 	S3_PATH_STYLE   string
+
+	UNSPLASH_ACCESS_KEY string
 }
 
 func (s *envConfigSchema) IsDev() bool {
