@@ -1,3 +1,5 @@
+//go:build e2e
+
 // Progress:
 //   All tests are synced with 2023-2-20 version of the API. Not sure if the API will change in the future.
 
