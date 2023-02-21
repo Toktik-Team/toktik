@@ -5,11 +5,14 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/cloudwego/kitex/client"
+	consul "github.com/kitex-contrib/registry-consul"
 	"io"
 	"log"
 	"net/http"
 	"time"
 	"toktik/constant/biz"
+	"toktik/constant/config"
 	"toktik/kitex_gen/douyin/comment"
 	"toktik/kitex_gen/douyin/comment/commentservice"
 	"toktik/kitex_gen/douyin/feed"
@@ -32,6 +35,21 @@ import (
 
 var UserClient userservice.Client
 var CommentClient commentservice.Client
+
+func init() {
+	r, err := consul.NewConsulResolver(config.EnvConfig.CONSUL_ADDR)
+	if err != nil {
+		log.Fatal(err)
+	}
+	UserClient, err = userservice.NewClient(config.UserServiceName, client.WithResolver(r))
+	if err != nil {
+		log.Fatal(err)
+	}
+	CommentClient, err = commentservice.NewClient(config.CommentServiceName, client.WithResolver(r))
+	if err != nil {
+		log.Fatal(err)
+	}
+}
 
 // getThumbnail Generate JPEG thumbnail from video
 func getThumbnail(input io.ReadSeeker) ([]byte, error) {
