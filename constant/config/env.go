@@ -2,14 +2,15 @@ package config
 
 import (
 	"fmt"
-	"github.com/joho/godotenv"
-	"github.com/sirupsen/logrus"
 	"log"
 	"os"
 	"reflect"
 	"strconv"
 	"strings"
 	"toktik/logging"
+
+	"github.com/joho/godotenv"
+	"github.com/sirupsen/logrus"
 )
 
 var EnvConfig = envConfigSchema{}

@@ -3,10 +3,6 @@ package main
 import (
 	"context"
 	"fmt"
-	"github.com/golang/protobuf/proto"
-	"github.com/redis/go-redis/v9"
-	"github.com/sirupsen/logrus"
-	"google.golang.org/protobuf/encoding/protojson"
 	"strconv"
 	"time"
 	"toktik/constant/biz"
@@ -14,6 +10,11 @@ import (
 	"toktik/kitex_gen/douyin/wechat"
 	"toktik/logging"
 	"toktik/service/wechat/db"
+
+	"github.com/golang/protobuf/proto"
+	"github.com/redis/go-redis/v9"
+	"github.com/sirupsen/logrus"
+	"google.golang.org/protobuf/encoding/protojson"
 )
 
 var rdb *redis.Client
@@ -36,10 +37,10 @@ func (s *WechatServiceImpl) generateKey(sender, receiver *uint32) *string {
 
 // WechatAction implements the WechatServiceImpl interface.
 func (s *WechatServiceImpl) WechatAction(ctx context.Context, req *wechat.MessageActionRequest) (resp *wechat.MessageActionResponse, err error) {
-	startTime := time.Now()
+	actionTime := time.Now()
 	logger := logging.Logger.WithFields(logrus.Fields{
-		"time":   startTime,
-		"method": "WechatAction",
+		"actionTime": actionTime,
+		"method":     "WechatAction",
 	})
 	logger.Debugf("Process start")
 	if req == nil {
@@ -54,7 +55,7 @@ func (s *WechatServiceImpl) WechatAction(ctx context.Context, req *wechat.Messag
 
 	// 0 means chat with GPT
 	if receiverID == 0 {
-		err := s.handleChatGPT(ctx, senderID, req.Content, false, startTime.UnixMilli())
+		err := s.handleChatGPT(ctx, senderID, req.Content, false, actionTime.UnixMilli())
 		if err != nil {
 			logger.Warningf("handleChatGPT error: %v", err)
 			return &wechat.MessageActionResponse{
@@ -69,8 +70,10 @@ func (s *WechatServiceImpl) WechatAction(ctx context.Context, req *wechat.Messag
 	}
 
 	msg := &db.ChatMessage{
+		From: senderID,
+		To:   receiverID,
 		Msg:  req.Content,
-		Time: startTime.UnixMilli(),
+		Time: actionTime.UnixMilli(),
 	}
 
 	msgStr, err := proto.Marshal(msg)
@@ -83,7 +86,10 @@ func (s *WechatServiceImpl) WechatAction(ctx context.Context, req *wechat.Messag
 		return
 	}
 	key := *s.generateKey(&senderID, &receiverID)
-	cmd := rdb.LPush(ctx, key, msgStr)
+	cmd := rdb.ZAdd(ctx, key, redis.Z{
+		Score:  float64(actionTime.UnixMilli()),
+		Member: msgStr,
+	})
 	if cmd.Err() != nil {
 		logger.Warningf("redis error: %v", cmd.Err())
 		resp = &wechat.MessageActionResponse{
@@ -100,7 +106,7 @@ func (s *WechatServiceImpl) WechatAction(ctx context.Context, req *wechat.Messag
 		"sender_id":   senderID,
 		"receiver_id": receiverID,
 		"content":     req.Content,
-		"cost_time":   time.Since(startTime).Milliseconds(),
+		"cost_time":   time.Since(actionTime).Milliseconds(),
 	}).Debugf("Process end")
 	return
 }
@@ -121,48 +127,37 @@ func (s *WechatServiceImpl) WechatChat(ctx context.Context, req *wechat.MessageC
 	}
 	senderID := req.SenderId
 	receiverID := req.ReceiverId
+	min := strconv.FormatInt(int64(req.PreMsgTime), 10)
+	max := "+inf"
 	key := *s.generateKey(&senderID, &receiverID)
-	lRangeCMD := rdb.LRange(ctx, key, 0, -1)
-	if lRangeCMD.Err() != nil {
-		logger.Warningf("redis lrange error: %v", lRangeCMD.Err())
+	zRangeCMD := rdb.ZRangeByScore(ctx, key, &redis.ZRangeBy{Min: fmt.Sprintf("%f", min), Max: max})
+	if zRangeCMD.Err() != nil {
+		logger.Warningf("redis lrange error: %v", zRangeCMD.Err())
 		resp = &wechat.MessageChatResponse{
 			StatusCode: biz.RedisError,
-			StatusMsg:  lRangeCMD.Err().Error(),
-		}
-		return
-	}
-	delCMD := rdb.Del(ctx, key)
-	if delCMD.Err() != nil {
-		logger.Warningf("redis del error: %v", delCMD.Err())
-		resp = &wechat.MessageChatResponse{
-			StatusCode: biz.RedisError,
-			StatusMsg:  delCMD.Err().Error(),
+			StatusMsg:  zRangeCMD.Err().Error(),
 		}
 		return
 	}
 	respMessageList := make([]*wechat.Message, 0)
-	messages := lRangeCMD.Val()
+	messages := zRangeCMD.Val()
 	for i, message := range messages {
 		msg := &db.ChatMessage{}
 		err = proto.Unmarshal([]byte(message), msg)
+		var content string
 		if err != nil {
+			content = fmt.Sprintf("%s", message)
 			logger.Warningf("proto unmarshal error: %v", err)
-			respMessageList = append(respMessageList, &wechat.Message{
-				Id:         uint32(i),
-				Content:    fmt.Sprintf("%s", message),
-				CreateTime: strconv.FormatInt(time.Now().UnixMilli(), 10),
-				FromUserId: &senderID,
-				ToUserId:   &receiverID,
-			})
 		} else {
-			respMessageList = append(respMessageList, &wechat.Message{
-				Id:         uint32(i),
-				Content:    msg.Msg,
-				CreateTime: strconv.FormatInt(msg.Time, 10),
-				FromUserId: &senderID,
-				ToUserId:   &receiverID,
-			})
+			content = msg.Msg
 		}
+		respMessageList = append(respMessageList, &wechat.Message{
+			Id:         uint32(i),
+			Content:    content,
+			CreateTime: strconv.FormatInt(msg.Time, 10),
+			FromUserId: &msg.From,
+			ToUserId:   &msg.To,
+		})
 	}
 	resp = &wechat.MessageChatResponse{
 		StatusCode:  0,
