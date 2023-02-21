@@ -9,7 +9,6 @@ import (
 	"github.com/sirupsen/logrus"
 	"net/http"
 	"strconv"
-	"time"
 	"toktik/constant/biz"
 	bizConfig "toktik/constant/config"
 	"toktik/kitex_gen/douyin/favorite"
@@ -31,10 +30,7 @@ func init() {
 	}
 }
 
-var actionField = logrus.Fields{
-	"time":   time.Now(),
-	"method": "FavoriteAction",
-}
+var logger = logging.Logger
 
 // 获取 actorId
 func getActorId(c *app.RequestContext, actorId *uint32) bool {
@@ -46,7 +42,6 @@ func getActorId(c *app.RequestContext, actorId *uint32) bool {
 	default:
 		biz.AuthFailed.
 			WithFields(&logrus.Fields{
-				"time":   time.Now(),
 				"method": "GetActorId",
 			}).
 			LaunchError(c)
@@ -55,14 +50,18 @@ func getActorId(c *app.RequestContext, actorId *uint32) bool {
 }
 
 // 用于解析 Action 函数所需参数
-func parseParameters(c *app.RequestContext) (videoId uint32, actionType uint32, end bool) {
-	end = true
+func parseParameters(c *app.RequestContext) (videoId uint32, actionType uint32, isEnd bool) {
+	field := logrus.Fields{
+		"method": "parseParameters",
+	}
+
+	isEnd = true
 	// 获取参数
 	qVideoId, videoIdExist := c.GetQuery("video_id")
 	qActionType, actionTypeExist := c.GetQuery("action_type")
 	if !videoIdExist || !actionTypeExist {
 		biz.BadRequestError.
-			WithFields(&actionField).
+			WithFields(&field).
 			LaunchError(c)
 		return
 	}
@@ -71,7 +70,7 @@ func parseParameters(c *app.RequestContext) (videoId uint32, actionType uint32, 
 	if err != nil {
 		biz.BadRequestError.
 			WithCause(err).
-			WithFields(&actionField).
+			WithFields(&field).
 			LaunchError(c)
 		return
 	}
@@ -81,34 +80,36 @@ func parseParameters(c *app.RequestContext) (videoId uint32, actionType uint32, 
 	if err != nil {
 		biz.BadRequestError.
 			WithCause(err).
-			WithFields(&actionField).
+			WithFields(&field).
 			LaunchError(c)
 		return
 	}
 	actionType = uint32(temp)
 	if actionType != 1 && actionType != 2 {
 		biz.BadRequestError.
-			WithFields(&actionField).
+			WithFields(&field).
 			LaunchError(c)
 		return
 	}
 
-	end = false
+	isEnd = false
 	return
 }
 
 // Action 处理点赞和取消点赞
 func Action(ctx context.Context, c *app.RequestContext) {
-	logger := logging.Logger
-	logger.WithFields(actionField).Debugf("Process start")
+	field := logrus.Fields{
+		"method": "Action",
+	}
+	logger.WithFields(field).Debugf("Process start")
 
 	var actorId uint32
 	if getActorId(c, &actorId) {
 		return
 	}
 
-	videoId, actionType, end := parseParameters(c)
-	if end {
+	videoId, actionType, isEnd := parseParameters(c)
+	if isEnd {
 		return
 	}
 
@@ -119,7 +120,7 @@ func Action(ctx context.Context, c *app.RequestContext) {
 	})
 
 	if err != nil {
-		biz.RPCCallError.WithCause(err).WithFields(&actionField).LaunchError(c)
+		biz.RPCCallError.WithCause(err).WithFields(&field).LaunchError(c)
 		return
 	}
 
@@ -127,32 +128,30 @@ func Action(ctx context.Context, c *app.RequestContext) {
 		http.StatusOK,
 		response,
 	)
+	return
 }
 
 // List 列出用户所有点赞视频
 func List(ctx context.Context, c *app.RequestContext) {
-	methodField := logrus.Fields{
-		"time":   time.Now(),
-		"method": "FavoriteList",
+	field := logrus.Fields{
+		"method": "List",
 	}
-
-	logger := logging.Logger
-	logger.WithFields(methodField).Debugf("Process start")
+	logger.WithFields(field).Info("Process start")
 
 	if mw.GetAuthResult(c) != mw.AUTH_RESULT_SUCCESS {
-		biz.AuthFailed.WithFields(&methodField).LaunchError(c)
+		biz.AuthFailed.WithFields(&field).LaunchError(c)
 		return
 	}
 
 	qUserId, userIdExist := c.GetQuery("user_id")
 	if !userIdExist {
-		biz.BadRequestError.WithFields(&methodField).LaunchError(c)
+		biz.BadRequestError.WithFields(&field).LaunchError(c)
 		return
 	}
 
 	userId, err := strconv.ParseUint(qUserId, 10, 32)
 	if err != nil {
-		biz.BadRequestError.WithCause(err).WithFields(&methodField).LaunchError(c)
+		biz.BadRequestError.WithCause(err).WithFields(&field).LaunchError(c)
 		return
 	}
 
@@ -161,7 +160,7 @@ func List(ctx context.Context, c *app.RequestContext) {
 	})
 
 	if err != nil {
-		biz.RPCCallError.WithCause(err).WithFields(&methodField).LaunchError(c)
+		biz.RPCCallError.WithCause(err).WithFields(&field).LaunchError(c)
 		return
 	}
 
@@ -169,4 +168,5 @@ func List(ctx context.Context, c *app.RequestContext) {
 		consts.StatusOK,
 		response,
 	)
+	return
 }
