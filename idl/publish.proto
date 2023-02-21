@@ -2,6 +2,8 @@ syntax = "proto3";
 package douyin.publish;
 option go_package = "douyin/publish";
 
+import "feed.proto";
+
 message CreateVideoRequest {
   uint32 userId = 1 [json_name = "user_id"]; // 用户id
   bytes data = 2; // 视频数据
@@ -13,6 +15,18 @@ message CreateVideoResponse {
   string status_msg = 2 [json_name = "status_msg"]; // 返回状态描述
 }
 
+message ListVideoRequest{
+  uint32 user_id = 1; // 用户id
+  uint32 actor_id = 2; // 发送请求的用户的id
+}
+
+message ListVideoResponse{
+  uint32 status_code = 1; // 状态码，0-成功，其他值-失败
+  optional string status_msg = 2; // 返回状态描述
+  repeated feed.Video video_list = 3; // 视频列表
+}
+
 service PublishService {
   rpc CreateVideo(CreateVideoRequest) returns (CreateVideoResponse) {}
+  rpc ListVideo(ListVideoRequest) returns (ListVideoResponse) {}
 }

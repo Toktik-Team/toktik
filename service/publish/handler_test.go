@@ -2,24 +2,53 @@ package main
 
 import (
 	"context"
-	"github.com/DATA-DOG/go-sqlmock"
 	"io"
 	"os"
 	"path"
 	"reflect"
 	"regexp"
 	"runtime"
+	"strconv"
 	"testing"
+	"time"
 	"toktik/constant/biz"
+	"toktik/kitex_gen/douyin/comment"
+	"toktik/kitex_gen/douyin/feed"
 	"toktik/kitex_gen/douyin/publish"
+	"toktik/kitex_gen/douyin/user"
+	"toktik/repo/model"
 	"toktik/storage"
 	"toktik/test/mock"
 
-	"bou.ke/monkey"
-	"github.com/aws/aws-sdk-go-v2/service/s3"
+	"github.com/DATA-DOG/go-sqlmock"
+	"github.com/cloudwego/kitex/client/callopt"
 )
 
 var testVideo []byte
+
+var mockUser = user.User{Id: 65535}
+var (
+	mockVideoReq = model.Video{
+		Model: model.Model{
+			ID:        1,
+			CreatedAt: time.UnixMilli(0),
+		},
+		UserId:    mockUser.Id,
+		Title:     "Test Video " + strconv.Itoa(1),
+		FileName:  "test_video_file_" + strconv.Itoa(1) + ".mp4",
+		CoverName: "test_video_cover_file_" + strconv.Itoa(1) + ".png",
+	}
+	mockVideoResp = feed.Video{
+		Id:            1,
+		Author:        &mockUser,
+		PlayUrl:       "https://test.com/test_video_file_" + strconv.Itoa(1) + ".mp4",
+		CoverUrl:      "https://test.com/test_video_cover_file_" + strconv.Itoa(1) + ".png",
+		FavoriteCount: 0, // TODO
+		CommentCount:  0,
+		IsFavorite:    false, // TODO
+		Title:         "Test Video " + strconv.Itoa(1),
+	}
+)
 
 func TestMain(m *testing.M) {
 	var err error
@@ -29,6 +58,8 @@ func TestMain(m *testing.M) {
 	if err != nil {
 		panic("Cannot find test resources.")
 	}
+
+	storage.Instance = MockStorageProvider{}
 
 	code := m.Run()
 	os.Exit(code)
@@ -46,6 +77,7 @@ func TestPublishServiceImpl_CreateVideo(t *testing.T) {
 
 	var successResp = &publish.CreateVideoResponse{
 		StatusCode: biz.OkStatusCode,
+		StatusMsg:  biz.PublishActionSuccess,
 	}
 
 	var invalidContentArg = struct {
@@ -62,10 +94,6 @@ func TestPublishServiceImpl_CreateVideo(t *testing.T) {
 		StatusMsg:  biz.BadRequestStatusMsg,
 	}
 
-	monkey.Patch(storage.Upload, func(fileName string, content io.Reader) (*s3.PutObjectOutput, error) {
-		// TODO: nothing
-		return nil, nil
-	})
 	defer mock.MockConn.Close()
 	mock.DBMock.ExpectBegin()
 	mock.DBMock.ExpectQuery(regexp.QuoteMeta(`INSERT INTO "videos" 
@@ -107,4 +135,94 @@ func TestPublishServiceImpl_CreateVideo(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestPublishServiceImpl_ListVideo(t *testing.T) {
+	var successArg = struct {
+		ctx context.Context
+		req *publish.ListVideoRequest
+	}{ctx: context.Background(), req: &publish.ListVideoRequest{
+		ActorId: 1,
+		UserId:  65535,
+	}}
+
+	var successResp = &publish.ListVideoResponse{
+		StatusCode: biz.OkStatusCode,
+		StatusMsg:  &biz.OkStatusMsg,
+		VideoList:  []*feed.Video{&mockVideoResp},
+	}
+
+	UserClient = MockUserClient{}
+	CommentClient = MockCommentClient{}
+
+	rows := sqlmock.NewRows([]string{"id", "created_at", "updated_at", "deleted_at", "user_id", "title", "file_name", "cover_name"})
+	rows.AddRow(mockVideoReq.ID, mockVideoReq.CreatedAt, nil, nil, mockVideoReq.UserId, mockVideoReq.Title, mockVideoReq.FileName, mockVideoReq.CoverName)
+
+	mock.DBMock.
+		ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "videos" WHERE "videos"."user_id" = $1 AND "videos"."deleted_at" IS NULL ORDER BY "videos"."created_at" DESC`)).
+		WillReturnRows(rows)
+
+	type args struct {
+		ctx context.Context
+		req *publish.ListVideoRequest
+	}
+	tests := []struct {
+		name     string
+		args     args
+		wantResp *publish.ListVideoResponse
+		wantErr  bool
+	}{
+		{name: "List Video", args: successArg, wantResp: successResp},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			s := &PublishServiceImpl{}
+			gotResp, err := s.ListVideo(tt.args.ctx, tt.args.req)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("ListVideo() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(gotResp, tt.wantResp) {
+				t.Errorf("ListVideo() gotResp %v, want %v", gotResp, tt.wantResp)
+			}
+		})
+	}
+}
+
+type MockUserClient struct {
+}
+
+func (m MockUserClient) GetUser(ctx context.Context, Req *user.UserRequest, callOptions ...callopt.Option) (r *user.UserResponse, err error) {
+	return &user.UserResponse{StatusCode: biz.OkStatusCode, User: &mockUser}, nil
+}
+
+type MockCommentClient struct {
+}
+
+func (m MockCommentClient) CountComment(ctx context.Context, Req *comment.CountCommentRequest, callOptions ...callopt.Option) (r *comment.CountCommentResponse, err error) {
+	return &comment.CountCommentResponse{
+		StatusCode:   biz.OkStatusCode,
+		StatusMsg:    &biz.OkStatusMsg,
+		CommentCount: 0,
+	}, nil
+}
+
+func (m MockCommentClient) ActionComment(ctx context.Context, Req *comment.ActionCommentRequest, callOptions ...callopt.Option) (r *comment.ActionCommentResponse, err error) {
+	panic("unimplemented")
+}
+
+func (m MockCommentClient) ListComment(ctx context.Context, Req *comment.ListCommentRequest, callOptions ...callopt.Option) (r *comment.ListCommentResponse, err error) {
+	panic("unimplemented")
+}
+
+type MockStorageProvider struct {
+}
+
+func (m MockStorageProvider) Upload(fileName string, content io.Reader) (*storage.PutObjectOutput, error) {
+	// Nothing to do
+	return &storage.PutObjectOutput{}, nil
+}
+
+func (m MockStorageProvider) GetLink(fileName string) (string, error) {
+	return "https://test.com/" + fileName, nil
 }

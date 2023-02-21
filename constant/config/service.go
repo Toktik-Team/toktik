@@ -18,5 +18,11 @@ const UserServiceAddr = ":40130"
 const CommentServiceName = "toktik-comment-api"
 const CommentServiceAddr = ":40131"
 
+const WechatServiceName = "toktik-wechat"
+const WechatServiceAddr = ":40132"
+
+const RelationServiceName = "toktik-relation-api"
+const RelationServiceAddr = ":40133"
+
 const FavoriteServiceName = "toktik-favorite-api"
-const FavoriteServiceAddr = ":40133"
+const FavoriteServiceAddr = ":40134"

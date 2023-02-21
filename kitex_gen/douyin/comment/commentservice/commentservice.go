@@ -24,6 +24,7 @@ func NewServiceInfo() *kitex.ServiceInfo {
 	methods := map[string]kitex.MethodInfo{
 		"ActionComment": kitex.NewMethodInfo(actionCommentHandler, newActionCommentArgs, newActionCommentResult, false),
 		"ListComment":   kitex.NewMethodInfo(listCommentHandler, newListCommentArgs, newListCommentResult, false),
+		"CountComment":  kitex.NewMethodInfo(countCommentHandler, newCountCommentArgs, newCountCommentResult, false),
 	}
 	extra := map[string]interface{}{
 		"PackageName": "douyin.comment",
@@ -329,6 +330,151 @@ func (p *ListCommentResult) IsSetSuccess() bool {
 	return p.Success != nil
 }
 
+func countCommentHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
+	switch s := arg.(type) {
+	case *streaming.Args:
+		st := s.Stream
+		req := new(comment.CountCommentRequest)
+		if err := st.RecvMsg(req); err != nil {
+			return err
+		}
+		resp, err := handler.(comment.CommentService).CountComment(ctx, req)
+		if err != nil {
+			return err
+		}
+		if err := st.SendMsg(resp); err != nil {
+			return err
+		}
+	case *CountCommentArgs:
+		success, err := handler.(comment.CommentService).CountComment(ctx, s.Req)
+		if err != nil {
+			return err
+		}
+		realResult := result.(*CountCommentResult)
+		realResult.Success = success
+	}
+	return nil
+}
+func newCountCommentArgs() interface{} {
+	return &CountCommentArgs{}
+}
+
+func newCountCommentResult() interface{} {
+	return &CountCommentResult{}
+}
+
+type CountCommentArgs struct {
+	Req *comment.CountCommentRequest
+}
+
+func (p *CountCommentArgs) FastRead(buf []byte, _type int8, number int32) (n int, err error) {
+	if !p.IsSetReq() {
+		p.Req = new(comment.CountCommentRequest)
+	}
+	return p.Req.FastRead(buf, _type, number)
+}
+
+func (p *CountCommentArgs) FastWrite(buf []byte) (n int) {
+	if !p.IsSetReq() {
+		return 0
+	}
+	return p.Req.FastWrite(buf)
+}
+
+func (p *CountCommentArgs) Size() (n int) {
+	if !p.IsSetReq() {
+		return 0
+	}
+	return p.Req.Size()
+}
+
+func (p *CountCommentArgs) Marshal(out []byte) ([]byte, error) {
+	if !p.IsSetReq() {
+		return out, fmt.Errorf("No req in CountCommentArgs")
+	}
+	return proto.Marshal(p.Req)
+}
+
+func (p *CountCommentArgs) Unmarshal(in []byte) error {
+	msg := new(comment.CountCommentRequest)
+	if err := proto.Unmarshal(in, msg); err != nil {
+		return err
+	}
+	p.Req = msg
+	return nil
+}
+
+var CountCommentArgs_Req_DEFAULT *comment.CountCommentRequest
+
+func (p *CountCommentArgs) GetReq() *comment.CountCommentRequest {
+	if !p.IsSetReq() {
+		return CountCommentArgs_Req_DEFAULT
+	}
+	return p.Req
+}
+
+func (p *CountCommentArgs) IsSetReq() bool {
+	return p.Req != nil
+}
+
+type CountCommentResult struct {
+	Success *comment.CountCommentResponse
+}
+
+var CountCommentResult_Success_DEFAULT *comment.CountCommentResponse
+
+func (p *CountCommentResult) FastRead(buf []byte, _type int8, number int32) (n int, err error) {
+	if !p.IsSetSuccess() {
+		p.Success = new(comment.CountCommentResponse)
+	}
+	return p.Success.FastRead(buf, _type, number)
+}
+
+func (p *CountCommentResult) FastWrite(buf []byte) (n int) {
+	if !p.IsSetSuccess() {
+		return 0
+	}
+	return p.Success.FastWrite(buf)
+}
+
+func (p *CountCommentResult) Size() (n int) {
+	if !p.IsSetSuccess() {
+		return 0
+	}
+	return p.Success.Size()
+}
+
+func (p *CountCommentResult) Marshal(out []byte) ([]byte, error) {
+	if !p.IsSetSuccess() {
+		return out, fmt.Errorf("No req in CountCommentResult")
+	}
+	return proto.Marshal(p.Success)
+}
+
+func (p *CountCommentResult) Unmarshal(in []byte) error {
+	msg := new(comment.CountCommentResponse)
+	if err := proto.Unmarshal(in, msg); err != nil {
+		return err
+	}
+	p.Success = msg
+	return nil
+}
+
+func (p *CountCommentResult) GetSuccess() *comment.CountCommentResponse {
+	if !p.IsSetSuccess() {
+		return CountCommentResult_Success_DEFAULT
+	}
+	return p.Success
+}
+
+func (p *CountCommentResult) SetSuccess(x interface{}) {
+	p.Success = x.(*comment.CountCommentResponse)
+}
+
+func (p *CountCommentResult) IsSetSuccess() bool {
+	return p.Success != nil
+}
+
 type kClient struct {
 	c client.Client
 }
@@ -354,6 +500,16 @@ func (p *kClient) ListComment(ctx context.Context, Req *comment.ListCommentReque
 	_args.Req = Req
 	var _result ListCommentResult
 	if err = p.c.Call(ctx, "ListComment", &_args, &_result); err != nil {
+		return
+	}
+	return _result.GetSuccess(), nil
+}
+
+func (p *kClient) CountComment(ctx context.Context, Req *comment.CountCommentRequest) (r *comment.CountCommentResponse, err error) {
+	var _args CountCommentArgs
+	_args.Req = Req
+	var _result CountCommentResult
+	if err = p.c.Call(ctx, "CountComment", &_args, &_result); err != nil {
 		return
 	}
 	return _result.GetSuccess(), nil

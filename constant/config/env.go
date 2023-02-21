@@ -3,6 +3,7 @@ package config
 import (
 	"fmt"
 	"github.com/joho/godotenv"
+	"github.com/sirupsen/logrus"
 	"log"
 	"os"
 	"reflect"
@@ -43,7 +44,7 @@ var defaultConfig = envConfigSchema{
 
 	REDIS_ADDR:     "localhost:6379",
 	REDIS_PASSWORD: "",
-	REDIS_DB:       "0",
+	REDIS_DB:       0,
 
 	STORAGE_TYPE:          "s3",
 	MAX_REQUEST_BODY_SIZE: 200 * 1024 * 1024,
@@ -57,6 +58,8 @@ var defaultConfig = envConfigSchema{
 	S3_SECRET_ID:    "minio",
 	S3_SECRET_KEY:   "12345678",
 	S3_PATH_STYLE:   "true",
+
+	UNSPLASH_ACCESS_KEY: "access_key",
 }
 
 type envConfigSchema struct {
@@ -72,7 +75,7 @@ type envConfigSchema struct {
 
 	REDIS_ADDR     string
 	REDIS_PASSWORD string
-	REDIS_DB       string
+	REDIS_DB       int
 
 	STORAGE_TYPE          string
 	MAX_REQUEST_BODY_SIZE int
@@ -86,6 +89,8 @@ type envConfigSchema struct {
 	S3_SECRET_ID    string
 	S3_SECRET_KEY   string
 	S3_PATH_STYLE   string
+
+	UNSPLASH_ACCESS_KEY string
 }
 
 func (s *envConfigSchema) IsDev() bool {
@@ -124,7 +129,7 @@ func envInit() {
 			{
 				configDefaultValue, ok := fieldValue.(int)
 				if !ok {
-					logging.Logger.WithFields(map[string]interface{}{
+					logging.Logger.WithFields(logrus.Fields{
 						"field": fieldName,
 						"type":  "int",
 						"value": fieldValue,
@@ -139,7 +144,7 @@ func envInit() {
 				if len(envValue) > 0 {
 					envValueInteger, err := strconv.ParseInt(envValue, 10, 64)
 					if err != nil {
-						logging.Logger.WithFields(map[string]interface{}{
+						logging.Logger.WithFields(logrus.Fields{
 							"field": fieldName,
 							"type":  "int",
 							"value": fieldValue,
@@ -155,7 +160,7 @@ func envInit() {
 			{
 				configDefaultValue, ok := fieldValue.(string)
 				if !ok {
-					logging.Logger.WithFields(map[string]interface{}{
+					logging.Logger.WithFields(logrus.Fields{
 						"field": fieldName,
 						"type":  "int",
 						"value": fieldValue,

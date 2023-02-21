@@ -5,13 +5,23 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/sirupsen/logrus"
+	"github.com/cloudwego/kitex/client"
+	consul "github.com/kitex-contrib/registry-consul"
 	"io"
+	"log"
 	"net/http"
 	"time"
 	"toktik/constant/biz"
+	"toktik/constant/config"
+	"toktik/kitex_gen/douyin/comment"
+	"toktik/kitex_gen/douyin/comment/commentservice"
+	"toktik/kitex_gen/douyin/feed"
+	"toktik/kitex_gen/douyin/user"
+	"toktik/kitex_gen/douyin/user/userservice"
 	"toktik/logging"
 	"toktik/repo/model"
+
+	"github.com/sirupsen/logrus"
 
 	"github.com/bakape/thumbnailer/v2"
 	"github.com/gofrs/uuid"
@@ -22,6 +32,24 @@ import (
 	gen "toktik/repo"
 	"toktik/storage"
 )
+
+var UserClient userservice.Client
+var CommentClient commentservice.Client
+
+func init() {
+	r, err := consul.NewConsulResolver(config.EnvConfig.CONSUL_ADDR)
+	if err != nil {
+		log.Fatal(err)
+	}
+	UserClient, err = userservice.NewClient(config.UserServiceName, client.WithResolver(r))
+	if err != nil {
+		log.Fatal(err)
+	}
+	CommentClient, err = commentservice.NewClient(config.CommentServiceName, client.WithResolver(r))
+	if err != nil {
+		log.Fatal(err)
+	}
+}
 
 // getThumbnail Generate JPEG thumbnail from video
 func getThumbnail(input io.ReadSeeker) ([]byte, error) {
@@ -53,7 +81,7 @@ func (s *PublishServiceImpl) CreateVideo(ctx context.Context, req *publish.Creat
 
 	detectedContentType := http.DetectContentType(req.Data)
 	if detectedContentType != "video/mp4" {
-		logger.WithFields(map[string]interface{}{
+		logger.WithFields(logrus.Fields{
 			"time":         time.Now(),
 			"content_type": detectedContentType,
 		}).Debug("invalid content type")
@@ -68,7 +96,7 @@ func (s *PublishServiceImpl) CreateVideo(ctx context.Context, req *publish.Creat
 	// V7 based on timestamp
 	generatedUUID, err := uuid.NewV7()
 	if err != nil {
-		logger.WithFields(map[string]interface{}{
+		logger.WithFields(logrus.Fields{
 			"time": time.Now(),
 			"err":  err,
 		}).Debug("error generating uuid")
@@ -77,10 +105,10 @@ func (s *PublishServiceImpl) CreateVideo(ctx context.Context, req *publish.Creat
 			StatusMsg:  biz.InternalServerErrorStatusMsg,
 		}, nil
 	}
-	logger = logger.WithFields(map[string]interface{}{
+	logger = logger.WithFields(logrus.Fields{
 		"uuid": generatedUUID,
 	})
-	logger.WithFields(map[string]interface{}{
+	logger.WithFields(logrus.Fields{
 		"time": time.Now(),
 	}).Debug("generated uuid")
 
@@ -88,7 +116,7 @@ func (s *PublishServiceImpl) CreateVideo(ctx context.Context, req *publish.Creat
 	fileName := fmt.Sprintf("%d/%s.%s", req.UserId, generatedUUID.String(), "mp4")
 	_, err = storage.Upload(fileName, reader)
 	if err != nil {
-		logger.WithFields(map[string]interface{}{
+		logger.WithFields(logrus.Fields{
 			"time":      time.Now(),
 			"file_name": fileName,
 			"err":       err,
@@ -98,7 +126,7 @@ func (s *PublishServiceImpl) CreateVideo(ctx context.Context, req *publish.Creat
 			StatusMsg:  biz.InternalServerErrorStatusMsg,
 		}, nil
 	}
-	logger.WithFields(map[string]interface{}{
+	logger.WithFields(logrus.Fields{
 		"time":      time.Now(),
 		"file_name": fileName,
 	}).Debug("uploaded video")
@@ -107,7 +135,7 @@ func (s *PublishServiceImpl) CreateVideo(ctx context.Context, req *publish.Creat
 	coverName := fmt.Sprintf("%d/%s.%s", req.UserId, generatedUUID.String(), "jpg")
 	thumbData, err := getThumbnail(reader)
 	if err != nil {
-		logger.WithFields(map[string]interface{}{
+		logger.WithFields(logrus.Fields{
 			"time":       time.Now(),
 			"file_name":  fileName,
 			"cover_name": coverName,
@@ -118,7 +146,7 @@ func (s *PublishServiceImpl) CreateVideo(ctx context.Context, req *publish.Creat
 			StatusMsg:  biz.InternalServerErrorStatusMsg,
 		}, nil
 	}
-	logger.WithFields(map[string]interface{}{
+	logger.WithFields(logrus.Fields{
 		"time":       time.Now(),
 		"cover_name": coverName,
 		"data_size":  len(thumbData),
@@ -127,7 +155,7 @@ func (s *PublishServiceImpl) CreateVideo(ctx context.Context, req *publish.Creat
 	// Upload thumbnail
 	_, err = storage.Upload(coverName, bytes.NewReader(thumbData))
 	if err != nil {
-		logger.WithFields(map[string]interface{}{
+		logger.WithFields(logrus.Fields{
 			"time":       time.Now(),
 			"file_name":  fileName,
 			"cover_name": coverName,
@@ -138,7 +166,7 @@ func (s *PublishServiceImpl) CreateVideo(ctx context.Context, req *publish.Creat
 			StatusMsg:  biz.InternalServerErrorStatusMsg,
 		}, nil
 	}
-	logger.WithFields(map[string]interface{}{
+	logger.WithFields(logrus.Fields{
 		"time":       time.Now(),
 		"cover_name": coverName,
 		"data_size":  len(thumbData),
@@ -153,7 +181,7 @@ func (s *PublishServiceImpl) CreateVideo(ctx context.Context, req *publish.Creat
 
 	err = gen.Q.Video.WithContext(ctx).Create(&publishModel)
 	if err != nil {
-		logger.WithFields(map[string]interface{}{
+		logger.WithFields(logrus.Fields{
 			"time":       time.Now(),
 			"file_name":  fileName,
 			"cover_name": coverName,
@@ -164,15 +192,109 @@ func (s *PublishServiceImpl) CreateVideo(ctx context.Context, req *publish.Creat
 			StatusMsg:  biz.InternalServerErrorStatusMsg,
 		}, nil
 	}
-	logger.WithFields(map[string]interface{}{
+	logger.WithFields(logrus.Fields{
 		"time":  time.Now(),
 		"entry": publishModel,
 	}).Debug("saved db entry")
 
+	u := gen.Q.User
+	_, err = u.WithContext(ctx).Where(u.ID.Eq(req.UserId)).Update(u.WorkCount, u.WorkCount.Add(1))
+	if err != nil {
+		logger.Debug("failed to update the number of user works")
+		return &publish.CreateVideoResponse{
+			StatusCode: biz.Unable2CreateDBEntry,
+			StatusMsg:  biz.InternalServerErrorStatusMsg,
+		}, err
+	}
+
 	resp = &publish.CreateVideoResponse{StatusCode: 0, StatusMsg: biz.PublishActionSuccess}
-	logger.WithFields(map[string]interface{}{
+	logger.WithFields(logrus.Fields{
 		"time":     time.Now(),
 		"response": resp,
 	}).Debug("all process done, ready to launch response")
 	return resp, nil
+}
+
+// ListVideo implements the PublishServiceImpl interface.
+func (s *PublishServiceImpl) ListVideo(ctx context.Context, req *publish.ListVideoRequest) (resp *publish.ListVideoResponse, err error) {
+	methodFields := logrus.Fields{
+		"user_id":  req.UserId,
+		"actor_id": req.ActorId,
+		"time":     time.Now(),
+		"function": "ListVideo",
+	}
+	logger := logging.Logger.WithFields(methodFields)
+	logger.Debug("Process start")
+
+	find, err := gen.Q.Video.WithContext(ctx).
+		Where(gen.Q.Video.UserId.Eq(req.UserId)).
+		Order(gen.Q.Video.CreatedAt.Desc()).
+		Find()
+	if err != nil {
+		logger.WithFields(logrus.Fields{
+			"time": time.Now(),
+			"err":  err,
+		}).Debug("failed to query video")
+		return &publish.ListVideoResponse{
+			StatusCode: biz.UnableToQueryVideo,
+			StatusMsg:  &biz.InternalServerErrorStatusMsg,
+		}, nil
+	}
+
+	rVideo := make([]*feed.Video, 0, len(find))
+	for _, m := range find {
+
+		userResponse, err := UserClient.GetUser(ctx, &user.UserRequest{
+			UserId:  m.UserId,
+			ActorId: req.ActorId,
+		})
+		if err != nil || userResponse.StatusCode != biz.OkStatusCode {
+			log.Println(fmt.Errorf("failed to get user info: %w", err))
+			continue
+		}
+
+		playUrl, err := storage.GetLink(m.FileName)
+		if err != nil {
+			log.Println(fmt.Errorf("failed to fetch play url: %w", err))
+			continue
+		}
+
+		coverUrl, err := storage.GetLink(m.CoverName)
+		if err != nil {
+			log.Println(fmt.Errorf("failed to fetch cover url: %w", err))
+			continue
+		}
+
+		commentCount, err := CommentClient.CountComment(ctx, &comment.CountCommentRequest{
+			ActorId: req.ActorId,
+			VideoId: m.ID,
+		})
+		if err != nil {
+			log.Println(fmt.Errorf("failed to fetch comment count: %w", err))
+			continue
+		}
+
+		rVideo = append(rVideo, &feed.Video{
+			Id:       m.ID,
+			Author:   userResponse.User,
+			PlayUrl:  playUrl,
+			CoverUrl: coverUrl,
+			// TODO: finish this
+			FavoriteCount: 0,
+			CommentCount:  commentCount.CommentCount,
+			// TODO: finish this
+			IsFavorite: false,
+			Title:      m.Title,
+		})
+	}
+
+	logger.WithFields(logrus.Fields{
+		"time":     time.Now(),
+		"response": resp,
+	}).Debug("all process done, ready to launch response")
+	return &publish.ListVideoResponse{
+		StatusCode: biz.OkStatusCode,
+		StatusMsg:  &biz.OkStatusMsg,
+		VideoList:  rVideo,
+	}, nil
 }

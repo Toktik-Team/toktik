@@ -9,7 +9,7 @@ message UserRequest {
 
 message UserResponse {
   uint32 status_code = 1; // 状态码，0-成功，其他值-失败
-  string status_msg = 2; // 返回状态描述
+  optional string status_msg = 2; // 返回状态描述
   User user = 3; // 用户信息
 }
 
@@ -19,6 +19,12 @@ message User {
   uint32 follow_count = 3; // 关注总数
   uint32 follower_count = 4; // 粉丝总数
   bool is_follow = 5; // true-已关注，false-未关注
+  optional string avatar = 6; // 用户头像
+  optional string background_image = 7; // 用户个人顶部大图
+  optional string signature = 8; // 个人简介
+  optional uint32 total_favorited = 9; // 获赞数量
+  optional uint32 work_count = 10; // 作品数量
+  optional uint32 favorite_count = 11; // 点赞数量
 }
 
 

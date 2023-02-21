@@ -10,22 +10,23 @@
 https://toktik.xctra.cn/
 
 ## Project Structure
+
 - [config](config)
-  - [config.go](config/config.go) - Environment variables
+    - [config.go](config/config.go) - Environment variables
 - [idl](idl)
-  - [auth.proto](idl/auth.proto) - RPC definition of auth service
-  - [feed.proto](idl/feed.proto) - RPC definition of feed service
-  - [user.proto](idl/user.proto) - RPC definition of user service
-  - [publish.proto](idl/publish.proto) - RPC definition of publish service
+    - [auth.proto](idl/auth.proto) - RPC definition of auth service
+    - [feed.proto](idl/feed.proto) - RPC definition of feed service
+    - [user.proto](idl/user.proto) - RPC definition of user service
+    - [publish.proto](idl/publish.proto) - RPC definition of publish service
 - [kitex_gen](kitex_gen) - Generated code by kitex
 - [manifests-dev](manifests-dev) - Kubernetes manifests for development
 - [repo](repo) - Database schema and generated code by gorm gen
 - [service](service)
-  - [auth](service/auth) - Auth service impl
-  - [feed](service/feed) - Feed service impl
-  - [user](service/user) - User service impl
-  - [publish](service/publish) - Publish service impl
-  - [web](service/web) - Web gateway with middleware support
+    - [auth](service/auth) - Auth service impl
+    - [feed](service/feed) - Feed service impl
+    - [user](service/user) - User service impl
+    - [publish](service/publish) - Publish service impl
+    - [web](service/web) - Web gateway with middleware support
 
 ## Compile
 

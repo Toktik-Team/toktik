@@ -36,6 +36,12 @@ func newUser(db *gorm.DB, opts ...gen.DOOption) user {
 	_user.Password = field.NewString(tableName, "password")
 	_user.FollowCount = field.NewUint32(tableName, "follow_count")
 	_user.FollowerCount = field.NewUint32(tableName, "follower_count")
+	_user.Avatar = field.NewString(tableName, "avatar")
+	_user.BackgroundImage = field.NewString(tableName, "background_image")
+	_user.Signature = field.NewString(tableName, "signature")
+	_user.TotalFavorited = field.NewUint32(tableName, "total_favorited")
+	_user.WorkCount = field.NewUint32(tableName, "work_count")
+	_user.FavoriteCount = field.NewUint32(tableName, "favorite_count")
 	_user.Name = field.NewString(tableName, "name")
 	_user.Role = field.NewString(tableName, "role")
 	_user.FavoriteVideo = userManyToManyFavoriteVideo{
@@ -52,18 +58,24 @@ func newUser(db *gorm.DB, opts ...gen.DOOption) user {
 type user struct {
 	userDo
 
-	ALL           field.Asterisk
-	ID            field.Uint32
-	CreatedAt     field.Time
-	UpdatedAt     field.Time
-	DeletedAt     field.Field
-	Username      field.String
-	Password      field.String
-	FollowCount   field.Uint32
-	FollowerCount field.Uint32
-	Name          field.String
-	Role          field.String
-	FavoriteVideo userManyToManyFavoriteVideo
+	ALL             field.Asterisk
+	ID              field.Uint32
+	CreatedAt       field.Time
+	UpdatedAt       field.Time
+	DeletedAt       field.Field
+	Username        field.String
+	Password        field.String
+	FollowCount     field.Uint32
+	FollowerCount   field.Uint32
+	Avatar          field.String
+	BackgroundImage field.String
+	Signature       field.String
+	TotalFavorited  field.Uint32
+	WorkCount       field.Uint32
+	FavoriteCount   field.Uint32
+	Name            field.String
+	Role            field.String
+	FavoriteVideo   userManyToManyFavoriteVideo
 
 	fieldMap map[string]field.Expr
 }
@@ -88,6 +100,12 @@ func (u *user) updateTableName(table string) *user {
 	u.Password = field.NewString(table, "password")
 	u.FollowCount = field.NewUint32(table, "follow_count")
 	u.FollowerCount = field.NewUint32(table, "follower_count")
+	u.Avatar = field.NewString(table, "avatar")
+	u.BackgroundImage = field.NewString(table, "background_image")
+	u.Signature = field.NewString(table, "signature")
+	u.TotalFavorited = field.NewUint32(table, "total_favorited")
+	u.WorkCount = field.NewUint32(table, "work_count")
+	u.FavoriteCount = field.NewUint32(table, "favorite_count")
 	u.Name = field.NewString(table, "name")
 	u.Role = field.NewString(table, "role")
 
@@ -106,7 +124,7 @@ func (u *user) GetFieldByName(fieldName string) (field.OrderExpr, bool) {
 }
 
 func (u *user) fillFieldMap() {
-	u.fieldMap = make(map[string]field.Expr, 11)
+	u.fieldMap = make(map[string]field.Expr, 17)
 	u.fieldMap["id"] = u.ID
 	u.fieldMap["created_at"] = u.CreatedAt
 	u.fieldMap["updated_at"] = u.UpdatedAt
@@ -115,6 +133,12 @@ func (u *user) fillFieldMap() {
 	u.fieldMap["password"] = u.Password
 	u.fieldMap["follow_count"] = u.FollowCount
 	u.fieldMap["follower_count"] = u.FollowerCount
+	u.fieldMap["avatar"] = u.Avatar
+	u.fieldMap["background_image"] = u.BackgroundImage
+	u.fieldMap["signature"] = u.Signature
+	u.fieldMap["total_favorited"] = u.TotalFavorited
+	u.fieldMap["work_count"] = u.WorkCount
+	u.fieldMap["favorite_count"] = u.FavoriteCount
 	u.fieldMap["name"] = u.Name
 	u.fieldMap["role"] = u.Role
 

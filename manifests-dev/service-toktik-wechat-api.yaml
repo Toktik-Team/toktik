@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: toktik-wechat-api
+  name: toktik-wechat-api
+  namespace: toktik-service-bundle
+spec:
+  ports:
+    - name: grpc
+      port: 40132
+      protocol: TCP
+      targetPort: 40132
+  selector:
+    name: toktik-wechat-api
+    branch: dev
+  type: ClusterIP

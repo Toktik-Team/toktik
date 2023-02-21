@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"io"
 	"os"
 	"reflect"
 	"regexp"
@@ -9,13 +10,13 @@ import (
 	"testing"
 	"time"
 	"toktik/constant/biz"
+	"toktik/kitex_gen/douyin/comment"
 	"toktik/kitex_gen/douyin/feed"
 	"toktik/kitex_gen/douyin/user"
 	"toktik/repo/model"
 	"toktik/storage"
 	"toktik/test/mock"
 
-	"bou.ke/monkey"
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/cloudwego/kitex/client/callopt"
 )
@@ -30,6 +31,8 @@ var (
 var mockUser = user.User{Id: 65535}
 
 func TestMain(m *testing.M) {
+	storage.Instance = MockStorageProvider{}
+
 	now := time.Now().UnixMilli()
 	for i := 0; i < mockVideoCount; i++ {
 		test := &model.Video{
@@ -47,8 +50,8 @@ func TestMain(m *testing.M) {
 			Author:        &mockUser,
 			PlayUrl:       "https://test.com/test_video_file_" + strconv.Itoa(i) + ".mp4",
 			CoverUrl:      "https://test.com/test_video_cover_file_" + strconv.Itoa(i) + ".png",
-			FavoriteCount: 0,     // TODO
-			CommentCount:  0,     // TODO
+			FavoriteCount: 0, // TODO
+			CommentCount:  0,
 			IsFavorite:    false, // TODO
 			Title:         "Test Video " + strconv.Itoa(i),
 		}
@@ -81,10 +84,7 @@ func TestFeedServiceImpl_ListVideos(t *testing.T) {
 	}
 
 	UserClient = MockUserClient{}
-
-	monkey.Patch(storage.GetLink, func(fileName string) (string, error) {
-		return "https://test.com/" + fileName, nil
-	})
+	CommentClient = MockCommentClient{}
 
 	rows := sqlmock.NewRows([]string{"id", "created_at", "updated_at", "deleted_at", "user_id", "title", "file_name", "cover_name"})
 	for _, v := range testVideos[:biz.VideoCount] {
@@ -147,4 +147,35 @@ type MockUserClient struct {
 
 func (m MockUserClient) GetUser(ctx context.Context, Req *user.UserRequest, callOptions ...callopt.Option) (r *user.UserResponse, err error) {
 	return &user.UserResponse{StatusCode: biz.OkStatusCode, User: &mockUser}, nil
+}
+
+type MockCommentClient struct {
+}
+
+func (m MockCommentClient) CountComment(ctx context.Context, Req *comment.CountCommentRequest, callOptions ...callopt.Option) (r *comment.CountCommentResponse, err error) {
+	return &comment.CountCommentResponse{
+		StatusCode:   biz.OkStatusCode,
+		StatusMsg:    &biz.OkStatusMsg,
+		CommentCount: 0,
+	}, nil
+}
+
+func (m MockCommentClient) ActionComment(ctx context.Context, Req *comment.ActionCommentRequest, callOptions ...callopt.Option) (r *comment.ActionCommentResponse, err error) {
+	panic("unimplemented")
+}
+
+func (m MockCommentClient) ListComment(ctx context.Context, Req *comment.ListCommentRequest, callOptions ...callopt.Option) (r *comment.ListCommentResponse, err error) {
+	panic("unimplemented")
+}
+
+type MockStorageProvider struct {
+}
+
+func (m MockStorageProvider) Upload(fileName string, content io.Reader) (*storage.PutObjectOutput, error) {
+	// Nothing to do
+	return &storage.PutObjectOutput{}, nil
+}
+
+func (m MockStorageProvider) GetLink(fileName string) (string, error) {
+	return "https://test.com/" + fileName, nil
 }

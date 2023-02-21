@@ -45,8 +45,19 @@ message ListCommentResponse {
   repeated Comment comment_list = 3;
 }
 
+message CountCommentRequest {
+  uint32 actor_id = 1;
+  uint32 video_id = 2;
+}
+
+message CountCommentResponse {
+  uint32 status_code = 1;
+  optional string status_msg = 2;
+  uint32 comment_count = 3;
+}
 
 service CommentService {
   rpc ActionComment(ActionCommentRequest) returns (ActionCommentResponse);
   rpc ListComment(ListCommentRequest) returns (ListCommentResponse);
+  rpc CountComment(CountCommentRequest) returns(CountCommentResponse);
 }

@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"mime/multipart"
+	"strconv"
 	"time"
 	bizConstant "toktik/constant/biz"
 	bizConfig "toktik/constant/config"
@@ -62,14 +63,14 @@ func Action(ctx context.Context, c *app.RequestContext) {
 	logger.Debugf("Process start")
 
 	if err := paramValidate(ctx, c); err != nil {
-		bizConstant.InvalidFormError.WithCause(err).WithFields(&methodFields).LaunchError(c)
+		bizConstant.InvalidArguments.WithCause(err).WithFields(&methodFields).LaunchError(c)
 		return
 	}
 
 	form, _ := c.MultipartForm()
 	title := form.Value["title"][0]
-	file := form.File["data"]
-	opened, _ := file[0].Open()
+	file := form.File["data"][0]
+	opened, _ := file.Open()
 	defer func(opened multipart.File) {
 		err := opened.Close()
 		if err != nil {
@@ -78,13 +79,13 @@ func Action(ctx context.Context, c *app.RequestContext) {
 			}).Errorf("opened.Close() failed")
 		}
 	}(opened)
-	var data = make([]byte, file[0].Size)
+	var data = make([]byte, file.Size)
 	readSize, err := opened.Read(data)
 	if err != nil {
 		bizConstant.OpenFileFailedError.WithCause(err).WithFields(&methodFields).LaunchError(c)
 		return
 	}
-	if readSize != int(file[0].Size) {
+	if readSize != int(file.Size) {
 		bizConstant.SizeNotMatchError.WithCause(err).WithFields(&methodFields).LaunchError(c)
 		return
 	}
@@ -110,5 +111,48 @@ func Action(ctx context.Context, c *app.RequestContext) {
 	c.JSON(
 		httpStatus.StatusOK,
 		publishResp,
+	)
+}
+
+func List(ctx context.Context, c *app.RequestContext) {
+	methodFields := logrus.Fields{
+		"time":   time.Now(),
+		"method": "CommentAction",
+	}
+	logger := logging.Logger.WithFields(methodFields)
+	logger.Debugf("Process start")
+
+	actorId := c.GetUint32("user_id")
+	userId, userIdExists := c.GetQuery("user_id")
+
+	if actorId == 0 {
+		bizConstant.UnauthorizedError.WithFields(&methodFields).LaunchError(c)
+		return
+	}
+
+	if !userIdExists {
+		bizConstant.InvalidArguments.WithFields(&methodFields).LaunchError(c)
+	}
+
+	pUserId, err := strconv.ParseUint(userId, 10, 32)
+
+	if err != nil {
+		bizConstant.BadRequestError.WithFields(&methodFields).WithCause(err).LaunchError(c)
+		return
+	}
+
+	resp, err := publishClient.ListVideo(ctx, &publish.ListVideoRequest{
+		UserId:  uint32(pUserId),
+		ActorId: actorId,
+	})
+
+	if err != nil {
+		bizConstant.InternalServerError.WithCause(err).WithFields(&methodFields).LaunchError(c)
+		return
+	}
+
+	c.JSON(
+		httpStatus.StatusOK,
+		resp,
 	)
 }

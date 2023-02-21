@@ -8,7 +8,9 @@ import (
 	"toktik/service/web/feed"
 	"toktik/service/web/mw"
 	"toktik/service/web/publish"
+	"toktik/service/web/relation"
 	"toktik/service/web/user"
+	"toktik/service/web/wechat"
 
 	"github.com/cloudwego/hertz/pkg/app/server"
 	"github.com/hertz-contrib/gzip"
@@ -40,7 +42,7 @@ func main() {
 	// publish service
 	publishGroup := douyin.Group("/publish")
 	publishGroup.POST("/action/", publish.Action)
-	publishGroup.GET("/list")
+	publishGroup.GET("/list", publish.List)
 
 	// favorite service
 	favoriteGroup := douyin.Group("/favorite")
@@ -54,14 +56,15 @@ func main() {
 
 	// relation service
 	relationGroup := douyin.Group("/relation")
-	relationGroup.GET("/follow/list")
-	relationGroup.GET("/follower/list")
-	relationGroup.GET("/friend/list")
+	relationGroup.POST("/action/", relation.RelationAction)
+	relationGroup.GET("/follow/list/", relation.GetFollowList)
+	relationGroup.GET("/follower/list/", relation.GetFollowerList)
+	relationGroup.GET("/friend/list/", relation.GetFriendList)
 
 	// message service
 	messageGroup := douyin.Group("/message")
-	messageGroup.POST("/action")
-	messageGroup.GET("/chat")
+	messageGroup.POST("/action/", wechat.MessageAction)
+	messageGroup.GET("/chat/", wechat.MessageChat)
 
 	url := swagger.URL("http://localhost:8080/swagger/doc.json") // The url pointing to API definition
 	h.GET("/swagger/*any", swagger.WrapHandler(swaggerFiles.Handler, url))
