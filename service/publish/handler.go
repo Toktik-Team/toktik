@@ -15,6 +15,8 @@ import (
 	"toktik/constant/config"
 	"toktik/kitex_gen/douyin/comment"
 	"toktik/kitex_gen/douyin/comment/commentservice"
+	"toktik/kitex_gen/douyin/favorite"
+	favoriteService "toktik/kitex_gen/douyin/favorite/favoriteservice"
 	"toktik/kitex_gen/douyin/feed"
 	"toktik/kitex_gen/douyin/user"
 	"toktik/kitex_gen/douyin/user/userservice"
@@ -35,6 +37,7 @@ import (
 
 var UserClient userservice.Client
 var CommentClient commentservice.Client
+var FavoriteClient favoriteService.Client
 
 func init() {
 	r, err := consul.NewConsulResolver(config.EnvConfig.CONSUL_ADDR)
@@ -46,6 +49,10 @@ func init() {
 		log.Fatal(err)
 	}
 	CommentClient, err = commentservice.NewClient(config.CommentServiceName, client.WithResolver(r))
+	if err != nil {
+		log.Fatal(err)
+	}
+	FavoriteClient, err = favoriteService.NewClient(config.FavoriteServiceName, client.WithResolver(r))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -274,17 +281,24 @@ func (s *PublishServiceImpl) ListVideo(ctx context.Context, req *publish.ListVid
 			continue
 		}
 
+		isFavorite, err := FavoriteClient.IsFavorite(ctx, &favorite.IsFavoriteRequest{
+			UserId:  req.UserId,
+			VideoId: m.ID,
+		})
+		if err != nil {
+			log.Println(fmt.Errorf("unable to determine if the user liked the video : %w", err))
+			continue
+		}
+
 		rVideo = append(rVideo, &feed.Video{
-			Id:       m.ID,
-			Author:   userResponse.User,
-			PlayUrl:  playUrl,
-			CoverUrl: coverUrl,
-			// TODO: finish this
-			FavoriteCount: 0,
+			Id:            m.ID,
+			Author:        userResponse.User,
+			PlayUrl:       playUrl,
+			CoverUrl:      coverUrl,
+			FavoriteCount: m.FavoriteCount,
 			CommentCount:  commentCount.CommentCount,
-			// TODO: finish this
-			IsFavorite: false,
-			Title:      m.Title,
+			IsFavorite:    isFavorite.Result,
+			Title:         m.Title,
 		})
 	}
 

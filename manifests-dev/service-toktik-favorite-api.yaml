@@ -8,9 +8,9 @@ metadata:
 spec:
   ports:
     - name: grpc
-      port: 40133
+      port: 40134
       protocol: TCP
-      targetPort: 40133
+      targetPort: 40134
   selector:
     name: toktik-favorite-api
     branch: dev

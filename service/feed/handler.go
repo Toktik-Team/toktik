@@ -12,6 +12,8 @@ import (
 	"toktik/constant/config"
 	"toktik/kitex_gen/douyin/comment"
 	"toktik/kitex_gen/douyin/comment/commentservice"
+	"toktik/kitex_gen/douyin/favorite"
+	favoriteService "toktik/kitex_gen/douyin/favorite/favoriteservice"
 	"toktik/kitex_gen/douyin/feed"
 	"toktik/kitex_gen/douyin/user"
 	"toktik/kitex_gen/douyin/user/userservice"
@@ -22,6 +24,7 @@ import (
 
 var UserClient userservice.Client
 var CommentClient commentservice.Client
+var FavoriteClient favoriteService.Client
 
 func init() {
 	r, err := consul.NewConsulResolver(config.EnvConfig.CONSUL_ADDR)
@@ -33,6 +36,10 @@ func init() {
 		log.Fatal(err)
 	}
 	CommentClient, err = commentservice.NewClient(config.CommentServiceName, client.WithResolver(r))
+	if err != nil {
+		log.Fatal(err)
+	}
+	FavoriteClient, err = favoriteService.NewClient(config.FavoriteServiceName, client.WithResolver(r))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -118,6 +125,14 @@ func (s *FeedServiceImpl) ListVideos(ctx context.Context, req *feed.ListFeedRequ
 			log.Println(fmt.Errorf("failed to fetch comment count: %w", err))
 			continue
 		}
+		isFavorite, err := FavoriteClient.IsFavorite(ctx, &favorite.IsFavoriteRequest{
+			UserId:  actorId,
+			VideoId: m.ID,
+		})
+		if err != nil {
+			log.Println(fmt.Errorf("unable to determine if the user liked the video : %w", err))
+			continue
+		}
 
 		videos = append(videos, &feed.Video{
 			Id:            m.ID,
@@ -126,9 +141,8 @@ func (s *FeedServiceImpl) ListVideos(ctx context.Context, req *feed.ListFeedRequ
 			CoverUrl:      coverUrl,
 			FavoriteCount: m.FavoriteCount,
 			CommentCount:  commentCount.CommentCount,
-			// TODO: finish this
-			IsFavorite: false,
-			Title:      m.Title,
+			IsFavorite:    isFavorite.Result,
+			Title:         m.Title,
 		})
 	}
 

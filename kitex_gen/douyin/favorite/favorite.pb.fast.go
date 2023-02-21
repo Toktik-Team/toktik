@@ -170,6 +170,66 @@ func (x *FavoriteListResponse) fastReadField3(buf []byte, _type int8) (offset in
 	return offset, nil
 }
 
+func (x *IsFavoriteRequest) FastRead(buf []byte, _type int8, number int32) (offset int, err error) {
+	switch number {
+	case 1:
+		offset, err = x.fastReadField1(buf, _type)
+		if err != nil {
+			goto ReadFieldError
+		}
+	case 2:
+		offset, err = x.fastReadField2(buf, _type)
+		if err != nil {
+			goto ReadFieldError
+		}
+	default:
+		offset, err = fastpb.Skip(buf, _type, number)
+		if err != nil {
+			goto SkipFieldError
+		}
+	}
+	return offset, nil
+SkipFieldError:
+	return offset, fmt.Errorf("%T cannot parse invalid wire-format data, error: %s", x, err)
+ReadFieldError:
+	return offset, fmt.Errorf("%T read field %d '%s' error: %s", x, number, fieldIDToName_IsFavoriteRequest[number], err)
+}
+
+func (x *IsFavoriteRequest) fastReadField1(buf []byte, _type int8) (offset int, err error) {
+	x.UserId, offset, err = fastpb.ReadUint32(buf, _type)
+	return offset, err
+}
+
+func (x *IsFavoriteRequest) fastReadField2(buf []byte, _type int8) (offset int, err error) {
+	x.VideoId, offset, err = fastpb.ReadUint32(buf, _type)
+	return offset, err
+}
+
+func (x *IsFavoriteResponse) FastRead(buf []byte, _type int8, number int32) (offset int, err error) {
+	switch number {
+	case 1:
+		offset, err = x.fastReadField1(buf, _type)
+		if err != nil {
+			goto ReadFieldError
+		}
+	default:
+		offset, err = fastpb.Skip(buf, _type, number)
+		if err != nil {
+			goto SkipFieldError
+		}
+	}
+	return offset, nil
+SkipFieldError:
+	return offset, fmt.Errorf("%T cannot parse invalid wire-format data, error: %s", x, err)
+ReadFieldError:
+	return offset, fmt.Errorf("%T read field %d '%s' error: %s", x, number, fieldIDToName_IsFavoriteResponse[number], err)
+}
+
+func (x *IsFavoriteResponse) fastReadField1(buf []byte, _type int8) (offset int, err error) {
+	x.Result, offset, err = fastpb.ReadBool(buf, _type)
+	return offset, err
+}
+
 func (x *FavoriteRequest) FastWrite(buf []byte) (offset int) {
 	if x == nil {
 		return offset
@@ -278,6 +338,47 @@ func (x *FavoriteListResponse) fastWriteField3(buf []byte) (offset int) {
 	for i := range x.VideoList {
 		offset += fastpb.WriteMessage(buf[offset:], 3, x.VideoList[i])
 	}
+	return offset
+}
+
+func (x *IsFavoriteRequest) FastWrite(buf []byte) (offset int) {
+	if x == nil {
+		return offset
+	}
+	offset += x.fastWriteField1(buf[offset:])
+	offset += x.fastWriteField2(buf[offset:])
+	return offset
+}
+
+func (x *IsFavoriteRequest) fastWriteField1(buf []byte) (offset int) {
+	if x.UserId == 0 {
+		return offset
+	}
+	offset += fastpb.WriteUint32(buf[offset:], 1, x.UserId)
+	return offset
+}
+
+func (x *IsFavoriteRequest) fastWriteField2(buf []byte) (offset int) {
+	if x.VideoId == 0 {
+		return offset
+	}
+	offset += fastpb.WriteUint32(buf[offset:], 2, x.VideoId)
+	return offset
+}
+
+func (x *IsFavoriteResponse) FastWrite(buf []byte) (offset int) {
+	if x == nil {
+		return offset
+	}
+	offset += x.fastWriteField1(buf[offset:])
+	return offset
+}
+
+func (x *IsFavoriteResponse) fastWriteField1(buf []byte) (offset int) {
+	if !x.Result {
+		return offset
+	}
+	offset += fastpb.WriteBool(buf[offset:], 1, x.Result)
 	return offset
 }
 
@@ -392,6 +493,47 @@ func (x *FavoriteListResponse) sizeField3() (n int) {
 	return n
 }
 
+func (x *IsFavoriteRequest) Size() (n int) {
+	if x == nil {
+		return n
+	}
+	n += x.sizeField1()
+	n += x.sizeField2()
+	return n
+}
+
+func (x *IsFavoriteRequest) sizeField1() (n int) {
+	if x.UserId == 0 {
+		return n
+	}
+	n += fastpb.SizeUint32(1, x.UserId)
+	return n
+}
+
+func (x *IsFavoriteRequest) sizeField2() (n int) {
+	if x.VideoId == 0 {
+		return n
+	}
+	n += fastpb.SizeUint32(2, x.VideoId)
+	return n
+}
+
+func (x *IsFavoriteResponse) Size() (n int) {
+	if x == nil {
+		return n
+	}
+	n += x.sizeField1()
+	return n
+}
+
+func (x *IsFavoriteResponse) sizeField1() (n int) {
+	if !x.Result {
+		return n
+	}
+	n += fastpb.SizeBool(1, x.Result)
+	return n
+}
+
 var fieldIDToName_FavoriteRequest = map[int32]string{
 	1: "ActorId",
 	2: "VideoId",
@@ -411,6 +553,15 @@ var fieldIDToName_FavoriteListResponse = map[int32]string{
 	1: "StatusCode",
 	2: "StatusMsg",
 	3: "VideoList",
+}
+
+var fieldIDToName_IsFavoriteRequest = map[int32]string{
+	1: "UserId",
+	2: "VideoId",
+}
+
+var fieldIDToName_IsFavoriteResponse = map[int32]string{
+	1: "Result",
 }
 
 var _ = feed.File_feed_proto

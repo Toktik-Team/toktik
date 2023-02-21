@@ -16,11 +16,13 @@ func main() {
 		postgres.New(
 			postgres.Config{
 				DSN: config.EnvConfig.GetDSN(),
-			}), &gorm.Config{})
+			}), &gorm.Config{
+			DisableForeignKeyConstraintWhenMigrating: true,
+		})
 	if err != nil {
 		panic(fmt.Errorf("db connection failed: %v", err))
 	}
-	err = db.AutoMigrate(&auth.UserToken{}, &model.User{}, &model.Video{}, &model.Comment{}, &model.Relation{})
+	err = db.AutoMigrate(&auth.UserToken{}, &model.User{}, &model.Video{}, &model.Comment{}, &model.Relation{}, &model.Favorite{})
 	if err != nil {
 		panic(fmt.Errorf("db migrate failed: %v", err))
 	}

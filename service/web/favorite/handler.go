@@ -31,8 +31,6 @@ func init() {
 	}
 }
 
-var logger *logrus.Entry
-
 var actionField = logrus.Fields{
 	"time":   time.Now(),
 	"method": "FavoriteAction",
@@ -101,8 +99,8 @@ func parseParameters(c *app.RequestContext) (videoId uint32, actionType uint32, 
 
 // Action 处理点赞和取消点赞
 func Action(ctx context.Context, c *app.RequestContext) {
-	logger = logging.Logger.WithFields(actionField)
-	logger.Debugf("Process start")
+	logger := logging.Logger
+	logger.WithFields(actionField).Debugf("Process start")
 
 	var actorId uint32
 	if getActorId(c, &actorId) {
@@ -138,8 +136,8 @@ func List(ctx context.Context, c *app.RequestContext) {
 		"method": "FavoriteList",
 	}
 
-	logger := logging.Logger.WithFields(methodField)
-	logger.Debugf("Process start")
+	logger := logging.Logger
+	logger.WithFields(methodField).Debugf("Process start")
 
 	if mw.GetAuthResult(c) != mw.AUTH_RESULT_SUCCESS {
 		biz.AuthFailed.WithFields(&methodField).LaunchError(c)

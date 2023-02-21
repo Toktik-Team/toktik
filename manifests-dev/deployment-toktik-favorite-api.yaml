@@ -37,8 +37,8 @@ spec:
             - configMapRef:
                 name: config
           ports:
-            - name: grpc-40133
-              containerPort: 40133
+            - name: grpc-40134
+              containerPort: 40134
               protocol: TCP
           resources:
             limits:
