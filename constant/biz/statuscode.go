@@ -31,6 +31,8 @@ const (
 	UnableToQueryFollowerList
 	UnableToCreateRelation
 	UnableToDeleteRelation
+	UnableToLike
+	UnableToCancelLike
 )
 
 // Bad Request

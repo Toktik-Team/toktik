@@ -13,6 +13,7 @@ import (
 	"time"
 	"toktik/constant/biz"
 	"toktik/kitex_gen/douyin/comment"
+	"toktik/kitex_gen/douyin/favorite"
 	"toktik/kitex_gen/douyin/feed"
 	"toktik/kitex_gen/douyin/publish"
 	"toktik/kitex_gen/douyin/user"
@@ -43,9 +44,9 @@ var (
 		Author:        &mockUser,
 		PlayUrl:       "https://test.com/test_video_file_" + strconv.Itoa(1) + ".mp4",
 		CoverUrl:      "https://test.com/test_video_cover_file_" + strconv.Itoa(1) + ".png",
-		FavoriteCount: 0, // TODO
+		FavoriteCount: 0,
 		CommentCount:  0,
-		IsFavorite:    false, // TODO
+		IsFavorite:    false,
 		Title:         "Test Video " + strconv.Itoa(1),
 	}
 )
@@ -154,6 +155,7 @@ func TestPublishServiceImpl_ListVideo(t *testing.T) {
 
 	UserClient = MockUserClient{}
 	CommentClient = MockCommentClient{}
+	FavoriteClient = MockFavoriteClient{}
 
 	rows := sqlmock.NewRows([]string{"id", "created_at", "updated_at", "deleted_at", "user_id", "title", "file_name", "cover_name"})
 	rows.AddRow(mockVideoReq.ID, mockVideoReq.CreatedAt, nil, nil, mockVideoReq.UserId, mockVideoReq.Title, mockVideoReq.FileName, mockVideoReq.CoverName)
@@ -225,4 +227,21 @@ func (m MockStorageProvider) Upload(fileName string, content io.Reader) (*storag
 
 func (m MockStorageProvider) GetLink(fileName string) (string, error) {
 	return "https://test.com/" + fileName, nil
+}
+
+type MockFavoriteClient struct {
+}
+
+func (m MockFavoriteClient) FavoriteAction(ctx context.Context, Req *favorite.FavoriteRequest, callOptions ...callopt.Option) (r *favorite.FavoriteResponse, err error) {
+	panic("unimplemented")
+}
+
+func (m MockFavoriteClient) FavoriteList(ctx context.Context, Req *favorite.FavoriteListRequest, callOptions ...callopt.Option) (r *favorite.FavoriteListResponse, err error) {
+	panic("unimplemented")
+}
+
+func (m MockFavoriteClient) IsFavorite(ctx context.Context, Req *favorite.IsFavoriteRequest, callOptions ...callopt.Option) (r *favorite.IsFavoriteResponse, err error) {
+	return &favorite.IsFavoriteResponse{
+		Result: false,
+	}, nil
 }

@@ -18,6 +18,7 @@ import (
 var (
 	Q         = new(Query)
 	Comment   *comment
+	Favorite  *favorite
 	Relation  *relation
 	User      *user
 	UserToken *userToken
@@ -27,6 +28,7 @@ var (
 func SetDefault(db *gorm.DB, opts ...gen.DOOption) {
 	*Q = *Use(db, opts...)
 	Comment = &Q.Comment
+	Favorite = &Q.Favorite
 	Relation = &Q.Relation
 	User = &Q.User
 	UserToken = &Q.UserToken
@@ -37,6 +39,7 @@ func Use(db *gorm.DB, opts ...gen.DOOption) *Query {
 	return &Query{
 		db:        db,
 		Comment:   newComment(db, opts...),
+		Favorite:  newFavorite(db, opts...),
 		Relation:  newRelation(db, opts...),
 		User:      newUser(db, opts...),
 		UserToken: newUserToken(db, opts...),
@@ -48,6 +51,7 @@ type Query struct {
 	db *gorm.DB
 
 	Comment   comment
+	Favorite  favorite
 	Relation  relation
 	User      user
 	UserToken userToken
@@ -60,6 +64,7 @@ func (q *Query) clone(db *gorm.DB) *Query {
 	return &Query{
 		db:        db,
 		Comment:   q.Comment.clone(db),
+		Favorite:  q.Favorite.clone(db),
 		Relation:  q.Relation.clone(db),
 		User:      q.User.clone(db),
 		UserToken: q.UserToken.clone(db),
@@ -79,6 +84,7 @@ func (q *Query) ReplaceDB(db *gorm.DB) *Query {
 	return &Query{
 		db:        db,
 		Comment:   q.Comment.replaceDB(db),
+		Favorite:  q.Favorite.replaceDB(db),
 		Relation:  q.Relation.replaceDB(db),
 		User:      q.User.replaceDB(db),
 		UserToken: q.UserToken.replaceDB(db),
@@ -88,6 +94,7 @@ func (q *Query) ReplaceDB(db *gorm.DB) *Query {
 
 type queryCtx struct {
 	Comment   ICommentDo
+	Favorite  IFavoriteDo
 	Relation  IRelationDo
 	User      IUserDo
 	UserToken IUserTokenDo
@@ -97,6 +104,7 @@ type queryCtx struct {
 func (q *Query) WithContext(ctx context.Context) *queryCtx {
 	return &queryCtx{
 		Comment:   q.Comment.WithContext(ctx),
+		Favorite:  q.Favorite.WithContext(ctx),
 		Relation:  q.Relation.WithContext(ctx),
 		User:      q.User.WithContext(ctx),
 		UserToken: q.UserToken.WithContext(ctx),

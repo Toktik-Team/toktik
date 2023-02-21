@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    sidecar.jaegertracing.io/inject: 'true'
+  labels:
+    app: toktik-favorite-api
+  name: toktik-favorite-api
+  namespace: toktik-service-bundle
+spec:
+  selector:
+    matchLabels:
+      name: toktik-favorite-api
+  template:
+    metadata:
+      labels:
+        app: toktik-favorite-api
+        branch: dev
+        version: ${BUILD_NUMBER}-${CI_COMMIT_ID}
+        name: toktik-favorite-api
+        dream-app: toktik-favorite-api
+        dream-unit: toktik-favorite-api
+    spec:
+      imagePullSecrets:
+        - name: regcred
+      containers:
+        - image: ${IMAGE}
+          imagePullPolicy: IfNotPresent
+          name: toktik-favorite-api
+          command:
+            - /bin/bash
+          args:
+            - bootstrap-favorite.sh
+          envFrom:
+            - configMapRef:
+                name: env-config
+            - configMapRef:
+                name: config
+          ports:
+            - name: grpc-40134
+              containerPort: 40134
+              protocol: TCP
+          resources:
+            limits:
+              cpu: 500m
+              memory: 256Mi
+            requests:
+              cpu: 100m
+              memory: 8Mi
+      terminationGracePeriodSeconds: 30

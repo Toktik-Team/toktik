@@ -12,7 +12,7 @@ const PublishServiceAddr = ":40128"
 const FeedServiceName = "toktik-feed-api"
 const FeedServiceAddr = ":40129"
 
-const UserServiceName = "toktik-user"
+const UserServiceName = "toktik-user-api"
 const UserServiceAddr = ":40130"
 
 const CommentServiceName = "toktik-comment-api"
@@ -23,3 +23,6 @@ const WechatServiceAddr = ":40132"
 
 const RelationServiceName = "toktik-relation-api"
 const RelationServiceAddr = ":40133"
+
+const FavoriteServiceName = "toktik-favorite-api"
+const FavoriteServiceAddr = ":40134"

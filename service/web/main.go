@@ -1,19 +1,16 @@
 package main
 
 import (
-	"context"
 	"toktik/constant/config"
 	"toktik/service/web/auth"
 	"toktik/service/web/comment"
+	"toktik/service/web/favorite"
 	"toktik/service/web/feed"
 	"toktik/service/web/mw"
 	"toktik/service/web/publish"
 	"toktik/service/web/relation"
 	"toktik/service/web/user"
 	"toktik/service/web/wechat"
-
-	"github.com/cloudwego/hertz/pkg/app"
-	httpStatus "github.com/cloudwego/hertz/pkg/protocol/consts"
 
 	"github.com/cloudwego/hertz/pkg/app/server"
 	"github.com/hertz-contrib/gzip"
@@ -49,19 +46,8 @@ func main() {
 
 	// favorite service
 	favoriteGroup := douyin.Group("/favorite")
-	favoriteGroup.POST("/action", func(c context.Context, ctx *app.RequestContext) {
-		ctx.JSON(httpStatus.StatusOK, map[string]any{
-			"status_code": 0,
-			"message":     "ok",
-		})
-	})
-	favoriteGroup.GET("/list", func(c context.Context, ctx *app.RequestContext) {
-		ctx.JSON(httpStatus.StatusOK, map[string]any{
-			"status_code": 0,
-			"message":     "ok",
-			"video_list":  []string{},
-		})
-	})
+	favoriteGroup.POST("/action/", favorite.Action)
+	favoriteGroup.GET("/list/", favorite.List)
 
 	// comment service
 	commentGroup := douyin.Group("/comment")
