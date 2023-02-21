@@ -300,12 +300,7 @@ func (s *FavoriteServiceImpl) IsFavorite(ctx context.Context, req *favorite.IsFa
 	f := gen.Favorite
 	_, err = f.WithContext(ctx).Where(f.UserId.Eq(req.UserId), f.VideoId.Eq(req.VideoId)).First()
 	if err != nil {
-		logger.
-			WithFields(field).
-			WithFields(logrus.Fields{
-				"parameters": fmt.Sprintf("UserId: %v, VideoId: %d", req.UserId, req.VideoId),
-			}).Error(err.Error())
-		return &favorite.IsFavoriteResponse{Result: false}, err
+		return &favorite.IsFavoriteResponse{Result: false}, nil
 	}
 
 	return &favorite.IsFavoriteResponse{Result: true}, nil
