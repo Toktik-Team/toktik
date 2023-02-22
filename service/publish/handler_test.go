@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"database/sql"
 	"io"
 	"os"
 	"path"
@@ -93,7 +94,12 @@ func TestPublishServiceImpl_CreateVideo(t *testing.T) {
 		StatusMsg:  biz.BadRequestStatusMsg,
 	}
 
-	defer mock.MockConn.Close()
+	defer func(MockConn *sql.DB) {
+		err := MockConn.Close()
+		if err != nil {
+			panic(err)
+		}
+	}(mock.Conn)
 	mock.DBMock.ExpectBegin()
 	mock.DBMock.ExpectQuery(regexp.QuoteMeta(`INSERT INTO "videos" 
     		("created_at","updated_at","deleted_at","user_id","title","file_name","cover_name") 
@@ -190,7 +196,7 @@ func TestPublishServiceImpl_ListVideo(t *testing.T) {
 type MockStorageProvider struct {
 }
 
-func (m MockStorageProvider) Upload(fileName string, content io.Reader) (*storage.PutObjectOutput, error) {
+func (m MockStorageProvider) Upload(string, io.Reader) (*storage.PutObjectOutput, error) {
 	// Nothing to do
 	return &storage.PutObjectOutput{}, nil
 }
@@ -202,7 +208,7 @@ func (m MockStorageProvider) GetLink(fileName string) (string, error) {
 type MockFeedClient struct {
 }
 
-func (m MockFeedClient) ListVideos(ctx context.Context, Req *feed.ListFeedRequest, callOptions ...callopt.Option) (r *feed.ListFeedResponse, err error) {
+func (m MockFeedClient) ListVideos(context.Context, *feed.ListFeedRequest, ...callopt.Option) (r *feed.ListFeedResponse, err error) {
 	return &feed.ListFeedResponse{
 		StatusCode: biz.OkStatusCode,
 		StatusMsg:  &biz.OkStatusMsg,
@@ -210,7 +216,7 @@ func (m MockFeedClient) ListVideos(ctx context.Context, Req *feed.ListFeedReques
 	}, nil
 }
 
-func (m MockFeedClient) QueryVideos(ctx context.Context, Req *feed.QueryVideosRequest, callOptions ...callopt.Option) (r *feed.QueryVideosResponse, err error) {
+func (m MockFeedClient) QueryVideos(context.Context, *feed.QueryVideosRequest, ...callopt.Option) (r *feed.QueryVideosResponse, err error) {
 	return &feed.QueryVideosResponse{
 		StatusCode: biz.OkStatusCode,
 		StatusMsg:  &biz.OkStatusMsg,

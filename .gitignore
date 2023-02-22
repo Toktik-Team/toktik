@@ -116,8 +116,5 @@ fabric.properties
 # Built Visual Studio Code Extensions
 *.vsix
 
-# ENV files, we don't want to leak any credentials
-.env
-
 # Service build output
 **/output/

@@ -51,7 +51,7 @@ func AuthMiddleware() app.HandlerFunc {
 			rc.Next(ctx)
 			return
 		}
-		if authResp.StatusCode == 0 && authResp.StatusMsg == string(AUTH_RESULT_SUCCESS) {
+		if authResp.StatusCode == 0 && authResp.StatusMsg == AUTH_RESULT_SUCCESS {
 			rc.Set(authResultKey, AUTH_RESULT_SUCCESS)
 			rc.Set(UserIdKey, authResp.UserId)
 		} else {

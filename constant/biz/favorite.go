@@ -5,12 +5,8 @@ import (
 )
 
 const (
-	UnauthorizedAction            = 401001
-	FailedToLikeVideo             = 500001
-	FailedToAddVideoFavoriteCount = 500002
-	FailedToCancelLike            = 500003
-	FailedToSubVideoFavoriteCount = 500004
-	FailedToGetVideoList          = 500005
+	UnauthorizedAction   = 401001
+	FailedToGetVideoList = 500001
 )
 
 var (

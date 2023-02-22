@@ -43,7 +43,7 @@ func init() {
 	}
 }
 
-func paramValidate(ctx context.Context, c *app.RequestContext) (err error) {
+func paramValidate(c *app.RequestContext) (err error) {
 	var wrappedError error
 	form, err := c.Request.MultipartForm()
 	if err != nil {
@@ -71,7 +71,7 @@ func Action(ctx context.Context, c *app.RequestContext) {
 	logger := logging.Logger.WithFields(methodFields)
 	logger.Debugf("Process start")
 
-	if err := paramValidate(ctx, c); err != nil {
+	if err := paramValidate(c); err != nil {
 		bizConstant.InvalidArguments.WithCause(err).WithFields(&methodFields).LaunchError(c)
 		return
 	}

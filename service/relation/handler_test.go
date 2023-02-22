@@ -7,7 +7,7 @@ import (
 	"regexp"
 	"testing"
 	"toktik/constant/biz"
-	relation "toktik/kitex_gen/douyin/relation"
+	"toktik/kitex_gen/douyin/relation"
 	"toktik/kitex_gen/douyin/user"
 	"toktik/test/mock"
 
@@ -82,7 +82,7 @@ func TestRelationServiceImpl_GetFollowList(t *testing.T) {
 type MockUserClient struct {
 }
 
-func (m MockUserClient) GetUser(ctx context.Context, req *user.UserRequest, callOptions ...callopt.Option) (r *user.UserResponse, err error) {
+func (m MockUserClient) GetUser(_ context.Context, req *user.UserRequest, _ ...callopt.Option) (r *user.UserResponse, err error) {
 	if req.UserId == 999 {
 		return &user.UserResponse{StatusCode: biz.UserNotFound, User: nil}, nil
 	}
@@ -217,7 +217,7 @@ func TestRelationServiceImpl_Follow(t *testing.T) {
 			nil,
 			mockUserA.Id,
 			mockUserC.Id).
-		WillReturnError(fmt.Errorf("Duplicated row"))
+		WillReturnError(fmt.Errorf("duplicated row"))
 
 	mock.DBMock.ExpectRollback()
 

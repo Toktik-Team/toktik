@@ -147,14 +147,14 @@ func reverseFeedVideo(s []*feed.Video) []*feed.Video {
 type MockUserClient struct {
 }
 
-func (m MockUserClient) GetUser(ctx context.Context, Req *user.UserRequest, callOptions ...callopt.Option) (r *user.UserResponse, err error) {
+func (m MockUserClient) GetUser(context.Context, *user.UserRequest, ...callopt.Option) (r *user.UserResponse, err error) {
 	return &user.UserResponse{StatusCode: biz.OkStatusCode, User: &mockUser}, nil
 }
 
 type MockCommentClient struct {
 }
 
-func (m MockCommentClient) CountComment(ctx context.Context, Req *comment.CountCommentRequest, callOptions ...callopt.Option) (r *comment.CountCommentResponse, err error) {
+func (m MockCommentClient) CountComment(context.Context, *comment.CountCommentRequest, ...callopt.Option) (r *comment.CountCommentResponse, err error) {
 	return &comment.CountCommentResponse{
 		StatusCode:   biz.OkStatusCode,
 		StatusMsg:    &biz.OkStatusMsg,
@@ -162,18 +162,18 @@ func (m MockCommentClient) CountComment(ctx context.Context, Req *comment.CountC
 	}, nil
 }
 
-func (m MockCommentClient) ActionComment(ctx context.Context, Req *comment.ActionCommentRequest, callOptions ...callopt.Option) (r *comment.ActionCommentResponse, err error) {
+func (m MockCommentClient) ActionComment(context.Context, *comment.ActionCommentRequest, ...callopt.Option) (r *comment.ActionCommentResponse, err error) {
 	panic("unimplemented")
 }
 
-func (m MockCommentClient) ListComment(ctx context.Context, Req *comment.ListCommentRequest, callOptions ...callopt.Option) (r *comment.ListCommentResponse, err error) {
+func (m MockCommentClient) ListComment(context.Context, *comment.ListCommentRequest, ...callopt.Option) (r *comment.ListCommentResponse, err error) {
 	panic("unimplemented")
 }
 
 type MockStorageProvider struct {
 }
 
-func (m MockStorageProvider) Upload(fileName string, content io.Reader) (*storage.PutObjectOutput, error) {
+func (m MockStorageProvider) Upload(string, io.Reader) (*storage.PutObjectOutput, error) {
 	// Nothing to do
 	return &storage.PutObjectOutput{}, nil
 }
@@ -185,32 +185,32 @@ func (m MockStorageProvider) GetLink(fileName string) (string, error) {
 type MockFavoriteClient struct {
 }
 
-func (m MockFavoriteClient) UserFavoriteCount(ctx context.Context, Req *favorite.UserFavoriteCountRequest, callOptions ...callopt.Option) (r *favorite.UserFavoriteCountResponse, err error) {
+func (m MockFavoriteClient) UserFavoriteCount(context.Context, *favorite.UserFavoriteCountRequest, ...callopt.Option) (r *favorite.UserFavoriteCountResponse, err error) {
 	return &favorite.UserFavoriteCountResponse{
 		Count: 0,
 	}, nil
 }
-func (m MockFavoriteClient) UserTotalFavoritedCount(ctx context.Context, Req *favorite.UserTotalFavoritedCountRequest, callOptions ...callopt.Option) (r *favorite.UserTotalFavoritedCountResponse, err error) {
+func (m MockFavoriteClient) UserTotalFavoritedCount(context.Context, *favorite.UserTotalFavoritedCountRequest, ...callopt.Option) (r *favorite.UserTotalFavoritedCountResponse, err error) {
 	return &favorite.UserTotalFavoritedCountResponse{
 		Count: 0,
 	}, nil
 }
 
-func (m MockFavoriteClient) FavoriteAction(ctx context.Context, Req *favorite.FavoriteRequest, callOptions ...callopt.Option) (r *favorite.FavoriteResponse, err error) {
+func (m MockFavoriteClient) FavoriteAction(context.Context, *favorite.FavoriteRequest, ...callopt.Option) (r *favorite.FavoriteResponse, err error) {
 	panic("unimplemented")
 }
 
-func (m MockFavoriteClient) FavoriteList(ctx context.Context, Req *favorite.FavoriteListRequest, callOptions ...callopt.Option) (r *favorite.FavoriteListResponse, err error) {
+func (m MockFavoriteClient) FavoriteList(context.Context, *favorite.FavoriteListRequest, ...callopt.Option) (r *favorite.FavoriteListResponse, err error) {
 	panic("unimplemented")
 }
 
-func (m MockFavoriteClient) IsFavorite(ctx context.Context, Req *favorite.IsFavoriteRequest, callOptions ...callopt.Option) (r *favorite.IsFavoriteResponse, err error) {
+func (m MockFavoriteClient) IsFavorite(context.Context, *favorite.IsFavoriteRequest, ...callopt.Option) (r *favorite.IsFavoriteResponse, err error) {
 	return &favorite.IsFavoriteResponse{
 		Result: false,
 	}, nil
 }
 
-func (m MockFavoriteClient) FavoriteCount(ctx context.Context, Req *favorite.FavoriteCountRequest, callOptions ...callopt.Option) (r *favorite.FavoriteCountResponse, err error) {
+func (m MockFavoriteClient) FavoriteCount(context.Context, *favorite.FavoriteCountRequest, ...callopt.Option) (r *favorite.FavoriteCountResponse, err error) {
 	return &favorite.FavoriteCountResponse{
 		Count: 0,
 	}, nil

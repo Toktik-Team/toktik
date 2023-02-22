@@ -52,7 +52,7 @@ func (s *AuthServiceImpl) Authenticate(ctx context.Context, req *auth.Authentica
 	}
 	resp = &auth.AuthenticateResponse{
 		StatusCode: 0,
-		StatusMsg:  string(mw.AUTH_RESULT_SUCCESS),
+		StatusMsg:  mw.AUTH_RESULT_SUCCESS,
 		UserId:     first.UserID,
 	}
 	return
