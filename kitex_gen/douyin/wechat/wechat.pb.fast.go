@@ -53,7 +53,7 @@ func (x *MessageChatRequest) fastReadField2(buf []byte, _type int8) (offset int,
 }
 
 func (x *MessageChatRequest) fastReadField6(buf []byte, _type int8) (offset int, err error) {
-	x.PreMsgTime, offset, err = fastpb.ReadUint32(buf, _type)
+	x.PreMsgTime, offset, err = fastpb.ReadInt64(buf, _type)
 	return offset, err
 }
 
@@ -108,7 +108,7 @@ func (x *Message) fastReadField2(buf []byte, _type int8) (offset int, err error)
 }
 
 func (x *Message) fastReadField3(buf []byte, _type int8) (offset int, err error) {
-	x.CreateTime, offset, err = fastpb.ReadUint32(buf, _type)
+	x.CreateTime, offset, err = fastpb.ReadInt64(buf, _type)
 	return offset, err
 }
 
@@ -294,7 +294,7 @@ func (x *MessageChatRequest) fastWriteField6(buf []byte) (offset int) {
 	if x.PreMsgTime == 0 {
 		return offset
 	}
-	offset += fastpb.WriteUint32(buf[offset:], 6, x.PreMsgTime)
+	offset += fastpb.WriteInt64(buf[offset:], 6, x.PreMsgTime)
 	return offset
 }
 
@@ -330,7 +330,7 @@ func (x *Message) fastWriteField3(buf []byte) (offset int) {
 	if x.CreateTime == 0 {
 		return offset
 	}
-	offset += fastpb.WriteUint32(buf[offset:], 3, x.CreateTime)
+	offset += fastpb.WriteInt64(buf[offset:], 3, x.CreateTime)
 	return offset
 }
 
@@ -484,7 +484,7 @@ func (x *MessageChatRequest) sizeField6() (n int) {
 	if x.PreMsgTime == 0 {
 		return n
 	}
-	n += fastpb.SizeUint32(6, x.PreMsgTime)
+	n += fastpb.SizeInt64(6, x.PreMsgTime)
 	return n
 }
 
@@ -520,7 +520,7 @@ func (x *Message) sizeField3() (n int) {
 	if x.CreateTime == 0 {
 		return n
 	}
-	n += fastpb.SizeUint32(3, x.CreateTime)
+	n += fastpb.SizeInt64(3, x.CreateTime)
 	return n
 }
 

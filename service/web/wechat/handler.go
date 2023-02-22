@@ -136,7 +136,7 @@ func MessageChat(ctx context.Context, c *app.RequestContext) {
 	if !exist {
 		preMsgTimeStr = "0"
 	}
-	preMsgTime, err := strconv.ParseInt(preMsgTimeStr, 10, 32)
+	preMsgTime, err := strconv.ParseInt(preMsgTimeStr, 10, 64)
 	if err != nil {
 		bizConstant.InvalidArguments.WithCause(err).WithFields(&methodFields).LaunchError(c)
 		return
@@ -149,7 +149,7 @@ func MessageChat(ctx context.Context, c *app.RequestContext) {
 	messageActionResponse, err := Client.WechatChat(ctx, &wechat.MessageChatRequest{
 		SenderId:   uint32(senderIdInt),
 		ReceiverId: userId,
-		PreMsgTime: uint32(preMsgTime),
+		PreMsgTime: preMsgTime,
 	})
 
 	if err != nil {

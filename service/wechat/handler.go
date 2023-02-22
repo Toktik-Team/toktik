@@ -136,7 +136,7 @@ func (s *WechatServiceImpl) WechatChat(ctx context.Context, req *wechat.MessageC
 	}
 	senderID := req.SenderId
 	receiverID := req.ReceiverId
-	min := strconv.FormatInt(int64(req.PreMsgTime), 10)
+	min := strconv.FormatInt(req.PreMsgTime+1000, 10)
 	max := "+inf"
 	key := *s.generateKey(&senderID, &receiverID)
 	zRangeCMD := rdb.ZRangeByScore(ctx, key, &redis.ZRangeBy{Min: fmt.Sprintf("%s", min), Max: max})
@@ -163,7 +163,7 @@ func (s *WechatServiceImpl) WechatChat(ctx context.Context, req *wechat.MessageC
 		respMessageList = append(respMessageList, &wechat.Message{
 			Id:         uint32(i),
 			Content:    content,
-			CreateTime: uint32(msg.Time),
+			CreateTime: msg.Time,
 			FromUserId: &msg.From,
 			ToUserId:   &msg.To,
 		})
