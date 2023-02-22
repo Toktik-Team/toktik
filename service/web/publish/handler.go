@@ -98,17 +98,17 @@ func Action(ctx context.Context, c *app.RequestContext) {
 		bizConstant.SizeNotMatchError.WithCause(err).WithFields(&methodFields).LaunchError(c)
 		return
 	}
-	userId := mw.GetAuthActorId(c)
+	actorId := mw.GetAuthActorId(c)
 
 	logger.WithFields(logrus.Fields{
-		"userId":    userId,
-		"title":     title,
-		"data_size": len(data),
+		"actorId":  actorId,
+		"title":    title,
+		"dataSize": len(data),
 	}).Debugf("Executing create video")
 	publishResp, err := publishClient.CreateVideo(ctx, &publish.CreateVideoRequest{
-		UserId: userId,
-		Data:   data,
-		Title:  title,
+		ActorId: actorId,
+		Data:    data,
+		Title:   title,
 	})
 	if err != nil {
 		bizConstant.RPCCallError.WithCause(err).WithFields(&methodFields).LaunchError(c)

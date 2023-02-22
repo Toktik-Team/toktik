@@ -109,7 +109,7 @@ func (s *UserServiceImpl) GetUser(ctx context.Context, req *user.UserRequest) (r
 		return
 	}
 
-	totalFavorited, err := FavoriteClient.UserTotalFavoritedCount(ctx, &favorite.UserTotalFavoritedCountRequest{
+	totalFavorited, err := FavoriteClient.CountUserTotalFavorited(ctx, &favorite.CountUserTotalFavoritedRequest{
 		ActorId: req.ActorId,
 		UserId:  req.UserId,
 	})
@@ -140,7 +140,7 @@ func (s *UserServiceImpl) GetUser(ctx context.Context, req *user.UserRequest) (r
 		return
 	}
 
-	favoriteCount, err := FavoriteClient.UserFavoriteCount(ctx, &favorite.UserFavoriteCountRequest{
+	favoriteCount, err := FavoriteClient.CountUserFavorite(ctx, &favorite.CountUserFavoriteRequest{
 		UserId: req.UserId,
 	})
 	if err != nil {

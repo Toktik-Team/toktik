@@ -189,10 +189,10 @@ func (s *FavoriteServiceImpl) IsFavorite(ctx context.Context, req *favorite.IsFa
 	return &favorite.IsFavoriteResponse{Result: true}, nil
 }
 
-// FavoriteCount implements the FavoriteServiceImpl interface.
-func (s *FavoriteServiceImpl) FavoriteCount(ctx context.Context, req *favorite.FavoriteCountRequest) (resp *favorite.FavoriteCountResponse, err error) {
+// CountFavorite implements the FavoriteServiceImpl interface.
+func (s *FavoriteServiceImpl) CountFavorite(ctx context.Context, req *favorite.CountFavoriteRequest) (resp *favorite.CountFavoriteResponse, err error) {
 	field := logrus.Fields{
-		"method": "FavoriteCount",
+		"method": "CountFavorite",
 	}
 	logger.WithFields(field).Info("process start")
 
@@ -202,23 +202,23 @@ func (s *FavoriteServiceImpl) FavoriteCount(ctx context.Context, req *favorite.F
 	if err != nil {
 		logger.WithFields(field).
 			Errorf("Failed to get the number of favorites: %v", err)
-		return &favorite.FavoriteCountResponse{
+		return &favorite.CountFavoriteResponse{
 			StatusCode: biz.SQLQueryErrorStatusCode,
 			StatusMsg:  &biz.InternalServerErrorStatusMsg,
 		}, nil
 	}
 
-	return &favorite.FavoriteCountResponse{
+	return &favorite.CountFavoriteResponse{
 		StatusCode: biz.OkStatusCode,
 		StatusMsg:  &biz.OkStatusMsg,
 		Count:      uint32(count),
 	}, nil
 }
 
-// UserFavoriteCount implements the FavoriteServiceImpl interface.
-func (s *FavoriteServiceImpl) UserFavoriteCount(ctx context.Context, req *favorite.UserFavoriteCountRequest) (resp *favorite.UserFavoriteCountResponse, err error) {
+// CountUserFavorite implements the FavoriteServiceImpl interface.
+func (s *FavoriteServiceImpl) CountUserFavorite(ctx context.Context, req *favorite.CountUserFavoriteRequest) (resp *favorite.CountUserFavoriteResponse, err error) {
 	field := logrus.Fields{
-		"method": "UserFavoriteCount",
+		"method": "CountUserFavorite",
 	}
 	logger.WithFields(field).Info("process start")
 
@@ -228,23 +228,23 @@ func (s *FavoriteServiceImpl) UserFavoriteCount(ctx context.Context, req *favori
 	if err != nil {
 		logger.WithFields(field).
 			Errorf("Failed to get the number of favorites: %v", err)
-		return &favorite.UserFavoriteCountResponse{
+		return &favorite.CountUserFavoriteResponse{
 			StatusCode: biz.SQLQueryErrorStatusCode,
 			StatusMsg:  &biz.InternalServerErrorStatusMsg,
 		}, nil
 	}
 
-	return &favorite.UserFavoriteCountResponse{
+	return &favorite.CountUserFavoriteResponse{
 		StatusCode: biz.OkStatusCode,
 		StatusMsg:  &biz.OkStatusMsg,
 		Count:      uint32(count),
 	}, nil
 }
 
-// UserTotalFavoritedCount implements the FavoriteServiceImpl interface.
-func (s *FavoriteServiceImpl) UserTotalFavoritedCount(ctx context.Context, req *favorite.UserTotalFavoritedCountRequest) (resp *favorite.UserTotalFavoritedCountResponse, err error) {
+// CountUserTotalFavorited implements the FavoriteServiceImpl interface.
+func (s *FavoriteServiceImpl) CountUserTotalFavorited(ctx context.Context, req *favorite.CountUserTotalFavoritedRequest) (resp *favorite.CountUserTotalFavoritedResponse, err error) {
 	field := logrus.Fields{
-		"method": "UserTotalFavoritedCount",
+		"method": "CountUserTotalFavorited",
 	}
 	logger.WithFields(field).Info("process start")
 
@@ -254,7 +254,7 @@ func (s *FavoriteServiceImpl) UserTotalFavoritedCount(ctx context.Context, req *
 	if err != nil {
 		logger.WithFields(field).
 			Errorf("Failed to get the number of favorites: %v", err)
-		return &favorite.UserTotalFavoritedCountResponse{
+		return &favorite.CountUserTotalFavoritedResponse{
 			StatusCode: biz.SQLQueryErrorStatusCode,
 			StatusMsg:  &biz.InternalServerErrorStatusMsg,
 		}, nil
@@ -271,13 +271,13 @@ func (s *FavoriteServiceImpl) UserTotalFavoritedCount(ctx context.Context, req *
 	if err != nil {
 		logger.WithFields(field).
 			Errorf("Failed to get the number of favorites: %v", err)
-		return &favorite.UserTotalFavoritedCountResponse{
+		return &favorite.CountUserTotalFavoritedResponse{
 			StatusCode: biz.SQLQueryErrorStatusCode,
 			StatusMsg:  &biz.InternalServerErrorStatusMsg,
 		}, nil
 	}
 
-	return &favorite.UserTotalFavoritedCountResponse{
+	return &favorite.CountUserTotalFavoritedResponse{
 		StatusCode: biz.OkStatusCode,
 		StatusMsg:  &biz.OkStatusMsg,
 		Count:      uint32(count),

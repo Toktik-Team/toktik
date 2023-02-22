@@ -221,7 +221,7 @@ func queryDetailed(
 
 		// fill favorite count
 		go func(i int, v *model.Video) {
-			favoriteCount, localErr := FavoriteClient.FavoriteCount(ctx, &favorite.FavoriteCountRequest{
+			favoriteCount, localErr := FavoriteClient.CountFavorite(ctx, &favorite.CountFavoriteRequest{
 				VideoId: v.ID,
 			})
 			if localErr != nil {

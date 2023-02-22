@@ -5,7 +5,7 @@ option go_package = "douyin/publish";
 import "feed.proto";
 
 message CreateVideoRequest {
-  uint32 userId = 1 [json_name = "user_id"]; // 用户id
+  uint32 actor_id = 1; // 用户id
   bytes data = 2; // 视频数据
   string title = 3; // 视频标题
 }
