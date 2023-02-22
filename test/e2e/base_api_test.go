@@ -14,6 +14,13 @@ import (
 	"github.com/segmentio/ksuid"
 )
 
+func BenchmarkFeed(b *testing.B) {
+	t := &testing.T{}
+	for i := 0; i < b.N; i++ {
+		TestFeed(t)
+	}
+}
+
 func TestFeed(t *testing.T) {
 	e := newExpect(t)
 	// Sample:
