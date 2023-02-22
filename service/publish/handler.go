@@ -290,12 +290,6 @@ func (s *PublishServiceImpl) ListVideo(ctx context.Context, req *publish.ListVid
 			continue
 		}
 
-		// TODO: 等到 kitex 更新后删除此代码
-		favoriteResult := false
-		if isFavorite != nil {
-			favoriteResult = isFavorite.Result
-		}
-
 		rVideo = append(rVideo, &feed.Video{
 			Id:            m.ID,
 			Author:        userResponse.User,
@@ -303,7 +297,7 @@ func (s *PublishServiceImpl) ListVideo(ctx context.Context, req *publish.ListVid
 			CoverUrl:      coverUrl,
 			FavoriteCount: m.FavoriteCount,
 			CommentCount:  commentCount.CommentCount,
-			IsFavorite:    favoriteResult,
+			IsFavorite:    isFavorite.Result,
 			Title:         m.Title,
 		})
 	}
