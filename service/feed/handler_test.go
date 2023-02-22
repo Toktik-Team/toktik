@@ -185,6 +185,17 @@ func (m MockStorageProvider) GetLink(fileName string) (string, error) {
 type MockFavoriteClient struct {
 }
 
+func (m MockFavoriteClient) UserFavoriteCount(ctx context.Context, Req *favorite.UserFavoriteCountRequest, callOptions ...callopt.Option) (r *favorite.UserFavoriteCountResponse, err error) {
+	return &favorite.UserFavoriteCountResponse{
+		Count: 0,
+	}, nil
+}
+func (m MockFavoriteClient) UserTotalFavoritedCount(ctx context.Context, Req *favorite.UserTotalFavoritedCountRequest, callOptions ...callopt.Option) (r *favorite.UserTotalFavoritedCountResponse, err error) {
+	return &favorite.UserTotalFavoritedCountResponse{
+		Count: 0,
+	}, nil
+}
+
 func (m MockFavoriteClient) FavoriteAction(ctx context.Context, Req *favorite.FavoriteRequest, callOptions ...callopt.Option) (r *favorite.FavoriteResponse, err error) {
 	panic("unimplemented")
 }
@@ -196,5 +207,11 @@ func (m MockFavoriteClient) FavoriteList(ctx context.Context, Req *favorite.Favo
 func (m MockFavoriteClient) IsFavorite(ctx context.Context, Req *favorite.IsFavoriteRequest, callOptions ...callopt.Option) (r *favorite.IsFavoriteResponse, err error) {
 	return &favorite.IsFavoriteResponse{
 		Result: false,
+	}, nil
+}
+
+func (m MockFavoriteClient) FavoriteCount(ctx context.Context, Req *favorite.FavoriteCountRequest, callOptions ...callopt.Option) (r *favorite.FavoriteCountResponse, err error) {
+	return &favorite.FavoriteCountResponse{
+		Count: 0,
 	}, nil
 }

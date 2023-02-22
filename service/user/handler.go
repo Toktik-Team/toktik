@@ -2,8 +2,18 @@ package main
 
 import (
 	"context"
+	"github.com/cloudwego/kitex/client"
+	consul "github.com/kitex-contrib/registry-consul"
 	"github.com/sirupsen/logrus"
+	"log"
 	"toktik/constant/biz"
+	bizConfig "toktik/constant/config"
+	"toktik/kitex_gen/douyin/favorite"
+	favoriteService "toktik/kitex_gen/douyin/favorite/favoriteservice"
+	"toktik/kitex_gen/douyin/publish"
+	publishService "toktik/kitex_gen/douyin/publish/publishservice"
+	"toktik/kitex_gen/douyin/relation"
+	relationService "toktik/kitex_gen/douyin/relation/relationservice"
 	"toktik/kitex_gen/douyin/user"
 	"toktik/logging"
 	"toktik/repo"
@@ -11,6 +21,29 @@ import (
 
 // UserServiceImpl implements the last service interface defined in the IDL.
 type UserServiceImpl struct{}
+
+var FavoriteClient favoriteService.Client
+var RelationClient relationService.Client
+var PublishClient publishService.Client
+
+func init() {
+	r, err := consul.NewConsulResolver(bizConfig.EnvConfig.CONSUL_ADDR)
+	if err != nil {
+		log.Fatal(err)
+	}
+	FavoriteClient, err = favoriteService.NewClient(bizConfig.FavoriteServiceName, client.WithResolver(r))
+	if err != nil {
+		log.Fatal(err)
+	}
+	RelationClient, err = relationService.NewClient(bizConfig.RelationServiceName, client.WithResolver(r))
+	if err != nil {
+		log.Fatal(err)
+	}
+	PublishClient, err = publishService.NewClient(bizConfig.PublishServiceName, client.WithResolver(r))
+	if err != nil {
+		log.Fatal(err)
+	}
+}
 
 // GetUser implements the UserServiceImpl interface.
 func (s *UserServiceImpl) GetUser(ctx context.Context, req *user.UserRequest) (resp *user.UserResponse, err error) {
@@ -30,21 +63,113 @@ func (s *UserServiceImpl) GetUser(ctx context.Context, req *user.UserRequest) (r
 	avatar := u.GetUserAvatar()
 	backgroundImage := u.GetBackgroundImage()
 
+	followCount, err := RelationClient.CountFollowList(ctx, &relation.CountFollowListRequest{
+		UserId: u.ID,
+	})
+	if err != nil {
+		logging.Logger.WithFields(logrus.Fields{
+			"err": err,
+		}).Errorf("get user follow count failed")
+		resp = &user.UserResponse{
+			StatusCode: biz.UnableToQueryFollowList,
+			StatusMsg:  &biz.InternalServerErrorStatusMsg,
+			User:       nil,
+		}
+		return
+	}
+
+	followerCount, err := RelationClient.CountFollowerList(ctx, &relation.CountFollowerListRequest{
+		UserId: req.UserId,
+	})
+	if err != nil {
+		logging.Logger.WithFields(logrus.Fields{
+			"err": err,
+		}).Errorf("get user follower count failed")
+		resp = &user.UserResponse{
+			StatusCode: biz.UnableToQueryFollowerList,
+			StatusMsg:  &biz.InternalServerErrorStatusMsg,
+			User:       nil,
+		}
+		return
+	}
+
+	isFollow, err := RelationClient.IsFollow(ctx, &relation.IsFollowRequest{
+		ActorId: req.ActorId,
+		UserId:  req.UserId,
+	})
+	if err != nil {
+		logging.Logger.WithFields(logrus.Fields{
+			"err": err,
+		}).Errorf("get user is follow failed")
+		resp = &user.UserResponse{
+			StatusCode: biz.UnableToQueryIsFollow,
+			StatusMsg:  &biz.InternalServerErrorStatusMsg,
+			User:       nil,
+		}
+		return
+	}
+
+	totalFavorited, err := FavoriteClient.UserTotalFavoritedCount(ctx, &favorite.UserTotalFavoritedCountRequest{
+		ActorId: req.ActorId,
+		UserId:  req.UserId,
+	})
+	if err != nil {
+		logging.Logger.WithFields(logrus.Fields{
+			"err": err,
+		}).Errorf("get user total favorited failed")
+		resp = &user.UserResponse{
+			StatusCode: biz.UnableToQueryTotalFavorited,
+			StatusMsg:  &biz.InternalServerErrorStatusMsg,
+			User:       nil,
+		}
+		return
+	}
+
+	workCount, err := PublishClient.CountVideo(ctx, &publish.CountVideoRequest{
+		UserId: req.UserId,
+	})
+	if err != nil {
+		logging.Logger.WithFields(logrus.Fields{
+			"err": err,
+		}).Errorf("get user work count failed")
+		resp = &user.UserResponse{
+			StatusCode: biz.UnableToQueryVideo,
+			StatusMsg:  &biz.InternalServerErrorStatusMsg,
+			User:       nil,
+		}
+		return
+	}
+
+	favoriteCount, err := FavoriteClient.UserFavoriteCount(ctx, &favorite.UserFavoriteCountRequest{
+		UserId: req.UserId,
+	})
+	if err != nil {
+		logging.Logger.WithFields(logrus.Fields{
+			"err": err,
+		}).Errorf("get user favorite count failed")
+		resp = &user.UserResponse{
+			StatusCode: biz.UnableToQueryFavorite,
+			StatusMsg:  &biz.InternalServerErrorStatusMsg,
+			User:       nil,
+		}
+		return
+	}
+
 	resp = &user.UserResponse{
 		StatusCode: biz.OkStatusCode,
 		StatusMsg:  &biz.OkStatusMsg,
 		User: &user.User{
 			Id:              u.ID,
-			Name:            u.Name,
-			FollowCount:     u.FollowCount,
-			FollowerCount:   u.FollowerCount,
-			IsFollow:        false, // TODO: 是否关注
+			Name:            u.Username,
+			FollowCount:     followCount.Count,
+			FollowerCount:   followerCount.Count,
+			IsFollow:        isFollow.Result,
 			Avatar:          &avatar,
 			BackgroundImage: &backgroundImage,
-			Signature:       &u.Name,          // TODO:
-			TotalFavorited:  u.TotalFavorited, // TODO：获赞时更新获赞数量
-			WorkCount:       u.WorkCount,
-			FavoriteCount:   u.FavoriteCount, // TODO：点赞时更新点赞数量
+			Signature:       &u.Username, // TODO
+			TotalFavorited:  &totalFavorited.Count,
+			WorkCount:       &workCount.Count,
+			FavoriteCount:   &favoriteCount.Count,
 		},
 	}
 	if u.IsUpdated() {

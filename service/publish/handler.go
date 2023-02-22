@@ -190,16 +190,6 @@ func (s *PublishServiceImpl) CreateVideo(ctx context.Context, req *publish.Creat
 		"entry": publishModel,
 	}).Debug("saved db entry")
 
-	u := gen.Q.User
-	_, err = u.WithContext(ctx).Where(u.ID.Eq(req.UserId)).Update(u.WorkCount, u.WorkCount.Add(1))
-	if err != nil {
-		logger.Debug("failed to update the number of user works")
-		return &publish.CreateVideoResponse{
-			StatusCode: biz.Unable2CreateDBEntry,
-			StatusMsg:  biz.InternalServerErrorStatusMsg,
-		}, err
-	}
-
 	resp = &publish.CreateVideoResponse{StatusCode: 0, StatusMsg: biz.PublishActionSuccess}
 	logger.WithFields(logrus.Fields{
 		"response": resp,
@@ -239,19 +229,35 @@ func (s *PublishServiceImpl) ListVideo(ctx context.Context, req *publish.ListVid
 			ActorId: req.ActorId,
 		})
 		if err != nil || userResponse.StatusCode != biz.OkStatusCode {
-			log.Println(fmt.Errorf("failed to get user info: %w", err))
+			logger.WithFields(logrus.Fields{
+				"err": err,
+			}).Debug("failed to get user info")
 			continue
 		}
 
 		playUrl, err := storage.GetLink(m.FileName)
 		if err != nil {
-			log.Println(fmt.Errorf("failed to fetch play url: %w", err))
+			logger.WithFields(logrus.Fields{
+				"err": err,
+			}).Debug("failed to fetch play url")
 			continue
 		}
 
 		coverUrl, err := storage.GetLink(m.CoverName)
 		if err != nil {
-			log.Println(fmt.Errorf("failed to fetch cover url: %w", err))
+			logger.WithFields(logrus.Fields{
+				"err": err,
+			}).Debug("failed to fetch cover url")
+			continue
+		}
+
+		favoriteCount, err := FavoriteClient.FavoriteCount(ctx, &favorite.FavoriteCountRequest{
+			VideoId: m.ID,
+		})
+		if err != nil {
+			logger.WithFields(logrus.Fields{
+				"err": err,
+			}).Debug("failed to fetch favorite count")
 			continue
 		}
 
@@ -260,7 +266,9 @@ func (s *PublishServiceImpl) ListVideo(ctx context.Context, req *publish.ListVid
 			VideoId: m.ID,
 		})
 		if err != nil {
-			log.Println(fmt.Errorf("failed to fetch comment count: %w", err))
+			logger.WithFields(logrus.Fields{
+				"err": err,
+			}).Debug("failed to fetch comment count")
 			continue
 		}
 
@@ -269,7 +277,9 @@ func (s *PublishServiceImpl) ListVideo(ctx context.Context, req *publish.ListVid
 			VideoId: m.ID,
 		})
 		if err != nil {
-			log.Println(fmt.Errorf("unable to determine if the user liked the video : %w", err))
+			logger.WithFields(logrus.Fields{
+				"err": err,
+			}).Debug("unable to determine if the user liked the video")
 			continue
 		}
 
@@ -278,7 +288,7 @@ func (s *PublishServiceImpl) ListVideo(ctx context.Context, req *publish.ListVid
 			Author:        userResponse.User,
 			PlayUrl:       playUrl,
 			CoverUrl:      coverUrl,
-			FavoriteCount: m.FavoriteCount,
+			FavoriteCount: favoriteCount.Count,
 			CommentCount:  commentCount.CommentCount,
 			IsFavorite:    isFavorite.Result,
 			Title:         m.Title,
@@ -292,5 +302,32 @@ func (s *PublishServiceImpl) ListVideo(ctx context.Context, req *publish.ListVid
 		StatusCode: biz.OkStatusCode,
 		StatusMsg:  &biz.OkStatusMsg,
 		VideoList:  rVideo,
+	}, nil
+}
+
+// CountVideo implements the PublishServiceImpl interface.
+func (s *PublishServiceImpl) CountVideo(ctx context.Context, req *publish.CountVideoRequest) (resp *publish.CountVideoResponse, err error) {
+	methodFields := logrus.Fields{
+		"user_id":  req.UserId,
+		"function": "CountVideo",
+	}
+	logger := logging.Logger.WithFields(methodFields)
+	logger.Debug("Process start")
+
+	count, err := gen.Q.Video.WithContext(ctx).Where(gen.Q.Video.UserId.Eq(req.UserId)).Count()
+	if err != nil {
+		logger.WithFields(logrus.Fields{
+			"err": err,
+		}).Debug("failed to query video")
+		return &publish.CountVideoResponse{
+			StatusCode: biz.UnableToQueryVideo,
+			StatusMsg:  &biz.InternalServerErrorStatusMsg,
+		}, nil
+	}
+
+	return &publish.CountVideoResponse{
+		StatusCode: biz.OkStatusCode,
+		StatusMsg:  &biz.OkStatusMsg,
+		Count:      uint32(count),
 	}, nil
 }

@@ -54,28 +54,6 @@ func like(ctx context.Context, actorId uint32, videoId uint32, authorId uint32) 
 		if err != nil {
 			return err
 		}
-		// 增加用户总点赞数
-		_, err = tx.User.WithContext(ctx).
-			Where(tx.User.ID.Eq(actorId)).
-			Update(tx.User.FavoriteCount, tx.User.FavoriteCount.Add(1))
-		if err != nil {
-			return err
-		}
-		// 增加作者总获赞数
-		_, err = tx.User.WithContext(ctx).
-			Where(tx.User.ID.Eq(authorId)).
-			UpdateSimple(tx.User.TotalFavorited.Add(1))
-		if err != nil {
-			return err
-		}
-		// 增加视频总获赞数
-		_, err = tx.Video.WithContext(ctx).
-			Where(tx.Video.ID.Eq(videoId)).
-			Update(tx.Video.FavoriteCount, tx.Video.FavoriteCount.Add(1))
-		if err != nil {
-			return err
-		}
-
 		return nil
 	})
 	if err != nil {
@@ -106,27 +84,6 @@ func cancelLike(ctx context.Context, actorId uint32, videoId uint32, authorId ui
 			UserId:  actorId,
 			VideoId: videoId,
 		})
-		if err != nil {
-			return err
-		}
-		// 减少用户总点赞数
-		_, err = tx.User.WithContext(ctx).
-			Where(tx.User.ID.Eq(actorId)).
-			Update(tx.User.FavoriteCount, tx.User.FavoriteCount.Sub(1))
-		if err != nil {
-			return err
-		}
-		// 减少作者总获赞数
-		_, err = tx.User.WithContext(ctx).
-			Where(tx.User.ID.Eq(authorId)).
-			UpdateSimple(tx.User.TotalFavorited.Sub(1))
-		if err != nil {
-			return err
-		}
-		// 减少视频总获赞数
-		_, err = tx.Video.WithContext(ctx).
-			Where(tx.Video.ID.Eq(videoId)).
-			Update(tx.Video.FavoriteCount, tx.Video.FavoriteCount.Sub(1))
 		if err != nil {
 			return err
 		}
@@ -255,11 +212,23 @@ func (s *FavoriteServiceImpl) FavoriteList(ctx context.Context, req *favorite.Fa
 			continue
 		}
 
+		favoriteCount, err := s.FavoriteCount(ctx, &favorite.FavoriteCountRequest{
+			VideoId: video.ID,
+		})
+		if err != nil {
+			logger.
+				WithFields(field).
+				WithFields(logrus.Fields{
+					"function called": "FavoriteClient.FavoriteCount",
+					"parameters":      fmt.Sprintf("VideoId: %d", video.ID),
+				}).Errorf("Failed to get the number of likes: %v", err)
+			continue
+		}
+
 		commentCount, err := CommentClient.CountComment(ctx, &comment.CountCommentRequest{
 			ActorId: req.UserId,
 			VideoId: video.ID,
 		})
-
 		if err != nil {
 			logger.
 				WithFields(field).
@@ -275,7 +244,7 @@ func (s *FavoriteServiceImpl) FavoriteList(ctx context.Context, req *favorite.Fa
 			Author:        userResponse.User,
 			PlayUrl:       playUrl,
 			CoverUrl:      coverUrl,
-			FavoriteCount: video.FavoriteCount,
+			FavoriteCount: favoriteCount.Count,
 			CommentCount:  commentCount.CommentCount,
 			IsFavorite:    true,
 			Title:         video.Title,
@@ -304,4 +273,95 @@ func (s *FavoriteServiceImpl) IsFavorite(ctx context.Context, req *favorite.IsFa
 	}
 
 	return &favorite.IsFavoriteResponse{Result: true}, nil
+}
+
+// FavoriteCount implements the FavoriteServiceImpl interface.
+func (s *FavoriteServiceImpl) FavoriteCount(ctx context.Context, req *favorite.FavoriteCountRequest) (resp *favorite.FavoriteCountResponse, err error) {
+	field := logrus.Fields{
+		"method": "FavoriteCount",
+	}
+	logger.WithFields(field).Info("process start")
+
+	count, err := gen.Q.Favorite.WithContext(ctx).
+		Where(gen.Q.Favorite.VideoId.Eq(req.VideoId)).
+		Count()
+	if err != nil {
+		logger.WithFields(field).
+			Errorf("Failed to get the number of favorites: %v", err)
+		return &favorite.FavoriteCountResponse{
+			StatusCode: biz.SQLQueryErrorStatusCode,
+			StatusMsg:  &biz.InternalServerErrorStatusMsg,
+		}, nil
+	}
+
+	return &favorite.FavoriteCountResponse{
+		StatusCode: biz.OkStatusCode,
+		StatusMsg:  &biz.OkStatusMsg,
+		Count:      uint32(count),
+	}, nil
+}
+
+// UserFavoriteCount implements the FavoriteServiceImpl interface.
+func (s *FavoriteServiceImpl) UserFavoriteCount(ctx context.Context, req *favorite.UserFavoriteCountRequest) (resp *favorite.UserFavoriteCountResponse, err error) {
+	field := logrus.Fields{
+		"method": "UserFavoriteCount",
+	}
+	logger.WithFields(field).Info("process start")
+
+	count, err := gen.Q.Favorite.WithContext(ctx).
+		Where(gen.Q.Favorite.UserId.Eq(req.UserId)).
+		Count()
+	if err != nil {
+		logger.WithFields(field).
+			Errorf("Failed to get the number of favorites: %v", err)
+		return &favorite.UserFavoriteCountResponse{
+			StatusCode: biz.SQLQueryErrorStatusCode,
+			StatusMsg:  &biz.InternalServerErrorStatusMsg,
+		}, nil
+	}
+
+	return &favorite.UserFavoriteCountResponse{
+		StatusCode: biz.OkStatusCode,
+		StatusMsg:  &biz.OkStatusMsg,
+		Count:      uint32(count),
+	}, nil
+}
+
+// UserTotalFavoritedCount implements the FavoriteServiceImpl interface.
+func (s *FavoriteServiceImpl) UserTotalFavoritedCount(ctx context.Context, req *favorite.UserTotalFavoritedCountRequest) (resp *favorite.UserTotalFavoritedCountResponse, err error) {
+	field := logrus.Fields{
+		"method": "UserTotalFavoritedCount",
+	}
+	logger.WithFields(field).Info("process start")
+
+	var videoIds []uint32
+	err = gen.Q.Video.WithContext(ctx).
+		Where(gen.Q.Video.UserId.Eq(req.UserId)).
+		Pluck(gen.Q.Video.ID, &videoIds)
+	if err != nil {
+		logger.WithFields(field).
+			Errorf("Failed to get the number of favorites: %v", err)
+		return &favorite.UserTotalFavoritedCountResponse{
+			StatusCode: biz.SQLQueryErrorStatusCode,
+			StatusMsg:  &biz.InternalServerErrorStatusMsg,
+		}, nil
+	}
+
+	count, err := gen.Q.Favorite.WithContext(ctx).
+		Where(gen.Q.Favorite.VideoId.In(videoIds...)).
+		Count()
+	if err != nil {
+		logger.WithFields(field).
+			Errorf("Failed to get the number of favorites: %v", err)
+		return &favorite.UserTotalFavoritedCountResponse{
+			StatusCode: biz.SQLQueryErrorStatusCode,
+			StatusMsg:  &biz.InternalServerErrorStatusMsg,
+		}, nil
+	}
+
+	return &favorite.UserTotalFavoritedCountResponse{
+		StatusCode: biz.OkStatusCode,
+		StatusMsg:  &biz.OkStatusMsg,
+		Count:      uint32(count),
+	}, nil
 }

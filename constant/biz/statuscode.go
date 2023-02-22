@@ -12,7 +12,7 @@ const (
 
 // Internal Server Error
 const (
-	RedisError = 50000 + iota
+	RedisError = 500000 + iota
 	ProtoMarshalError
 	ProtoUnmarshalError
 	UnableToCreateComment
@@ -29,10 +29,13 @@ const (
 	RequestIsNil
 	UnableToQueryFollowList
 	UnableToQueryFollowerList
+	UnableToQueryIsFollow
 	UnableToCreateRelation
 	UnableToDeleteRelation
 	UnableToLike
 	UnableToCancelLike
+	UnableToQueryFavorite
+	UnableToQueryTotalFavorited
 )
 
 // Bad Request

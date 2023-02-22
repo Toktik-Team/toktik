@@ -24,6 +24,7 @@ func NewServiceInfo() *kitex.ServiceInfo {
 	methods := map[string]kitex.MethodInfo{
 		"CreateVideo": kitex.NewMethodInfo(createVideoHandler, newCreateVideoArgs, newCreateVideoResult, false),
 		"ListVideo":   kitex.NewMethodInfo(listVideoHandler, newListVideoArgs, newListVideoResult, false),
+		"CountVideo":  kitex.NewMethodInfo(countVideoHandler, newCountVideoArgs, newCountVideoResult, false),
 	}
 	extra := map[string]interface{}{
 		"PackageName": "douyin.publish",
@@ -329,6 +330,151 @@ func (p *ListVideoResult) IsSetSuccess() bool {
 	return p.Success != nil
 }
 
+func countVideoHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
+	switch s := arg.(type) {
+	case *streaming.Args:
+		st := s.Stream
+		req := new(publish.CountVideoRequest)
+		if err := st.RecvMsg(req); err != nil {
+			return err
+		}
+		resp, err := handler.(publish.PublishService).CountVideo(ctx, req)
+		if err != nil {
+			return err
+		}
+		if err := st.SendMsg(resp); err != nil {
+			return err
+		}
+	case *CountVideoArgs:
+		success, err := handler.(publish.PublishService).CountVideo(ctx, s.Req)
+		if err != nil {
+			return err
+		}
+		realResult := result.(*CountVideoResult)
+		realResult.Success = success
+	}
+	return nil
+}
+func newCountVideoArgs() interface{} {
+	return &CountVideoArgs{}
+}
+
+func newCountVideoResult() interface{} {
+	return &CountVideoResult{}
+}
+
+type CountVideoArgs struct {
+	Req *publish.CountVideoRequest
+}
+
+func (p *CountVideoArgs) FastRead(buf []byte, _type int8, number int32) (n int, err error) {
+	if !p.IsSetReq() {
+		p.Req = new(publish.CountVideoRequest)
+	}
+	return p.Req.FastRead(buf, _type, number)
+}
+
+func (p *CountVideoArgs) FastWrite(buf []byte) (n int) {
+	if !p.IsSetReq() {
+		return 0
+	}
+	return p.Req.FastWrite(buf)
+}
+
+func (p *CountVideoArgs) Size() (n int) {
+	if !p.IsSetReq() {
+		return 0
+	}
+	return p.Req.Size()
+}
+
+func (p *CountVideoArgs) Marshal(out []byte) ([]byte, error) {
+	if !p.IsSetReq() {
+		return out, fmt.Errorf("No req in CountVideoArgs")
+	}
+	return proto.Marshal(p.Req)
+}
+
+func (p *CountVideoArgs) Unmarshal(in []byte) error {
+	msg := new(publish.CountVideoRequest)
+	if err := proto.Unmarshal(in, msg); err != nil {
+		return err
+	}
+	p.Req = msg
+	return nil
+}
+
+var CountVideoArgs_Req_DEFAULT *publish.CountVideoRequest
+
+func (p *CountVideoArgs) GetReq() *publish.CountVideoRequest {
+	if !p.IsSetReq() {
+		return CountVideoArgs_Req_DEFAULT
+	}
+	return p.Req
+}
+
+func (p *CountVideoArgs) IsSetReq() bool {
+	return p.Req != nil
+}
+
+type CountVideoResult struct {
+	Success *publish.CountVideoResponse
+}
+
+var CountVideoResult_Success_DEFAULT *publish.CountVideoResponse
+
+func (p *CountVideoResult) FastRead(buf []byte, _type int8, number int32) (n int, err error) {
+	if !p.IsSetSuccess() {
+		p.Success = new(publish.CountVideoResponse)
+	}
+	return p.Success.FastRead(buf, _type, number)
+}
+
+func (p *CountVideoResult) FastWrite(buf []byte) (n int) {
+	if !p.IsSetSuccess() {
+		return 0
+	}
+	return p.Success.FastWrite(buf)
+}
+
+func (p *CountVideoResult) Size() (n int) {
+	if !p.IsSetSuccess() {
+		return 0
+	}
+	return p.Success.Size()
+}
+
+func (p *CountVideoResult) Marshal(out []byte) ([]byte, error) {
+	if !p.IsSetSuccess() {
+		return out, fmt.Errorf("No req in CountVideoResult")
+	}
+	return proto.Marshal(p.Success)
+}
+
+func (p *CountVideoResult) Unmarshal(in []byte) error {
+	msg := new(publish.CountVideoResponse)
+	if err := proto.Unmarshal(in, msg); err != nil {
+		return err
+	}
+	p.Success = msg
+	return nil
+}
+
+func (p *CountVideoResult) GetSuccess() *publish.CountVideoResponse {
+	if !p.IsSetSuccess() {
+		return CountVideoResult_Success_DEFAULT
+	}
+	return p.Success
+}
+
+func (p *CountVideoResult) SetSuccess(x interface{}) {
+	p.Success = x.(*publish.CountVideoResponse)
+}
+
+func (p *CountVideoResult) IsSetSuccess() bool {
+	return p.Success != nil
+}
+
 type kClient struct {
 	c client.Client
 }
@@ -354,6 +500,16 @@ func (p *kClient) ListVideo(ctx context.Context, Req *publish.ListVideoRequest) 
 	_args.Req = Req
 	var _result ListVideoResult
 	if err = p.c.Call(ctx, "ListVideo", &_args, &_result); err != nil {
+		return
+	}
+	return _result.GetSuccess(), nil
+}
+
+func (p *kClient) CountVideo(ctx context.Context, Req *publish.CountVideoRequest) (r *publish.CountVideoResponse, err error) {
+	var _args CountVideoArgs
+	_args.Req = Req
+	var _result CountVideoResult
+	if err = p.c.Call(ctx, "CountVideo", &_args, &_result); err != nil {
 		return
 	}
 	return _result.GetSuccess(), nil

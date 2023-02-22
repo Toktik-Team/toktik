@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"toktik/constant/biz"
 	"toktik/constant/config"
@@ -85,7 +84,9 @@ func (s *RelationServiceImpl) GetFollowList(ctx context.Context, req *relation.F
 			ActorId: req.UserId,
 		})
 		if err != nil || userResponse.StatusCode != biz.OkStatusCode {
-			log.Println(fmt.Errorf("failed to get user info: %w", err))
+			logger.WithFields(logrus.Fields{
+				"err": err,
+			}).Debug("failed to get user info")
 			continue
 		}
 		userList = append(userList, userResponse.User)
@@ -332,4 +333,95 @@ func (s *RelationServiceImpl) Unfollow(ctx context.Context, req *relation.Relati
 		StatusMsg:  biz.OkStatusMsg,
 	}
 	return
+}
+
+// CountFollowList implements the RelationServiceImpl interface.
+func (s *RelationServiceImpl) CountFollowList(ctx context.Context, req *relation.CountFollowListRequest) (resp *relation.CountFollowListResponse, err error) {
+	methodFields := logrus.Fields{
+		"user_id":  req.UserId,
+		"function": "CountFollowList",
+	}
+	logger := logging.Logger.WithFields(methodFields)
+	logger.Debug("Process start")
+
+	r := repo.Q.Relation
+	count, err := r.WithContext(ctx).Where(r.UserId.Eq(req.UserId)).Count()
+	if err != nil {
+		logger.WithFields(map[string]interface{}{
+			"user_id": req.UserId,
+			"err":     err,
+		}).Debug("failed to count follow list")
+
+		resp = &relation.CountFollowListResponse{
+			StatusCode: biz.UnableToQueryFollowList,
+			StatusMsg:  biz.InternalServerErrorStatusMsg,
+		}
+		return
+	}
+
+	return &relation.CountFollowListResponse{
+		StatusCode: biz.OkStatusCode,
+		StatusMsg:  biz.OkStatusMsg,
+		Count:      uint32(count),
+	}, nil
+}
+
+// CountFollowerList implements the RelationServiceImpl interface.
+func (s *RelationServiceImpl) CountFollowerList(ctx context.Context, req *relation.CountFollowerListRequest) (resp *relation.CountFollowerListResponse, err error) {
+	methodFields := logrus.Fields{
+		"user_id":  req.UserId,
+		"function": "CountFollowerList",
+	}
+	logger := logging.Logger.WithFields(methodFields)
+	logger.Debug("Process start")
+
+	r := repo.Q.Relation
+	count, err := r.WithContext(ctx).Where(r.TargetId.Eq(req.UserId)).Count()
+	if err != nil {
+		logger.WithFields(map[string]interface{}{
+			"user_id": req.UserId,
+			"err":     err,
+		}).Debug("failed to count follower list")
+
+		resp = &relation.CountFollowerListResponse{
+			StatusCode: biz.UnableToQueryFollowerList,
+			StatusMsg:  biz.InternalServerErrorStatusMsg,
+		}
+		return
+	}
+
+	return &relation.CountFollowerListResponse{
+		StatusCode: biz.OkStatusCode,
+		StatusMsg:  biz.OkStatusMsg,
+		Count:      uint32(count),
+	}, nil
+}
+
+// IsFollow implements the RelationServiceImpl interface.
+func (s *RelationServiceImpl) IsFollow(ctx context.Context, req *relation.IsFollowRequest) (resp *relation.IsFollowResponse, err error) {
+	methodFields := logrus.Fields{
+		"user_id":  req.UserId,
+		"function": "IsFollow",
+	}
+	logger := logging.Logger.WithFields(methodFields)
+	logger.Debug("Process start")
+
+	r := repo.Q.Relation
+	count, err := r.WithContext(ctx).Where(r.UserId.Eq(req.ActorId), r.TargetId.Eq(req.UserId)).Count()
+	if err != nil {
+		logger.WithFields(map[string]interface{}{
+			"user_id": req.UserId,
+			"err":     err,
+		}).Debug("failed to count follower list")
+
+		resp = &relation.IsFollowResponse{
+			Result: false,
+		}
+		return
+	}
+
+	return &relation.IsFollowResponse{
+		Result: count > 0,
+	}, nil
+
 }

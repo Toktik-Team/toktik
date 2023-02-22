@@ -2,9 +2,9 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"github.com/cloudwego/kitex/client"
 	consul "github.com/kitex-contrib/registry-consul"
+	"github.com/sirupsen/logrus"
 	"log"
 	"strconv"
 	"time"
@@ -17,6 +17,7 @@ import (
 	"toktik/kitex_gen/douyin/feed"
 	"toktik/kitex_gen/douyin/user"
 	"toktik/kitex_gen/douyin/user/userservice"
+	"toktik/logging"
 	gen "toktik/repo"
 	"toktik/repo/model"
 	"toktik/storage"
@@ -50,6 +51,14 @@ type FeedServiceImpl struct{}
 
 // ListVideos implements the FeedServiceImpl interface.
 func (s *FeedServiceImpl) ListVideos(ctx context.Context, req *feed.ListFeedRequest) (resp *feed.ListFeedResponse, err error) {
+	methodFields := logrus.Fields{
+		"latest_time": req.LatestTime,
+		"actor_id":    req.ActorId,
+		"function":    "ListVideos",
+	}
+	logger := logging.Logger.WithFields(methodFields)
+	logger.Debug("Process start")
+
 	now := time.Now().UnixMilli()
 	latestTime, err := strconv.ParseInt(*req.LatestTime, 10, 64)
 	if err != nil {
@@ -101,28 +110,45 @@ func (s *FeedServiceImpl) ListVideos(ctx context.Context, req *feed.ListFeedRequ
 			ActorId: actorId,
 		})
 		if err != nil || userResponse.StatusCode != biz.OkStatusCode {
-			log.Println(fmt.Errorf("failed to get user info: %w", err))
+			logger.WithFields(logrus.Fields{
+				"err": err,
+			}).Debug("failed to get user info")
 			continue
 		}
 
 		playUrl, err := storage.GetLink(m.FileName)
 		if err != nil {
-			log.Println(fmt.Errorf("failed to fetch play url: %w", err))
+			logger.WithFields(logrus.Fields{
+				"err": err,
+			}).Debug("failed to fetch play url")
 			continue
 		}
 
 		coverUrl, err := storage.GetLink(m.CoverName)
 		if err != nil {
-			log.Println(fmt.Errorf("failed to fetch cover url: %w", err))
+			logger.WithFields(logrus.Fields{
+				"err": err,
+			}).Debug("failed to fetch cover url")
 			continue
 		}
 
+		favoriteCount, err := FavoriteClient.FavoriteCount(ctx, &favorite.FavoriteCountRequest{
+			VideoId: m.ID,
+		})
+		if err != nil {
+			logger.WithFields(logrus.Fields{
+				"err": err,
+			}).Debug("failed to fetch favorite count")
+			continue
+		}
 		commentCount, err := CommentClient.CountComment(ctx, &comment.CountCommentRequest{
 			ActorId: actorId,
 			VideoId: m.ID,
 		})
 		if err != nil {
-			log.Println(fmt.Errorf("failed to fetch comment count: %w", err))
+			logger.WithFields(logrus.Fields{
+				"err": err,
+			}).Debug("failed to fetch comment count")
 			continue
 		}
 		isFavorite, err := FavoriteClient.IsFavorite(ctx, &favorite.IsFavoriteRequest{
@@ -130,7 +156,9 @@ func (s *FeedServiceImpl) ListVideos(ctx context.Context, req *feed.ListFeedRequ
 			VideoId: m.ID,
 		})
 		if err != nil {
-			log.Println(fmt.Errorf("unable to determine if the user liked the video : %w", err))
+			logger.WithFields(logrus.Fields{
+				"err": err,
+			}).Debug("unable to determine if the user liked the video")
 			continue
 		}
 
@@ -139,7 +167,7 @@ func (s *FeedServiceImpl) ListVideos(ctx context.Context, req *feed.ListFeedRequ
 			Author:        userResponse.User,
 			PlayUrl:       playUrl,
 			CoverUrl:      coverUrl,
-			FavoriteCount: m.FavoriteCount,
+			FavoriteCount: favoriteCount.Count,
 			CommentCount:  commentCount.CommentCount,
 			IsFavorite:    isFavorite.Result,
 			Title:         m.Title,
