@@ -70,9 +70,9 @@ func TestPublishServiceImpl_CreateVideo(t *testing.T) {
 		ctx context.Context
 		req *publish.CreateVideoRequest
 	}{ctx: context.Background(), req: &publish.CreateVideoRequest{
-		UserId: 1,
-		Data:   testVideo,
-		Title:  "Video for test",
+		ActorId: 1,
+		Data:    testVideo,
+		Title:   "Video for test",
 	}}
 
 	var successResp = &publish.CreateVideoResponse{
@@ -84,9 +84,9 @@ func TestPublishServiceImpl_CreateVideo(t *testing.T) {
 		ctx context.Context
 		req *publish.CreateVideoRequest
 	}{ctx: context.Background(), req: &publish.CreateVideoRequest{
-		UserId: 1,
-		Data:   []byte{1, 2},
-		Title:  "Invalid content",
+		ActorId: 1,
+		Data:    []byte{1, 2},
+		Title:   "Invalid content",
 	}}
 
 	var invalidContentResp = &publish.CreateVideoResponse{

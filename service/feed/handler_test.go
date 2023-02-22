@@ -185,13 +185,13 @@ func (m MockStorageProvider) GetLink(fileName string) (string, error) {
 type MockFavoriteClient struct {
 }
 
-func (m MockFavoriteClient) UserFavoriteCount(context.Context, *favorite.UserFavoriteCountRequest, ...callopt.Option) (r *favorite.UserFavoriteCountResponse, err error) {
-	return &favorite.UserFavoriteCountResponse{
+func (m MockFavoriteClient) CountUserFavorite(context.Context, *favorite.CountUserFavoriteRequest, ...callopt.Option) (r *favorite.CountUserFavoriteResponse, err error) {
+	return &favorite.CountUserFavoriteResponse{
 		Count: 0,
 	}, nil
 }
-func (m MockFavoriteClient) UserTotalFavoritedCount(context.Context, *favorite.UserTotalFavoritedCountRequest, ...callopt.Option) (r *favorite.UserTotalFavoritedCountResponse, err error) {
-	return &favorite.UserTotalFavoritedCountResponse{
+func (m MockFavoriteClient) CountUserTotalFavorited(context.Context, *favorite.CountUserTotalFavoritedRequest, ...callopt.Option) (r *favorite.CountUserTotalFavoritedResponse, err error) {
+	return &favorite.CountUserTotalFavoritedResponse{
 		Count: 0,
 	}, nil
 }
@@ -210,8 +210,8 @@ func (m MockFavoriteClient) IsFavorite(context.Context, *favorite.IsFavoriteRequ
 	}, nil
 }
 
-func (m MockFavoriteClient) FavoriteCount(context.Context, *favorite.FavoriteCountRequest, ...callopt.Option) (r *favorite.FavoriteCountResponse, err error) {
-	return &favorite.FavoriteCountResponse{
+func (m MockFavoriteClient) CountFavorite(context.Context, *favorite.CountFavoriteRequest, ...callopt.Option) (r *favorite.CountFavoriteResponse, err error) {
+	return &favorite.CountFavoriteResponse{
 		Count: 0,
 	}, nil
 }
