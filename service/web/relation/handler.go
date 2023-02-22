@@ -104,7 +104,7 @@ func RelationAction(ctx context.Context, c *app.RequestContext) {
 	)
 }
 
-// FollowList [POST] /relation/follow/list/
+// GetFollowList FollowList [POST] /relation/follow/list/
 func GetFollowList(ctx context.Context, c *app.RequestContext) {
 
 	methodFields := logrus.Fields{
@@ -134,7 +134,7 @@ func GetFollowList(ctx context.Context, c *app.RequestContext) {
 	)
 }
 
-// FollowList [POST] /relation/follower/list/
+// GetFollowerList FollowList [POST] /relation/follower/list/
 func GetFollowerList(ctx context.Context, c *app.RequestContext) {
 
 	methodFields := logrus.Fields{

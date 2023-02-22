@@ -153,7 +153,7 @@ func envInit() {
 						}).Warningf("Failed to parse env value, ignored")
 						continue
 					}
-					reflect.ValueOf(&EnvConfig).Elem().Field(i).SetInt(int64(envValueInteger))
+					reflect.ValueOf(&EnvConfig).Elem().Field(i).SetInt(envValueInteger)
 				}
 				continue
 			}
