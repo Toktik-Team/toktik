@@ -55,7 +55,8 @@ message UserFavoriteCountResponse {
 }
 
 message UserTotalFavoritedCountRequest {
-  uint32 user_id = 1; // 用户id
+  uint32 actor_id = 1;
+  uint32 user_id = 2;
 }
 
 message UserTotalFavoritedCountResponse {

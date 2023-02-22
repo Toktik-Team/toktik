@@ -90,12 +90,8 @@ func (s *AuthServiceImpl) Register(ctx context.Context, req *auth.RegisterReques
 	}
 
 	newUser := commonModel.User{
-		Username:      req.Username,
-		Password:      &hashedPwd,
-		FollowCount:   0,
-		FollowerCount: 0,
-		Name:          req.Username,
-		Role:          "0",
+		Username: req.Username,
+		Password: &hashedPwd,
 	}
 	err = user.WithContext(ctx).Save(
 		&newUser)
@@ -111,7 +107,6 @@ func (s *AuthServiceImpl) Register(ctx context.Context, req *auth.RegisterReques
 		Token:    token,
 		Username: newUser.Username,
 		UserID:   newUser.ID,
-		Role:     newUser.Role,
 	})
 
 	if err != nil {
@@ -172,7 +167,6 @@ func (s *AuthServiceImpl) Login(ctx context.Context, req *auth.LoginRequest) (re
 		Token:    token,
 		Username: dbUser[0].Username,
 		UserID:   dbUser[0].ID,
-		Role:     dbUser[0].Role,
 	})
 
 	if err != nil {

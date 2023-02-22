@@ -117,6 +117,13 @@ func (s *FeedServiceImpl) ListVideos(ctx context.Context, req *feed.ListFeedRequ
 			continue
 		}
 
+		favoriteCount, err := FavoriteClient.FavoriteCount(ctx, &favorite.FavoriteCountRequest{
+			VideoId: m.ID,
+		})
+		if err != nil {
+			log.Println(fmt.Errorf("failed to fetch favorite count: %w", err))
+			continue
+		}
 		commentCount, err := CommentClient.CountComment(ctx, &comment.CountCommentRequest{
 			ActorId: actorId,
 			VideoId: m.ID,
@@ -145,7 +152,7 @@ func (s *FeedServiceImpl) ListVideos(ctx context.Context, req *feed.ListFeedRequ
 			Author:        userResponse.User,
 			PlayUrl:       playUrl,
 			CoverUrl:      coverUrl,
-			FavoriteCount: m.FavoriteCount,
+			FavoriteCount: favoriteCount.Count,
 			CommentCount:  commentCount.CommentCount,
 			IsFavorite:    favoriteResult,
 			Title:         m.Title,

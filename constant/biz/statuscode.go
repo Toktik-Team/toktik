@@ -29,10 +29,13 @@ const (
 	RequestIsNil
 	UnableToQueryFollowList
 	UnableToQueryFollowerList
+	UnableToQueryIsFollow
 	UnableToCreateRelation
 	UnableToDeleteRelation
 	UnableToLike
 	UnableToCancelLike
+	UnableToQueryFavorite
+	UnableToQueryTotalFavorited
 )
 
 // Bad Request

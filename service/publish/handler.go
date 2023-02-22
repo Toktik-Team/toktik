@@ -204,16 +204,6 @@ func (s *PublishServiceImpl) CreateVideo(ctx context.Context, req *publish.Creat
 		"entry": publishModel,
 	}).Debug("saved db entry")
 
-	u := gen.Q.User
-	_, err = u.WithContext(ctx).Where(u.ID.Eq(req.UserId)).Update(u.WorkCount, u.WorkCount.Add(1))
-	if err != nil {
-		logger.Debug("failed to update the number of user works")
-		return &publish.CreateVideoResponse{
-			StatusCode: biz.Unable2CreateDBEntry,
-			StatusMsg:  biz.InternalServerErrorStatusMsg,
-		}, err
-	}
-
 	resp = &publish.CreateVideoResponse{StatusCode: 0, StatusMsg: biz.PublishActionSuccess}
 	logger.WithFields(logrus.Fields{
 		"time":     time.Now(),
@@ -272,6 +262,14 @@ func (s *PublishServiceImpl) ListVideo(ctx context.Context, req *publish.ListVid
 			continue
 		}
 
+		favoriteCount, err := FavoriteClient.FavoriteCount(ctx, &favorite.FavoriteCountRequest{
+			VideoId: m.ID,
+		})
+		if err != nil {
+			log.Println(fmt.Errorf("failed to fetch favorite count: %w", err))
+			continue
+		}
+
 		commentCount, err := CommentClient.CountComment(ctx, &comment.CountCommentRequest{
 			ActorId: req.ActorId,
 			VideoId: m.ID,
@@ -301,7 +299,7 @@ func (s *PublishServiceImpl) ListVideo(ctx context.Context, req *publish.ListVid
 			Author:        userResponse.User,
 			PlayUrl:       playUrl,
 			CoverUrl:      coverUrl,
-			FavoriteCount: m.FavoriteCount,
+			FavoriteCount: favoriteCount.Count,
 			CommentCount:  commentCount.CommentCount,
 			IsFavorite:    favoriteResult,
 			Title:         m.Title,
@@ -321,6 +319,29 @@ func (s *PublishServiceImpl) ListVideo(ctx context.Context, req *publish.ListVid
 
 // CountVideo implements the PublishServiceImpl interface.
 func (s *PublishServiceImpl) CountVideo(ctx context.Context, req *publish.CountVideoRequest) (resp *publish.CountVideoResponse, err error) {
-	// TODO: Your code here...
-	return
+	methodFields := logrus.Fields{
+		"user_id":  req.UserId,
+		"time":     time.Now(),
+		"function": "CountVideo",
+	}
+	logger := logging.Logger.WithFields(methodFields)
+	logger.Debug("Process start")
+
+	count, err := gen.Q.Video.WithContext(ctx).Where(gen.Q.Video.UserId.Eq(req.UserId)).Count()
+	if err != nil {
+		logger.WithFields(logrus.Fields{
+			"time": time.Now(),
+			"err":  err,
+		}).Debug("failed to query video")
+		return &publish.CountVideoResponse{
+			StatusCode: biz.UnableToQueryVideo,
+			StatusMsg:  &biz.InternalServerErrorStatusMsg,
+		}, nil
+	}
+
+	return &publish.CountVideoResponse{
+		StatusCode: biz.OkStatusCode,
+		StatusMsg:  &biz.OkStatusMsg,
+		Count:      uint32(count),
+	}, nil
 }

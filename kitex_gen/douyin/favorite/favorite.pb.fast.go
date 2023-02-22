@@ -379,6 +379,11 @@ func (x *UserTotalFavoritedCountRequest) FastRead(buf []byte, _type int8, number
 		if err != nil {
 			goto ReadFieldError
 		}
+	case 2:
+		offset, err = x.fastReadField2(buf, _type)
+		if err != nil {
+			goto ReadFieldError
+		}
 	default:
 		offset, err = fastpb.Skip(buf, _type, number)
 		if err != nil {
@@ -393,6 +398,11 @@ ReadFieldError:
 }
 
 func (x *UserTotalFavoritedCountRequest) fastReadField1(buf []byte, _type int8) (offset int, err error) {
+	x.ActorId, offset, err = fastpb.ReadUint32(buf, _type)
+	return offset, err
+}
+
+func (x *UserTotalFavoritedCountRequest) fastReadField2(buf []byte, _type int8) (offset int, err error) {
 	x.UserId, offset, err = fastpb.ReadUint32(buf, _type)
 	return offset, err
 }
@@ -700,14 +710,23 @@ func (x *UserTotalFavoritedCountRequest) FastWrite(buf []byte) (offset int) {
 		return offset
 	}
 	offset += x.fastWriteField1(buf[offset:])
+	offset += x.fastWriteField2(buf[offset:])
 	return offset
 }
 
 func (x *UserTotalFavoritedCountRequest) fastWriteField1(buf []byte) (offset int) {
+	if x.ActorId == 0 {
+		return offset
+	}
+	offset += fastpb.WriteUint32(buf[offset:], 1, x.ActorId)
+	return offset
+}
+
+func (x *UserTotalFavoritedCountRequest) fastWriteField2(buf []byte) (offset int) {
 	if x.UserId == 0 {
 		return offset
 	}
-	offset += fastpb.WriteUint32(buf[offset:], 1, x.UserId)
+	offset += fastpb.WriteUint32(buf[offset:], 2, x.UserId)
 	return offset
 }
 
@@ -1002,14 +1021,23 @@ func (x *UserTotalFavoritedCountRequest) Size() (n int) {
 		return n
 	}
 	n += x.sizeField1()
+	n += x.sizeField2()
 	return n
 }
 
 func (x *UserTotalFavoritedCountRequest) sizeField1() (n int) {
+	if x.ActorId == 0 {
+		return n
+	}
+	n += fastpb.SizeUint32(1, x.ActorId)
+	return n
+}
+
+func (x *UserTotalFavoritedCountRequest) sizeField2() (n int) {
 	if x.UserId == 0 {
 		return n
 	}
-	n += fastpb.SizeUint32(1, x.UserId)
+	n += fastpb.SizeUint32(2, x.UserId)
 	return n
 }
 
@@ -1098,7 +1126,8 @@ var fieldIDToName_UserFavoriteCountResponse = map[int32]string{
 }
 
 var fieldIDToName_UserTotalFavoritedCountRequest = map[int32]string{
-	1: "UserId",
+	1: "ActorId",
+	2: "UserId",
 }
 
 var fieldIDToName_UserTotalFavoritedCountResponse = map[int32]string{
