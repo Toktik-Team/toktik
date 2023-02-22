@@ -5,6 +5,8 @@ import (
 	"github.com/cloudwego/hertz/pkg/app"
 	httpStatus "github.com/cloudwego/hertz/pkg/protocol/consts"
 	"github.com/cloudwego/kitex/client"
+	"github.com/kitex-contrib/obs-opentelemetry/provider"
+	"github.com/kitex-contrib/obs-opentelemetry/tracing"
 	consul "github.com/kitex-contrib/registry-consul"
 	"github.com/sirupsen/logrus"
 	"log"
@@ -24,7 +26,16 @@ func init() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	Client, err = wechatservice.NewClient(bizConfig.WechatServiceName, client.WithResolver(r))
+	provider.NewOpenTelemetryProvider(
+		provider.WithServiceName(bizConfig.WechatServiceName),
+		provider.WithExportEndpoint(bizConfig.EnvConfig.EXPORT_ENDPOINT),
+		provider.WithInsecure(),
+	)
+	Client, err = wechatservice.NewClient(
+		bizConfig.WechatServiceName,
+		client.WithResolver(r),
+		client.WithSuite(tracing.NewClientSuite()),
+	)
 	if err != nil {
 		log.Fatal(err)
 	}

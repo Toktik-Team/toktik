@@ -2,9 +2,11 @@ package relation
 
 import (
 	"context"
+	"github.com/kitex-contrib/obs-opentelemetry/provider"
+	"github.com/kitex-contrib/obs-opentelemetry/tracing"
 	"strconv"
 	bizConstant "toktik/constant/biz"
-	bizConfig "toktik/constant/config"
+	"toktik/constant/config"
 	"toktik/kitex_gen/douyin/relation"
 	relationService "toktik/kitex_gen/douyin/relation/relationservice"
 	"toktik/logging"
@@ -20,11 +22,20 @@ import (
 var relationClient relationService.Client
 
 func init() {
-	r, err := consul.NewConsulResolver(bizConfig.EnvConfig.CONSUL_ADDR)
+	r, err := consul.NewConsulResolver(config.EnvConfig.CONSUL_ADDR)
 	if err != nil {
 		panic(err)
 	}
-	relationClient, err = relationService.NewClient(bizConfig.RelationServiceName, client.WithResolver(r))
+	provider.NewOpenTelemetryProvider(
+		provider.WithServiceName(config.RelationServiceName),
+		provider.WithExportEndpoint(config.EnvConfig.EXPORT_ENDPOINT),
+		provider.WithInsecure(),
+	)
+	relationClient, err = relationService.NewClient(
+		config.RelationServiceName,
+		client.WithResolver(r),
+		client.WithSuite(tracing.NewClientSuite()),
+	)
 	if err != nil {
 		panic(err)
 	}
