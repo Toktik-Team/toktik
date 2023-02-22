@@ -97,13 +97,61 @@ func (s *FeedServiceImpl) ListVideos(ctx context.Context, req *feed.ListFeedRequ
 	}
 	nextTime := find[len(find)-1].CreatedAt.Add(time.Duration(-1)).UnixMilli()
 
-	var videos []*feed.Video
 	var actorId uint32 = 0
 	if req.ActorId != nil {
 		actorId = *req.ActorId
 	}
+	videos, err := queryDetailed(ctx, logger, actorId, find)
 
-	for _, m := range find {
+	return &feed.ListFeedResponse{
+		StatusCode: biz.OkStatusCode,
+		StatusMsg:  &biz.OkStatusMsg,
+		NextTime:   &nextTime,
+		VideoList:  videos,
+	}, nil
+}
+
+func findVideos(ctx context.Context, latestTime int64) ([]*model.Video, error) {
+	video := gen.Q.Video
+	return video.WithContext(ctx).
+		Where(video.CreatedAt.Lte(time.UnixMilli(latestTime))).
+		Order(video.CreatedAt.Desc()).
+		Limit(biz.VideoCount).
+		Offset(0).
+		Find()
+}
+
+// QueryVideos implements the FeedServiceImpl interface.
+func (s *FeedServiceImpl) QueryVideos(ctx context.Context, req *feed.QueryVideosRequest) (resp *feed.QueryVideosResponse, err error) {
+	methodFields := logrus.Fields{
+		"actor_id":  req.ActorId,
+		"video_ids": req.VideoIds,
+		"function":  "ListVideos",
+	}
+	logger := logging.Logger.WithFields(methodFields)
+	logger.Debug("Process start")
+
+	rst, err := query(ctx, logger, req.ActorId, req.VideoIds)
+	if err != nil {
+		resp = &feed.QueryVideosResponse{
+			StatusCode: biz.UnableToQueryUser,
+			StatusMsg:  &biz.InternalServerErrorStatusMsg,
+			VideoList:  rst,
+		}
+		return resp, nil
+	}
+
+	return &feed.QueryVideosResponse{
+		StatusCode: biz.OkStatusCode,
+		StatusMsg:  &biz.OkStatusMsg,
+		VideoList:  rst,
+	}, nil
+}
+
+func queryDetailed(ctx context.Context, logger *logrus.Entry, actorId uint32, videos []*model.Video) (resp []*feed.Video, err error) {
+	rVideos := make([]*feed.Video, 0, len(videos))
+
+	for _, m := range videos {
 
 		userResponse, err := UserClient.GetUser(ctx, &user.UserRequest{
 			UserId:  m.UserId,
@@ -162,7 +210,7 @@ func (s *FeedServiceImpl) ListVideos(ctx context.Context, req *feed.ListFeedRequ
 			continue
 		}
 
-		videos = append(videos, &feed.Video{
+		rVideos = append(rVideos, &feed.Video{
 			Id:            m.ID,
 			Author:        userResponse.User,
 			PlayUrl:       playUrl,
@@ -174,20 +222,14 @@ func (s *FeedServiceImpl) ListVideos(ctx context.Context, req *feed.ListFeedRequ
 		})
 	}
 
-	return &feed.ListFeedResponse{
-		StatusCode: biz.OkStatusCode,
-		StatusMsg:  &biz.OkStatusMsg,
-		NextTime:   &nextTime,
-		VideoList:  videos,
-	}, nil
+	return rVideos, nil
 }
 
-func findVideos(ctx context.Context, latestTime int64) ([]*model.Video, error) {
-	video := gen.Q.Video
-	return video.WithContext(ctx).
-		Where(video.CreatedAt.Lte(time.UnixMilli(latestTime))).
-		Order(video.CreatedAt.Desc()).
-		Limit(biz.VideoCount).
-		Offset(0).
-		Find()
+func query(ctx context.Context, logger *logrus.Entry, actorId uint32, videoIds []uint32) (resp []*feed.Video, err error) {
+	find, err := gen.Q.Video.WithContext(ctx).Where(gen.Q.Video.ID.In(videoIds...)).Find()
+	if err != nil {
+		return nil, err
+	}
+
+	return queryDetailed(ctx, logger, actorId, find)
 }

@@ -22,7 +22,8 @@ func NewServiceInfo() *kitex.ServiceInfo {
 	serviceName := "FeedService"
 	handlerType := (*feed.FeedService)(nil)
 	methods := map[string]kitex.MethodInfo{
-		"ListVideos": kitex.NewMethodInfo(listVideosHandler, newListVideosArgs, newListVideosResult, false),
+		"ListVideos":  kitex.NewMethodInfo(listVideosHandler, newListVideosArgs, newListVideosResult, false),
+		"QueryVideos": kitex.NewMethodInfo(queryVideosHandler, newQueryVideosArgs, newQueryVideosResult, false),
 	}
 	extra := map[string]interface{}{
 		"PackageName": "douyin.feed",
@@ -183,6 +184,151 @@ func (p *ListVideosResult) IsSetSuccess() bool {
 	return p.Success != nil
 }
 
+func queryVideosHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
+	switch s := arg.(type) {
+	case *streaming.Args:
+		st := s.Stream
+		req := new(feed.QueryVideosRequest)
+		if err := st.RecvMsg(req); err != nil {
+			return err
+		}
+		resp, err := handler.(feed.FeedService).QueryVideos(ctx, req)
+		if err != nil {
+			return err
+		}
+		if err := st.SendMsg(resp); err != nil {
+			return err
+		}
+	case *QueryVideosArgs:
+		success, err := handler.(feed.FeedService).QueryVideos(ctx, s.Req)
+		if err != nil {
+			return err
+		}
+		realResult := result.(*QueryVideosResult)
+		realResult.Success = success
+	}
+	return nil
+}
+func newQueryVideosArgs() interface{} {
+	return &QueryVideosArgs{}
+}
+
+func newQueryVideosResult() interface{} {
+	return &QueryVideosResult{}
+}
+
+type QueryVideosArgs struct {
+	Req *feed.QueryVideosRequest
+}
+
+func (p *QueryVideosArgs) FastRead(buf []byte, _type int8, number int32) (n int, err error) {
+	if !p.IsSetReq() {
+		p.Req = new(feed.QueryVideosRequest)
+	}
+	return p.Req.FastRead(buf, _type, number)
+}
+
+func (p *QueryVideosArgs) FastWrite(buf []byte) (n int) {
+	if !p.IsSetReq() {
+		return 0
+	}
+	return p.Req.FastWrite(buf)
+}
+
+func (p *QueryVideosArgs) Size() (n int) {
+	if !p.IsSetReq() {
+		return 0
+	}
+	return p.Req.Size()
+}
+
+func (p *QueryVideosArgs) Marshal(out []byte) ([]byte, error) {
+	if !p.IsSetReq() {
+		return out, fmt.Errorf("No req in QueryVideosArgs")
+	}
+	return proto.Marshal(p.Req)
+}
+
+func (p *QueryVideosArgs) Unmarshal(in []byte) error {
+	msg := new(feed.QueryVideosRequest)
+	if err := proto.Unmarshal(in, msg); err != nil {
+		return err
+	}
+	p.Req = msg
+	return nil
+}
+
+var QueryVideosArgs_Req_DEFAULT *feed.QueryVideosRequest
+
+func (p *QueryVideosArgs) GetReq() *feed.QueryVideosRequest {
+	if !p.IsSetReq() {
+		return QueryVideosArgs_Req_DEFAULT
+	}
+	return p.Req
+}
+
+func (p *QueryVideosArgs) IsSetReq() bool {
+	return p.Req != nil
+}
+
+type QueryVideosResult struct {
+	Success *feed.QueryVideosResponse
+}
+
+var QueryVideosResult_Success_DEFAULT *feed.QueryVideosResponse
+
+func (p *QueryVideosResult) FastRead(buf []byte, _type int8, number int32) (n int, err error) {
+	if !p.IsSetSuccess() {
+		p.Success = new(feed.QueryVideosResponse)
+	}
+	return p.Success.FastRead(buf, _type, number)
+}
+
+func (p *QueryVideosResult) FastWrite(buf []byte) (n int) {
+	if !p.IsSetSuccess() {
+		return 0
+	}
+	return p.Success.FastWrite(buf)
+}
+
+func (p *QueryVideosResult) Size() (n int) {
+	if !p.IsSetSuccess() {
+		return 0
+	}
+	return p.Success.Size()
+}
+
+func (p *QueryVideosResult) Marshal(out []byte) ([]byte, error) {
+	if !p.IsSetSuccess() {
+		return out, fmt.Errorf("No req in QueryVideosResult")
+	}
+	return proto.Marshal(p.Success)
+}
+
+func (p *QueryVideosResult) Unmarshal(in []byte) error {
+	msg := new(feed.QueryVideosResponse)
+	if err := proto.Unmarshal(in, msg); err != nil {
+		return err
+	}
+	p.Success = msg
+	return nil
+}
+
+func (p *QueryVideosResult) GetSuccess() *feed.QueryVideosResponse {
+	if !p.IsSetSuccess() {
+		return QueryVideosResult_Success_DEFAULT
+	}
+	return p.Success
+}
+
+func (p *QueryVideosResult) SetSuccess(x interface{}) {
+	p.Success = x.(*feed.QueryVideosResponse)
+}
+
+func (p *QueryVideosResult) IsSetSuccess() bool {
+	return p.Success != nil
+}
+
 type kClient struct {
 	c client.Client
 }
@@ -198,6 +344,16 @@ func (p *kClient) ListVideos(ctx context.Context, Req *feed.ListFeedRequest) (r 
 	_args.Req = Req
 	var _result ListVideosResult
 	if err = p.c.Call(ctx, "ListVideos", &_args, &_result); err != nil {
+		return
+	}
+	return _result.GetSuccess(), nil
+}
+
+func (p *kClient) QueryVideos(ctx context.Context, Req *feed.QueryVideosRequest) (r *feed.QueryVideosResponse, err error) {
+	var _args QueryVideosArgs
+	_args.Req = Req
+	var _result QueryVideosResult
+	if err = p.c.Call(ctx, "QueryVideos", &_args, &_result); err != nil {
 		return
 	}
 	return _result.GetSuccess(), nil
