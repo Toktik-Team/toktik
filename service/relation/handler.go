@@ -63,6 +63,7 @@ type RelationServiceImpl struct{}
 // GetFollowList implements the RelationServiceImpl interface.
 func (s *RelationServiceImpl) GetFollowList(ctx context.Context, req *relation.FollowListRequest) (resp *relation.FollowListResponse, err error) {
 	logger := logging.Logger.WithFields(logrus.Fields{
+		"actor_id": req.ActorId,
 		"user_id":  req.UserId,
 		"function": "GetFollowList",
 	})
@@ -82,7 +83,7 @@ func (s *RelationServiceImpl) GetFollowList(ctx context.Context, req *relation.F
 	for _, m := range relationModels {
 		userResponse, err := UserClient.GetUser(ctx, &user.UserRequest{
 			UserId:  m.TargetId,
-			ActorId: req.UserId,
+			ActorId: req.ActorId,
 		})
 		if err != nil || userResponse.StatusCode != biz.OkStatusCode {
 			log.Println(fmt.Errorf("failed to get user info: %w", err))
@@ -105,6 +106,7 @@ func (s *RelationServiceImpl) GetFollowList(ctx context.Context, req *relation.F
 // GetFollowerList implements the RelationServiceImpl interface.
 func (s *RelationServiceImpl) GetFollowerList(ctx context.Context, req *relation.FollowerListRequest) (resp *relation.FollowerListResponse, err error) {
 	methodFields := logrus.Fields{
+		"actor_id": req.ActorId,
 		"user_id":  req.UserId,
 		"function": "GetFollowerList",
 	}
@@ -125,7 +127,7 @@ func (s *RelationServiceImpl) GetFollowerList(ctx context.Context, req *relation
 	for _, m := range relationModels {
 		userResponse, err := UserClient.GetUser(ctx, &user.UserRequest{
 			UserId:  m.UserId,
-			ActorId: req.UserId,
+			ActorId: req.ActorId,
 		})
 		if err != nil || userResponse.StatusCode != biz.OkStatusCode {
 			logger.Error("failed to get user info: %w", err)
@@ -148,6 +150,7 @@ func (s *RelationServiceImpl) GetFollowerList(ctx context.Context, req *relation
 // GetFriendList implements the RelationServiceImpl interface.
 func (s *RelationServiceImpl) GetFriendList(ctx context.Context, req *relation.FriendListRequest) (resp *relation.FriendListResponse, err error) {
 	logger := logging.Logger.WithFields(logrus.Fields{
+		"actor_id": req.ActorId,
 		"user_id":  req.UserId,
 		"function": "GetFriendList",
 	})
@@ -192,7 +195,7 @@ func (s *RelationServiceImpl) GetFriendList(ctx context.Context, req *relation.F
 	for _, m := range ids {
 		userResponse, err := UserClient.GetUser(ctx, &user.UserRequest{
 			UserId:  m,
-			ActorId: req.UserId,
+			ActorId: req.ActorId,
 		})
 		if err != nil || userResponse.StatusCode != biz.OkStatusCode {
 			logger.Error("failed to get user info: %w", err)
@@ -216,13 +219,13 @@ func (s *RelationServiceImpl) GetFriendList(ctx context.Context, req *relation.F
 // Follow implements the RelationServiceImpl interface.
 func (s *RelationServiceImpl) Follow(ctx context.Context, req *relation.RelationActionRequest) (resp *relation.RelationActionResponse, err error) {
 	logger := logging.Logger.WithFields(logrus.Fields{
-		"user_id":    req.UserId,
-		"to_user_id": req.ToUserId,
-		"function":   "RelationAction",
+		"actor_id": req.ActorId,
+		"user_id":  req.UserId,
+		"function": "RelationAction",
 	})
 	logger.Debug("Process start")
 
-	if req.ToUserId == req.UserId {
+	if req.UserId == req.ActorId {
 		resp = &relation.RelationActionResponse{
 			StatusCode: biz.InvalidToUserId,
 			StatusMsg:  biz.BadRequestStatusMsg,
@@ -231,14 +234,14 @@ func (s *RelationServiceImpl) Follow(ctx context.Context, req *relation.Relation
 	}
 
 	relationModel := model.Relation{
-		UserId:   req.UserId,
-		TargetId: req.ToUserId,
+		UserId:   req.ActorId,
+		TargetId: req.UserId,
 	}
 
 	// make sure target id exists
 	userResponse, err := UserClient.GetUser(ctx, &user.UserRequest{
-		UserId:  req.ToUserId,
-		ActorId: req.UserId,
+		UserId:  req.UserId,
+		ActorId: req.ActorId,
 	})
 	if err != nil || userResponse.StatusCode != biz.OkStatusCode || userResponse.User == nil {
 		logger.Error("failed to get user info: %w", err)
@@ -278,12 +281,12 @@ func (s *RelationServiceImpl) Follow(ctx context.Context, req *relation.Relation
 // Unfollow implements the RelationServiceImpl interface.
 func (s *RelationServiceImpl) Unfollow(ctx context.Context, req *relation.RelationActionRequest) (resp *relation.RelationActionResponse, err error) {
 	logger := logging.Logger.WithFields(logrus.Fields{
-		"user_id":    req.UserId,
-		"to_user_id": req.ToUserId,
-		"function":   "RelationAction",
+		"actor_id": req.ActorId,
+		"user_id":  req.UserId,
+		"function": "RelationAction",
 	})
 	logger.Debug("Process start")
-	if req.ToUserId == req.UserId {
+	if req.ActorId == req.UserId {
 		resp = &relation.RelationActionResponse{
 			StatusCode: biz.InvalidToUserId,
 			StatusMsg:  biz.BadRequestStatusMsg,
@@ -293,11 +296,11 @@ func (s *RelationServiceImpl) Unfollow(ctx context.Context, req *relation.Relati
 
 	r := repo.Q.Relation
 
-	relationModel, err := r.WithContext(ctx).Where(r.UserId.Eq(req.UserId), r.TargetId.Eq(req.ToUserId)).First()
+	relationModel, err := r.WithContext(ctx).Where(r.UserId.Eq(req.ActorId), r.TargetId.Eq(req.UserId)).First()
 	if err != nil {
 		logger.WithFields(logrus.Fields{
-			"user_id":    req.UserId,
-			"to_user_id": req.ToUserId,
+			"actor_id": req.ActorId,
+			"user_id":  req.UserId,
 		}).Debug("record not found")
 		// Unfollow a user that was not followed before
 		resp = &relation.RelationActionResponse{
@@ -307,7 +310,7 @@ func (s *RelationServiceImpl) Unfollow(ctx context.Context, req *relation.Relati
 		return
 	}
 
-	if _, err = r.Where(r.UserId.Eq(req.UserId), r.TargetId.Eq(req.ToUserId)).Delete(); err != nil {
+	if _, err = r.Where(r.UserId.Eq(req.ActorId), r.TargetId.Eq(req.UserId)).Delete(); err != nil {
 		logger.WithFields(logrus.Fields{
 			"entry": relationModel,
 			"err":   err,
