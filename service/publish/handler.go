@@ -185,7 +185,7 @@ func (s *PublishServiceImpl) CreateVideo(ctx context.Context, req *publish.Creat
 // ListVideo implements the PublishServiceImpl interface.
 func (s *PublishServiceImpl) ListVideo(ctx context.Context, req *publish.ListVideoRequest) (resp *publish.ListVideoResponse, err error) {
 	methodFields := logrus.Fields{
-		"user_id":  req.ActorId,
+		"user_id":  req.UserId,
 		"actor_id": req.ActorId,
 		"function": "ListVideo",
 	}
@@ -193,7 +193,7 @@ func (s *PublishServiceImpl) ListVideo(ctx context.Context, req *publish.ListVid
 	logger.Debug("Process start")
 
 	videos, err := gen.Q.Video.WithContext(ctx).
-		Where(gen.Q.Video.UserId.Eq(req.ActorId)).
+		Where(gen.Q.Video.UserId.Eq(req.UserId)).
 		Order(gen.Q.Video.CreatedAt.Desc()).
 		Find()
 	if err != nil {
