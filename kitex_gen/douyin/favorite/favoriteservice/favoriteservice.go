@@ -25,6 +25,7 @@ func NewServiceInfo() *kitex.ServiceInfo {
 		"FavoriteAction": kitex.NewMethodInfo(favoriteActionHandler, newFavoriteActionArgs, newFavoriteActionResult, false),
 		"FavoriteList":   kitex.NewMethodInfo(favoriteListHandler, newFavoriteListArgs, newFavoriteListResult, false),
 		"IsFavorite":     kitex.NewMethodInfo(isFavoriteHandler, newIsFavoriteArgs, newIsFavoriteResult, false),
+		"FavoriteCount":  kitex.NewMethodInfo(favoriteCountHandler, newFavoriteCountArgs, newFavoriteCountResult, false),
 	}
 	extra := map[string]interface{}{
 		"PackageName": "douyin.favorite",
@@ -475,6 +476,151 @@ func (p *IsFavoriteResult) IsSetSuccess() bool {
 	return p.Success != nil
 }
 
+func favoriteCountHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
+	switch s := arg.(type) {
+	case *streaming.Args:
+		st := s.Stream
+		req := new(favorite.FavoriteCountRequest)
+		if err := st.RecvMsg(req); err != nil {
+			return err
+		}
+		resp, err := handler.(favorite.FavoriteService).FavoriteCount(ctx, req)
+		if err != nil {
+			return err
+		}
+		if err := st.SendMsg(resp); err != nil {
+			return err
+		}
+	case *FavoriteCountArgs:
+		success, err := handler.(favorite.FavoriteService).FavoriteCount(ctx, s.Req)
+		if err != nil {
+			return err
+		}
+		realResult := result.(*FavoriteCountResult)
+		realResult.Success = success
+	}
+	return nil
+}
+func newFavoriteCountArgs() interface{} {
+	return &FavoriteCountArgs{}
+}
+
+func newFavoriteCountResult() interface{} {
+	return &FavoriteCountResult{}
+}
+
+type FavoriteCountArgs struct {
+	Req *favorite.FavoriteCountRequest
+}
+
+func (p *FavoriteCountArgs) FastRead(buf []byte, _type int8, number int32) (n int, err error) {
+	if !p.IsSetReq() {
+		p.Req = new(favorite.FavoriteCountRequest)
+	}
+	return p.Req.FastRead(buf, _type, number)
+}
+
+func (p *FavoriteCountArgs) FastWrite(buf []byte) (n int) {
+	if !p.IsSetReq() {
+		return 0
+	}
+	return p.Req.FastWrite(buf)
+}
+
+func (p *FavoriteCountArgs) Size() (n int) {
+	if !p.IsSetReq() {
+		return 0
+	}
+	return p.Req.Size()
+}
+
+func (p *FavoriteCountArgs) Marshal(out []byte) ([]byte, error) {
+	if !p.IsSetReq() {
+		return out, fmt.Errorf("No req in FavoriteCountArgs")
+	}
+	return proto.Marshal(p.Req)
+}
+
+func (p *FavoriteCountArgs) Unmarshal(in []byte) error {
+	msg := new(favorite.FavoriteCountRequest)
+	if err := proto.Unmarshal(in, msg); err != nil {
+		return err
+	}
+	p.Req = msg
+	return nil
+}
+
+var FavoriteCountArgs_Req_DEFAULT *favorite.FavoriteCountRequest
+
+func (p *FavoriteCountArgs) GetReq() *favorite.FavoriteCountRequest {
+	if !p.IsSetReq() {
+		return FavoriteCountArgs_Req_DEFAULT
+	}
+	return p.Req
+}
+
+func (p *FavoriteCountArgs) IsSetReq() bool {
+	return p.Req != nil
+}
+
+type FavoriteCountResult struct {
+	Success *favorite.FavoriteCountResponse
+}
+
+var FavoriteCountResult_Success_DEFAULT *favorite.FavoriteCountResponse
+
+func (p *FavoriteCountResult) FastRead(buf []byte, _type int8, number int32) (n int, err error) {
+	if !p.IsSetSuccess() {
+		p.Success = new(favorite.FavoriteCountResponse)
+	}
+	return p.Success.FastRead(buf, _type, number)
+}
+
+func (p *FavoriteCountResult) FastWrite(buf []byte) (n int) {
+	if !p.IsSetSuccess() {
+		return 0
+	}
+	return p.Success.FastWrite(buf)
+}
+
+func (p *FavoriteCountResult) Size() (n int) {
+	if !p.IsSetSuccess() {
+		return 0
+	}
+	return p.Success.Size()
+}
+
+func (p *FavoriteCountResult) Marshal(out []byte) ([]byte, error) {
+	if !p.IsSetSuccess() {
+		return out, fmt.Errorf("No req in FavoriteCountResult")
+	}
+	return proto.Marshal(p.Success)
+}
+
+func (p *FavoriteCountResult) Unmarshal(in []byte) error {
+	msg := new(favorite.FavoriteCountResponse)
+	if err := proto.Unmarshal(in, msg); err != nil {
+		return err
+	}
+	p.Success = msg
+	return nil
+}
+
+func (p *FavoriteCountResult) GetSuccess() *favorite.FavoriteCountResponse {
+	if !p.IsSetSuccess() {
+		return FavoriteCountResult_Success_DEFAULT
+	}
+	return p.Success
+}
+
+func (p *FavoriteCountResult) SetSuccess(x interface{}) {
+	p.Success = x.(*favorite.FavoriteCountResponse)
+}
+
+func (p *FavoriteCountResult) IsSetSuccess() bool {
+	return p.Success != nil
+}
+
 type kClient struct {
 	c client.Client
 }
@@ -510,6 +656,16 @@ func (p *kClient) IsFavorite(ctx context.Context, Req *favorite.IsFavoriteReques
 	_args.Req = Req
 	var _result IsFavoriteResult
 	if err = p.c.Call(ctx, "IsFavorite", &_args, &_result); err != nil {
+		return
+	}
+	return _result.GetSuccess(), nil
+}
+
+func (p *kClient) FavoriteCount(ctx context.Context, Req *favorite.FavoriteCountRequest) (r *favorite.FavoriteCountResponse, err error) {
+	var _args FavoriteCountArgs
+	_args.Req = Req
+	var _result FavoriteCountResult
+	if err = p.c.Call(ctx, "FavoriteCount", &_args, &_result); err != nil {
 		return
 	}
 	return _result.GetSuccess(), nil

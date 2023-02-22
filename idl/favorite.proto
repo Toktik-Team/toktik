@@ -34,11 +34,23 @@ message IsFavoriteResponse {
   bool result = 1; // 结果
 }
 
+message FavoriteCountRequest {
+  uint32 video_id = 1; // 视频id
+}
+
+message FavoriteCountResponse {
+  uint32 status_code = 1;
+  optional string status_msg = 2;
+  uint32 count = 3; // 点赞数
+}
+
 service FavoriteService {
   rpc FavoriteAction (FavoriteRequest) returns (FavoriteResponse){
   }
   rpc FavoriteList (FavoriteListRequest) returns (FavoriteListResponse) {
   }
   rpc IsFavorite (IsFavoriteRequest) returns (IsFavoriteResponse) {
+  }
+  rpc FavoriteCount (FavoriteCountRequest) returns (FavoriteCountResponse) {
   }
 }
