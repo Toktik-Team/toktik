@@ -62,7 +62,7 @@ type PublishServiceImpl struct{}
 // CreateVideo implements the PublishServiceImpl interface.
 func (s *PublishServiceImpl) CreateVideo(ctx context.Context, req *publish.CreateVideoRequest) (resp *publish.CreateVideoResponse, err error) {
 	methodFields := logrus.Fields{
-		"user_id":  req.UserId,
+		"user_id":  req.ActorId,
 		"title":    req.Title,
 		"function": "CreateVideo",
 	}
@@ -99,7 +99,7 @@ func (s *PublishServiceImpl) CreateVideo(ctx context.Context, req *publish.Creat
 	logger.Debug("generated uuid")
 
 	// Upload video file
-	fileName := fmt.Sprintf("%d/%s.%s", req.UserId, generatedUUID.String(), "mp4")
+	fileName := fmt.Sprintf("%d/%s.%s", req.ActorId, generatedUUID.String(), "mp4")
 	_, err = storage.Upload(fileName, reader)
 	if err != nil {
 		logger.WithFields(logrus.Fields{
@@ -116,7 +116,7 @@ func (s *PublishServiceImpl) CreateVideo(ctx context.Context, req *publish.Creat
 	}).Debug("uploaded video")
 
 	// Generate thumbnail
-	coverName := fmt.Sprintf("%d/%s.%s", req.UserId, generatedUUID.String(), "jpg")
+	coverName := fmt.Sprintf("%d/%s.%s", req.ActorId, generatedUUID.String(), "jpg")
 	thumbData, err := getThumbnail(reader)
 	if err != nil {
 		logger.WithFields(logrus.Fields{
@@ -153,7 +153,7 @@ func (s *PublishServiceImpl) CreateVideo(ctx context.Context, req *publish.Creat
 	}).Debug("uploaded thumbnail")
 
 	publishModel := model.Video{
-		UserId:    req.UserId,
+		UserId:    req.ActorId,
 		FileName:  fileName,
 		CoverName: coverName,
 		Title:     req.Title,
@@ -185,7 +185,7 @@ func (s *PublishServiceImpl) CreateVideo(ctx context.Context, req *publish.Creat
 // ListVideo implements the PublishServiceImpl interface.
 func (s *PublishServiceImpl) ListVideo(ctx context.Context, req *publish.ListVideoRequest) (resp *publish.ListVideoResponse, err error) {
 	methodFields := logrus.Fields{
-		"user_id":  req.UserId,
+		"user_id":  req.ActorId,
 		"actor_id": req.ActorId,
 		"function": "ListVideo",
 	}
@@ -193,7 +193,7 @@ func (s *PublishServiceImpl) ListVideo(ctx context.Context, req *publish.ListVid
 	logger.Debug("Process start")
 
 	videos, err := gen.Q.Video.WithContext(ctx).
-		Where(gen.Q.Video.UserId.Eq(req.UserId)).
+		Where(gen.Q.Video.UserId.Eq(req.ActorId)).
 		Order(gen.Q.Video.CreatedAt.Desc()).
 		Find()
 	if err != nil {
@@ -229,13 +229,13 @@ func (s *PublishServiceImpl) ListVideo(ctx context.Context, req *publish.ListVid
 // CountVideo implements the PublishServiceImpl interface.
 func (s *PublishServiceImpl) CountVideo(ctx context.Context, req *publish.CountVideoRequest) (resp *publish.CountVideoResponse, err error) {
 	methodFields := logrus.Fields{
-		"user_id":  req.UserId,
+		"user_id":  req.ActorId,
 		"function": "CountVideo",
 	}
 	logger := logging.Logger.WithFields(methodFields)
 	logger.Debug("Process start")
 
-	count, err := gen.Q.Video.WithContext(ctx).Where(gen.Q.Video.UserId.Eq(req.UserId)).Count()
+	count, err := gen.Q.Video.WithContext(ctx).Where(gen.Q.Video.UserId.Eq(req.ActorId)).Count()
 	if err != nil {
 		logger.WithFields(logrus.Fields{
 			"err": err,
