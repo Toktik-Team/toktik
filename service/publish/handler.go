@@ -229,19 +229,25 @@ func (s *PublishServiceImpl) ListVideo(ctx context.Context, req *publish.ListVid
 			ActorId: req.ActorId,
 		})
 		if err != nil || userResponse.StatusCode != biz.OkStatusCode {
-			log.Println(fmt.Errorf("failed to get user info: %w", err))
+			logger.WithFields(logrus.Fields{
+				"err": err,
+			}).Debug("failed to get user info")
 			continue
 		}
 
 		playUrl, err := storage.GetLink(m.FileName)
 		if err != nil {
-			log.Println(fmt.Errorf("failed to fetch play url: %w", err))
+			logger.WithFields(logrus.Fields{
+				"err": err,
+			}).Debug("failed to fetch play url")
 			continue
 		}
 
 		coverUrl, err := storage.GetLink(m.CoverName)
 		if err != nil {
-			log.Println(fmt.Errorf("failed to fetch cover url: %w", err))
+			logger.WithFields(logrus.Fields{
+				"err": err,
+			}).Debug("failed to fetch cover url")
 			continue
 		}
 
@@ -249,7 +255,9 @@ func (s *PublishServiceImpl) ListVideo(ctx context.Context, req *publish.ListVid
 			VideoId: m.ID,
 		})
 		if err != nil {
-			log.Println(fmt.Errorf("failed to fetch favorite count: %w", err))
+			logger.WithFields(logrus.Fields{
+				"err": err,
+			}).Debug("failed to fetch favorite count")
 			continue
 		}
 
@@ -258,7 +266,9 @@ func (s *PublishServiceImpl) ListVideo(ctx context.Context, req *publish.ListVid
 			VideoId: m.ID,
 		})
 		if err != nil {
-			log.Println(fmt.Errorf("failed to fetch comment count: %w", err))
+			logger.WithFields(logrus.Fields{
+				"err": err,
+			}).Debug("failed to fetch comment count")
 			continue
 		}
 
@@ -267,7 +277,9 @@ func (s *PublishServiceImpl) ListVideo(ctx context.Context, req *publish.ListVid
 			VideoId: m.ID,
 		})
 		if err != nil {
-			log.Println(fmt.Errorf("unable to determine if the user liked the video : %w", err))
+			logger.WithFields(logrus.Fields{
+				"err": err,
+			}).Debug("unable to determine if the user liked the video")
 			continue
 		}
 

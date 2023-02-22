@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"toktik/constant/biz"
 	"toktik/constant/config"
@@ -85,7 +84,9 @@ func (s *RelationServiceImpl) GetFollowList(ctx context.Context, req *relation.F
 			ActorId: req.UserId,
 		})
 		if err != nil || userResponse.StatusCode != biz.OkStatusCode {
-			log.Println(fmt.Errorf("failed to get user info: %w", err))
+			logger.WithFields(logrus.Fields{
+				"err": err,
+			}).Debug("failed to get user info")
 			continue
 		}
 		userList = append(userList, userResponse.User)
