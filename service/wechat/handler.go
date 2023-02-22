@@ -30,8 +30,18 @@ func init() {
 // WechatServiceImpl implements the last service interface defined in the IDL.
 type WechatServiceImpl struct{}
 
+// generateKey generates a unique key for each pair of users
 func (s *WechatServiceImpl) generateKey(sender, receiver *uint32) *string {
-	key := fmt.Sprintf("chat:%d:%d", *sender, *receiver)
+	if sender == nil || receiver == nil {
+		key := fmt.Sprintf("chat:%d:%d", 0, 0)
+		return &key
+	}
+	var key string
+	if *sender < *receiver {
+		key = fmt.Sprintf("chat:%d:%d", *sender, *receiver)
+	} else {
+		key = fmt.Sprintf("chat:%d:%d", *receiver, *sender)
+	}
 	return &key
 }
 
@@ -153,7 +163,7 @@ func (s *WechatServiceImpl) WechatChat(ctx context.Context, req *wechat.MessageC
 		respMessageList = append(respMessageList, &wechat.Message{
 			Id:         uint32(i),
 			Content:    content,
-			CreateTime: strconv.FormatInt(msg.Time, 10),
+			CreateTime: uint32(msg.Time),
 			FromUserId: &msg.From,
 			ToUserId:   &msg.To,
 		})

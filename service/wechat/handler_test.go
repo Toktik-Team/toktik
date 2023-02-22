@@ -69,7 +69,7 @@ func TestWechatServiceImpl_WechatChat(t *testing.T) {
 func TestWechatServiceImpl_generateKey(t *testing.T) {
 	test1Result := "chat:0:0"
 	test2Result := "chat:1:2"
-	test3Result := "chat:2:1"
+	test3Result := "chat:1:2"
 	test4Result := fmt.Sprintf("chat:%d:%d", 1<<32-1, 1<<32-1)
 	test5Result := fmt.Sprintf("chat:%d:%d", 1<<32-2, 1<<32-1)
 

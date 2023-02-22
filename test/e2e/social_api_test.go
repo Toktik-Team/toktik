@@ -136,9 +136,9 @@ func TestChat(t *testing.T) {
 		JSON().Object()
 	chatResp.Value("status_code").Number().Equal(0)
 	chatResp.Value("status_msg").String().NotEmpty()
-
-	// TODO: update message service to support long time transaction messaging
-	//chatResp.Value("message_list").Array().Length().Gt(0)
+	chatResp.Value("message_list").Array().Length().Gt(0)
+	chatResp.Value("message_list").Array().First().Object().Value("content").String().Equal("Send to UserB")
+	chatResp.Value("message_list").Array().First().Object().Value("create_time").Number().Gt(0)
 
 	chatResp = e.GET("/douyin/message/chat/").
 		WithQuery("token", tokenB).WithQuery("to_user_id", userIdA).
@@ -149,4 +149,6 @@ func TestChat(t *testing.T) {
 	chatResp.Value("status_code").Number().Equal(0)
 	chatResp.Value("status_msg").String().NotEmpty()
 	chatResp.Value("message_list").Array().Length().Gt(0)
+	chatResp.Value("message_list").Array().First().Object().Value("content").String().Equal("Send to UserB")
+	chatResp.Value("message_list").Array().First().Object().Value("create_time").Number().Gt(0)
 }
