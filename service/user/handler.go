@@ -14,20 +14,6 @@ type UserServiceImpl struct{}
 
 // GetUser implements the UserServiceImpl interface.
 func (s *UserServiceImpl) GetUser(ctx context.Context, req *user.UserRequest) (resp *user.UserResponse, err error) {
-	// TODO: 等到 kitex 更新后删除此代码
-	if req == nil {
-		resp = &user.UserResponse{
-			StatusCode: biz.UserNotFound,
-			User: &user.User{
-				Id:            0,
-				Name:          "anonymous",
-				FollowCount:   0,
-				FollowerCount: 0,
-				IsFollow:      false,
-			},
-		}
-		return
-	}
 
 	userInfo := repo.User
 	u, err := userInfo.WithContext(ctx).Where(userInfo.ID.Eq(req.UserId)).First()

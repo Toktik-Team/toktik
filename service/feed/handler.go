@@ -134,12 +134,6 @@ func (s *FeedServiceImpl) ListVideos(ctx context.Context, req *feed.ListFeedRequ
 			continue
 		}
 
-		// TODO: 等到 kitex 更新后删除此代码
-		favoriteResult := false
-		if isFavorite != nil {
-			favoriteResult = isFavorite.Result
-		}
-
 		videos = append(videos, &feed.Video{
 			Id:            m.ID,
 			Author:        userResponse.User,
@@ -147,7 +141,7 @@ func (s *FeedServiceImpl) ListVideos(ctx context.Context, req *feed.ListFeedRequ
 			CoverUrl:      coverUrl,
 			FavoriteCount: m.FavoriteCount,
 			CommentCount:  commentCount.CommentCount,
-			IsFavorite:    favoriteResult,
+			IsFavorite:    isFavorite.Result,
 			Title:         m.Title,
 		})
 	}

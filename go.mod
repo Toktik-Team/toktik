@@ -11,9 +11,9 @@ require (
 	github.com/aws/aws-sdk-go-v2/credentials v1.13.12
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.30.2
 	github.com/bakape/thumbnailer/v2 v2.7.1
-	github.com/cloudwego/fastpb v0.0.3
+	github.com/cloudwego/fastpb v0.0.4-0.20230131074846-6fc453d58b96
 	github.com/cloudwego/hertz v0.5.2
-	github.com/cloudwego/kitex v0.4.4
+	github.com/cloudwego/kitex v0.4.5-0.20230208074253-5c9bc30c9f87
 	github.com/gavv/httpexpect/v2 v2.8.0
 	github.com/gofrs/uuid v4.4.0+incompatible
 	github.com/golang/protobuf v1.5.2
