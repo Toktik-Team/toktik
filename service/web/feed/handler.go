@@ -3,7 +3,6 @@ package feed
 import (
 	"context"
 	"strconv"
-	"time"
 	bizConstant "toktik/constant/biz"
 	bizConfig "toktik/constant/config"
 	"toktik/kitex_gen/douyin/feed"
@@ -34,7 +33,6 @@ func init() {
 }
 func Action(ctx context.Context, c *app.RequestContext) {
 	methodFields := logrus.Fields{
-		"time":   time.Now(),
 		"method": "FeedAction",
 	}
 	logger := logging.Logger.WithFields(methodFields)

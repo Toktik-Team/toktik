@@ -3,7 +3,6 @@ package user
 import (
 	"context"
 	"strconv"
-	"time"
 	bizConstant "toktik/constant/biz"
 	bizConfig "toktik/constant/config"
 	"toktik/kitex_gen/douyin/user"
@@ -33,7 +32,6 @@ func init() {
 
 func GetUserInfo(ctx context.Context, c *app.RequestContext) {
 	methodFields := logrus.Fields{
-		"time":   time.Now(),
 		"method": "GetUserInfo",
 	}
 	logger := logging.Logger.WithFields(methodFields)

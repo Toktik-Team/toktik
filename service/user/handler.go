@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"github.com/sirupsen/logrus"
-	"time"
 	"toktik/constant/biz"
 	"toktik/kitex_gen/douyin/user"
 	"toktik/logging"
@@ -66,8 +65,7 @@ func (s *UserServiceImpl) GetUser(ctx context.Context, req *user.UserRequest) (r
 		_, err = userInfo.WithContext(ctx).Where(userInfo.ID.Eq(u.ID)).Updates(u)
 		if err != nil {
 			logging.Logger.WithFields(logrus.Fields{
-				"time": time.Now(),
-				"err":  err,
+				"err": err,
 			}).Errorf("save user failed")
 		}
 	}

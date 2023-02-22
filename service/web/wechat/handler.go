@@ -9,7 +9,6 @@ import (
 	"github.com/sirupsen/logrus"
 	"log"
 	"strconv"
-	"time"
 	bizConstant "toktik/constant/biz"
 	bizConfig "toktik/constant/config"
 	"toktik/kitex_gen/douyin/wechat"
@@ -33,7 +32,6 @@ func init() {
 
 func MessageAction(ctx context.Context, c *app.RequestContext) {
 	methodFields := logrus.Fields{
-		"time":   time.Now(),
 		"method": "MessageAction",
 	}
 	logger := logging.Logger.WithFields(methodFields)
@@ -101,7 +99,6 @@ func MessageAction(ctx context.Context, c *app.RequestContext) {
 
 func MessageChat(ctx context.Context, c *app.RequestContext) {
 	methodFields := logrus.Fields{
-		"time":   time.Now(),
 		"method": "MessageChat",
 	}
 	logger := logging.Logger.WithFields(methodFields)

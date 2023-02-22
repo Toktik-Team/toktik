@@ -114,7 +114,6 @@ func (s *WechatServiceImpl) WechatAction(ctx context.Context, req *wechat.Messag
 // WechatChat implements the WechatServiceImpl interface.
 func (s *WechatServiceImpl) WechatChat(ctx context.Context, req *wechat.MessageChatRequest) (resp *wechat.MessageChatResponse, err error) {
 	logger := logging.Logger.WithFields(logrus.Fields{
-		"time":   time.Now(),
 		"method": "WechatChat",
 	})
 	logger.Debugf("Process start")

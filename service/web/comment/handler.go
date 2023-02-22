@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"log"
 	"strconv"
-	"time"
 	"toktik/constant/biz"
 	"toktik/constant/config"
 	"toktik/kitex_gen/douyin/comment"
@@ -36,7 +35,6 @@ func init() {
 
 func Action(ctx context.Context, c *app.RequestContext) {
 	methodFields := logrus.Fields{
-		"time":   time.Now(),
 		"method": "CommentAction",
 	}
 	logger := logging.Logger.WithFields(methodFields)
@@ -138,7 +136,6 @@ func Action(ctx context.Context, c *app.RequestContext) {
 
 func List(ctx context.Context, c *app.RequestContext) {
 	methodFields := logrus.Fields{
-		"time":   time.Now(),
 		"method": "CommentList",
 	}
 	logger := logging.Logger.WithFields(methodFields)
