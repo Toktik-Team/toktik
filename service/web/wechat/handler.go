@@ -132,6 +132,16 @@ func MessageChat(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
+	preMsgTimeStr, exist := c.GetQuery("pre_msg_time")
+	if !exist {
+		preMsgTimeStr = "0"
+	}
+	preMsgTime, err := strconv.ParseInt(preMsgTimeStr, 10, 32)
+	if err != nil {
+		bizConstant.InvalidArguments.WithCause(err).WithFields(&methodFields).LaunchError(c)
+		return
+	}
+
 	logger.WithFields(logrus.Fields{
 		"to_user_id": senderIdInt,
 	}).Debugf("Executing message chat")
@@ -139,6 +149,7 @@ func MessageChat(ctx context.Context, c *app.RequestContext) {
 	messageActionResponse, err := Client.WechatChat(ctx, &wechat.MessageChatRequest{
 		SenderId:   uint32(senderIdInt),
 		ReceiverId: userId,
+		PreMsgTime: uint32(preMsgTime),
 	})
 
 	if err != nil {
