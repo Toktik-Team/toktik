@@ -229,13 +229,13 @@ func (s *PublishServiceImpl) ListVideo(ctx context.Context, req *publish.ListVid
 // CountVideo implements the PublishServiceImpl interface.
 func (s *PublishServiceImpl) CountVideo(ctx context.Context, req *publish.CountVideoRequest) (resp *publish.CountVideoResponse, err error) {
 	methodFields := logrus.Fields{
-		"user_id":  req.ActorId,
+		"user_id":  req.UserId,
 		"function": "CountVideo",
 	}
 	logger := logging.Logger.WithFields(methodFields)
 	logger.Debug("Process start")
 
-	count, err := gen.Q.Video.WithContext(ctx).Where(gen.Q.Video.UserId.Eq(req.ActorId)).Count()
+	count, err := gen.Q.Video.WithContext(ctx).Where(gen.Q.Video.UserId.Eq(req.UserId)).Count()
 	if err != nil {
 		logger.WithFields(logrus.Fields{
 			"err": err,
