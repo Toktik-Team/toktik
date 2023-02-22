@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"log"
+	"sync"
 	"toktik/constant/biz"
 	"toktik/constant/config"
 	"toktik/kitex_gen/douyin/relation"
@@ -29,30 +30,61 @@ func init() {
 		log.Fatal(err)
 	}
 }
-func removeDups(elements []uint32) (nodups []uint32) {
+func removeDups(elements []*uint32) (nodups []*uint32) {
 	encountered := make(map[uint32]bool)
 	for _, element := range elements {
-		if !encountered[element] {
+		if !encountered[*element] {
 			nodups = append(nodups, element)
-			encountered[element] = true
+			encountered[*element] = true
 		}
 	}
 	return
 }
 
-func intersection(s1, s2 []uint32) (inter []uint32) {
+func intersection(s1, s2 []*uint32) (inter []*uint32) {
 	hash := make(map[uint32]bool)
 	for _, e := range s1 {
-		hash[e] = true
+		hash[*e] = true
 	}
 	for _, e := range s2 {
 		// If elements present in the hashmap then append intersection list.
-		if hash[e] {
+		if hash[*e] {
 			inter = append(inter, e)
 		}
 	}
 	//Remove dups from slice.
 	inter = removeDups(inter)
+	return
+}
+
+func queryUsers(
+	ctx context.Context,
+	logger *logrus.Entry,
+	actorId uint32,
+	userIds []*uint32,
+) (respUserList []*user.User) {
+	var wg sync.WaitGroup
+	wg.Add(len(userIds))
+	respUserList = make([]*user.User, len(userIds))
+	for i, v := range userIds {
+		go func(i int, v *uint32) {
+			defer wg.Done()
+			userResponse, localErr := UserClient.GetUser(ctx, &user.UserRequest{
+				UserId:  *v,
+				ActorId: actorId,
+			})
+			if localErr != nil || userResponse.StatusCode != biz.OkStatusCode {
+				logger.WithFields(logrus.Fields{
+					"actor_id": actorId,
+					"user_id":  *v,
+					"cause":    localErr,
+				}).Warning("failed to get user info")
+				return
+			}
+			respUserList[i] = userResponse.User
+		}(i, v)
+	}
+	wg.Wait()
 	return
 }
 
@@ -78,20 +110,12 @@ func (s *RelationServiceImpl) GetFollowList(ctx context.Context, req *relation.F
 		}
 		return
 	}
-	var userList []*user.User
-	for _, m := range relationModels {
-		userResponse, err := UserClient.GetUser(ctx, &user.UserRequest{
-			UserId:  m.TargetId,
-			ActorId: req.ActorId,
-		})
-		if err != nil || userResponse.StatusCode != biz.OkStatusCode {
-			logger.WithFields(logrus.Fields{
-				"err": err,
-			}).Debug("failed to get user info")
-			continue
-		}
-		userList = append(userList, userResponse.User)
+
+	userIds := make([]*uint32, len(relationModels))
+	for i, m := range relationModels {
+		userIds[i] = &m.TargetId
 	}
+	userList := queryUsers(ctx, logger, req.ActorId, userIds)
 
 	logger.WithFields(logrus.Fields{
 		"response": resp,
@@ -124,18 +148,12 @@ func (s *RelationServiceImpl) GetFollowerList(ctx context.Context, req *relation
 		}
 		return
 	}
-	var userList []*user.User
-	for _, m := range relationModels {
-		userResponse, err := UserClient.GetUser(ctx, &user.UserRequest{
-			UserId:  m.UserId,
-			ActorId: req.ActorId,
-		})
-		if err != nil || userResponse.StatusCode != biz.OkStatusCode {
-			logger.Error("failed to get user info: %w", err)
-			continue
-		}
-		userList = append(userList, userResponse.User)
+
+	userIds := make([]*uint32, len(relationModels))
+	for i, m := range relationModels {
+		userIds[i] = &m.UserId
 	}
+	userList := queryUsers(ctx, logger, req.ActorId, userIds)
 
 	logger.WithFields(logrus.Fields{
 		"response": resp,
@@ -181,29 +199,19 @@ func (s *RelationServiceImpl) GetFriendList(ctx context.Context, req *relation.F
 		return
 	}
 
-	var followerIds []uint32
+	var followerIds []*uint32
 	for _, followerModel := range followerModels {
-		followerIds = append(followerIds, followerModel.UserId)
+		followerIds = append(followerIds, &followerModel.UserId)
 	}
-	var followIds []uint32
+	var followIds []*uint32
 	for _, followModel := range followModels {
-		followIds = append(followIds, followModel.TargetId)
+		followIds = append(followIds, &followModel.TargetId)
 	}
 
 	var ids = intersection(followerIds, followIds)
 
-	var userList = []*user.User{biz.ChatGPTUser}
-	for _, m := range ids {
-		userResponse, err := UserClient.GetUser(ctx, &user.UserRequest{
-			UserId:  m,
-			ActorId: req.ActorId,
-		})
-		if err != nil || userResponse.StatusCode != biz.OkStatusCode {
-			logger.Error("failed to get user info: %w", err)
-			continue
-		}
-		userList = append(userList, userResponse.User)
-	}
+	userList := queryUsers(ctx, logger, req.ActorId, ids)
+	userList = append(userList, biz.ChatGPTUser)
 
 	resp = &relation.FriendListResponse{
 		StatusCode: biz.OkStatusCode,
