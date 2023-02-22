@@ -13,6 +13,7 @@ import (
 type Client interface {
 	CreateVideo(ctx context.Context, Req *publish.CreateVideoRequest, callOptions ...callopt.Option) (r *publish.CreateVideoResponse, err error)
 	ListVideo(ctx context.Context, Req *publish.ListVideoRequest, callOptions ...callopt.Option) (r *publish.ListVideoResponse, err error)
+	CountVideo(ctx context.Context, Req *publish.CountVideoRequest, callOptions ...callopt.Option) (r *publish.CountVideoResponse, err error)
 }
 
 // NewClient creates a client for the service defined in IDL.
@@ -52,4 +53,9 @@ func (p *kPublishServiceClient) CreateVideo(ctx context.Context, Req *publish.Cr
 func (p *kPublishServiceClient) ListVideo(ctx context.Context, Req *publish.ListVideoRequest, callOptions ...callopt.Option) (r *publish.ListVideoResponse, err error) {
 	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
 	return p.kClient.ListVideo(ctx, Req)
+}
+
+func (p *kPublishServiceClient) CountVideo(ctx context.Context, Req *publish.CountVideoRequest, callOptions ...callopt.Option) (r *publish.CountVideoResponse, err error) {
+	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
+	return p.kClient.CountVideo(ctx, Req)
 }

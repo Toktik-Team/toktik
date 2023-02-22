@@ -318,3 +318,9 @@ func (s *PublishServiceImpl) ListVideo(ctx context.Context, req *publish.ListVid
 		VideoList:  rVideo,
 	}, nil
 }
+
+// CountVideo implements the PublishServiceImpl interface.
+func (s *PublishServiceImpl) CountVideo(ctx context.Context, req *publish.CountVideoRequest) (resp *publish.CountVideoResponse, err error) {
+	// TODO: Your code here...
+	return
+}
