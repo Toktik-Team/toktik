@@ -14,7 +14,6 @@ const (
 const (
 	RedisError = 500000 + iota
 	ProtoMarshalError
-	ProtoUnmarshalError
 	UnableToCreateComment
 	UnableToDeleteComment
 	UnableToQueryVideo
@@ -30,7 +29,6 @@ const (
 	UnableToQueryFollowList
 	UnableToQueryFollowerList
 	UnableToQueryIsFollow
-	UnableToCreateRelation
 	UnableToDeleteRelation
 	UnableToLike
 	UnableToCancelLike
@@ -46,7 +44,6 @@ const (
 	VideoNotFound                    = 400002
 	Unable2ParseLatestTimeStatusCode = 400001
 	InvalidContentType               = 400101
-	TargetUserNotFound               = 400101
 	RelationNotFound                 = 400102
 	RelationAlreadyExists            = 400103
 	InvalidToUserId                  = 400104

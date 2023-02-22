@@ -3,10 +3,12 @@ package publish
 import (
 	"context"
 	"fmt"
+	"github.com/kitex-contrib/obs-opentelemetry/provider"
+	"github.com/kitex-contrib/obs-opentelemetry/tracing"
 	"mime/multipart"
 	"strconv"
 	bizConstant "toktik/constant/biz"
-	bizConfig "toktik/constant/config"
+	"toktik/constant/config"
 	"toktik/kitex_gen/douyin/publish"
 	publishService "toktik/kitex_gen/douyin/publish/publishservice"
 	"toktik/logging"
@@ -22,17 +24,26 @@ import (
 var publishClient publishService.Client
 
 func init() {
-	r, err := consul.NewConsulResolver(bizConfig.EnvConfig.CONSUL_ADDR)
+	r, err := consul.NewConsulResolver(config.EnvConfig.CONSUL_ADDR)
 	if err != nil {
 		panic(err)
 	}
-	publishClient, err = publishService.NewClient(bizConfig.PublishServiceName, client.WithResolver(r))
+	provider.NewOpenTelemetryProvider(
+		provider.WithServiceName(config.PublishServiceName),
+		provider.WithExportEndpoint(config.EnvConfig.EXPORT_ENDPOINT),
+		provider.WithInsecure(),
+	)
+	publishClient, err = publishService.NewClient(
+		config.PublishServiceName,
+		client.WithResolver(r),
+		client.WithSuite(tracing.NewClientSuite()),
+	)
 	if err != nil {
 		panic(err)
 	}
 }
 
-func paramValidate(ctx context.Context, c *app.RequestContext) (err error) {
+func paramValidate(c *app.RequestContext) (err error) {
 	var wrappedError error
 	form, err := c.Request.MultipartForm()
 	if err != nil {
@@ -60,7 +71,7 @@ func Action(ctx context.Context, c *app.RequestContext) {
 	logger := logging.Logger.WithFields(methodFields)
 	logger.Debugf("Process start")
 
-	if err := paramValidate(ctx, c); err != nil {
+	if err := paramValidate(c); err != nil {
 		bizConstant.InvalidArguments.WithCause(err).WithFields(&methodFields).LaunchError(c)
 		return
 	}

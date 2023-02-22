@@ -247,6 +247,6 @@ func TestCommentServiceImpl_ListComment(t *testing.T) {
 type MockUserClient struct {
 }
 
-func (m MockUserClient) GetUser(ctx context.Context, Req *user.UserRequest, callOptions ...callopt.Option) (r *user.UserResponse, err error) {
+func (m MockUserClient) GetUser(context.Context, *user.UserRequest, ...callopt.Option) (r *user.UserResponse, err error) {
 	return &user.UserResponse{StatusCode: biz.OkStatusCode, User: &mockUser}, nil
 }

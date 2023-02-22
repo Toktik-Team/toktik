@@ -2,9 +2,11 @@ package auth
 
 import (
 	"context"
+	"github.com/kitex-contrib/obs-opentelemetry/provider"
+	"github.com/kitex-contrib/obs-opentelemetry/tracing"
 	"log"
 	bizConstant "toktik/constant/biz"
-	bizConfig "toktik/constant/config"
+	"toktik/constant/config"
 	"toktik/kitex_gen/douyin/auth"
 	authService "toktik/kitex_gen/douyin/auth/authservice"
 	"toktik/logging"
@@ -19,11 +21,19 @@ import (
 var Client authService.Client
 
 func init() {
-	r, err := consul.NewConsulResolver(bizConfig.EnvConfig.CONSUL_ADDR)
+	r, err := consul.NewConsulResolver(config.EnvConfig.CONSUL_ADDR)
 	if err != nil {
 		log.Fatal(err)
 	}
-	Client, err = authService.NewClient(bizConfig.AuthServiceName, client.WithResolver(r))
+	provider.NewOpenTelemetryProvider(
+		provider.WithServiceName(config.AuthServiceName),
+		provider.WithExportEndpoint(config.EnvConfig.EXPORT_ENDPOINT),
+		provider.WithInsecure(),
+	)
+	Client, err = authService.NewClient(
+		config.AuthServiceName,
+		client.WithResolver(r),
+		client.WithSuite(tracing.NewClientSuite()))
 	if err != nil {
 		log.Fatal(err)
 	}

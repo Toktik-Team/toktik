@@ -4,6 +4,8 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/kitex-contrib/obs-opentelemetry/provider"
+	"github.com/kitex-contrib/obs-opentelemetry/tracing"
 	"log"
 	"strconv"
 	"toktik/constant/biz"
@@ -27,7 +29,16 @@ func init() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	commentClient, err = commentservice.NewClient(config.CommentServiceName, client.WithResolver(r))
+	provider.NewOpenTelemetryProvider(
+		provider.WithServiceName(config.CommentServiceName),
+		provider.WithExportEndpoint(config.EnvConfig.EXPORT_ENDPOINT),
+		provider.WithInsecure(),
+	)
+	commentClient, err = commentservice.NewClient(
+		config.CommentServiceName,
+		client.WithResolver(r),
+		client.WithSuite(tracing.NewClientSuite()),
+	)
 	if err != nil {
 		log.Fatal(err)
 	}

@@ -10,15 +10,15 @@ import (
 )
 
 var DBMock sqlmock.Sqlmock
-var MockConn *sql.DB
+var Conn *sql.DB
 
 func init() {
 	var err error
-	MockConn, DBMock, err = sqlmock.New()
+	Conn, DBMock, err = sqlmock.New()
 	db, err := gorm.Open(postgres.New(postgres.Config{
 		DSN:                  "sqlmock_db_0",
 		DriverName:           "postgres",
-		Conn:                 MockConn,
+		Conn:                 Conn,
 		PreferSimpleProtocol: true,
 	}), &gorm.Config{})
 	if err != nil {
