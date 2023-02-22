@@ -2,37 +2,27 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"github.com/cloudwego/kitex/client"
 	consul "github.com/kitex-contrib/registry-consul"
 	"github.com/sirupsen/logrus"
 	"toktik/constant/biz"
 	"toktik/constant/config"
-	"toktik/kitex_gen/douyin/comment"
-	commentService "toktik/kitex_gen/douyin/comment/commentservice"
 	"toktik/kitex_gen/douyin/favorite"
 	"toktik/kitex_gen/douyin/feed"
-	"toktik/kitex_gen/douyin/user"
-	userService "toktik/kitex_gen/douyin/user/userservice"
+	feedService "toktik/kitex_gen/douyin/feed/feedservice"
 	"toktik/logging"
 	gen "toktik/repo"
 	"toktik/repo/model"
-	"toktik/storage"
 )
 
-var UserClient userService.Client
-var CommentClient commentService.Client
+var FeedClient feedService.Client
 
 func init() {
 	r, err := consul.NewConsulResolver(config.EnvConfig.CONSUL_ADDR)
 	if err != nil {
 		panic(err)
 	}
-	UserClient, err = userService.NewClient(config.UserServiceName, client.WithResolver(r))
-	if err != nil {
-		panic(err)
-	}
-	CommentClient, err = commentService.NewClient(config.CommentServiceName, client.WithResolver(r))
+	FeedClient, err = feedService.NewClient(config.FeedServiceName, client.WithResolver(r))
 	if err != nil {
 		panic(err)
 	}
@@ -43,7 +33,7 @@ type FavoriteServiceImpl struct{}
 
 var logger = logging.Logger
 
-func like(ctx context.Context, actorId uint32, videoId uint32, authorId uint32) (resp *favorite.FavoriteResponse, err error) {
+func like(ctx context.Context, actorId uint32, videoId uint32) (resp *favorite.FavoriteResponse, err error) {
 	q := gen.Use(gen.DB)
 	err = q.Transaction(func(tx *gen.Query) error {
 		// 加入用户喜爱列表
@@ -76,7 +66,7 @@ func like(ctx context.Context, actorId uint32, videoId uint32, authorId uint32) 
 	return
 }
 
-func cancelLike(ctx context.Context, actorId uint32, videoId uint32, authorId uint32) (resp *favorite.FavoriteResponse, err error) {
+func cancelLike(ctx context.Context, actorId uint32, videoId uint32) (resp *favorite.FavoriteResponse, err error) {
 	q := gen.Use(gen.DB)
 	err = q.Transaction(func(tx *gen.Query) error {
 		// 从用户喜爱列表中移除
@@ -131,9 +121,9 @@ func (s *FavoriteServiceImpl) FavoriteAction(ctx context.Context, req *favorite.
 	}
 
 	if req.ActionType == 1 {
-		resp, err = like(ctx, req.ActorId, req.VideoId, authorId)
+		resp, err = like(ctx, req.ActorId, req.VideoId)
 	} else {
-		resp, err = cancelLike(ctx, req.ActorId, req.VideoId, authorId)
+		resp, err = cancelLike(ctx, req.ActorId, req.VideoId)
 	}
 
 	return
@@ -160,8 +150,10 @@ func (s *FavoriteServiceImpl) FavoriteList(ctx context.Context, req *favorite.Fa
 		return
 	}
 
-	v := gen.Video
-	videos, err := v.WithContext(ctx).Where(v.ID.In(videoIds...)).Find()
+	queryVideoResp, err := FeedClient.QueryVideos(ctx, &feed.QueryVideosRequest{
+		ActorId:  req.UserId,
+		VideoIds: videoIds,
+	})
 	if err != nil {
 		resp = &favorite.FavoriteListResponse{
 			StatusCode: biz.FailedToGetVideoList,
@@ -169,92 +161,14 @@ func (s *FavoriteServiceImpl) FavoriteList(ctx context.Context, req *favorite.Fa
 			VideoList:  nil,
 		}
 		logger.WithFields(field).
-			Errorf("Failed to get information of user's favorite videos: %v", err)
+			Errorf("Failed to get the user's favorite videos: %v", err)
 		return
-	}
-
-	var videoList []*feed.Video
-
-	for _, video := range videos {
-		userResponse, err := UserClient.GetUser(ctx, &user.UserRequest{
-			UserId:  video.UserId,
-			ActorId: req.UserId,
-		})
-		if err != nil {
-			logger.
-				WithFields(field).
-				WithFields(logrus.Fields{
-					"function called": "UserClient.GetUser",
-					"parameters":      fmt.Sprintf("UserId: %d, ActorId: %d", video.UserId, req.UserId),
-				}).Errorf("Failed to get user information: %v", err)
-			continue
-		}
-
-		playUrl, err := storage.GetLink(video.FileName)
-		if err != nil {
-			logger.
-				WithFields(field).
-				WithFields(logrus.Fields{
-					"function called": "storage.GetLink",
-					"parameters":      fmt.Sprintf("fileName: %s", video.FileName),
-				}).Errorf("Failed to get play url: %v", err)
-			continue
-		}
-
-		coverUrl, err := storage.GetLink(video.CoverName)
-		if err != nil {
-			logger.
-				WithFields(field).
-				WithFields(logrus.Fields{
-					"function called": "storage.GetLink",
-					"parameters":      fmt.Sprintf("fileName: %s", video.CoverName),
-				}).Errorf("Failed to get play url: %v", err)
-			continue
-		}
-
-		favoriteCount, err := s.FavoriteCount(ctx, &favorite.FavoriteCountRequest{
-			VideoId: video.ID,
-		})
-		if err != nil {
-			logger.
-				WithFields(field).
-				WithFields(logrus.Fields{
-					"function called": "FavoriteClient.FavoriteCount",
-					"parameters":      fmt.Sprintf("VideoId: %d", video.ID),
-				}).Errorf("Failed to get the number of likes: %v", err)
-			continue
-		}
-
-		commentCount, err := CommentClient.CountComment(ctx, &comment.CountCommentRequest{
-			ActorId: req.UserId,
-			VideoId: video.ID,
-		})
-		if err != nil {
-			logger.
-				WithFields(field).
-				WithFields(logrus.Fields{
-					"function called": "CommentClient.CountComment",
-					"parameters":      fmt.Sprintf("ActorId: %d, VideoId: %d", req.UserId, video.ID),
-				}).Errorf("Failed to get the number of comments: %v", err)
-			continue
-		}
-
-		videoList = append(videoList, &feed.Video{
-			Id:            video.ID,
-			Author:        userResponse.User,
-			PlayUrl:       playUrl,
-			CoverUrl:      coverUrl,
-			FavoriteCount: favoriteCount.Count,
-			CommentCount:  commentCount.CommentCount,
-			IsFavorite:    true,
-			Title:         video.Title,
-		})
 	}
 
 	resp = &favorite.FavoriteListResponse{
 		StatusCode: biz.OkStatusCode,
 		StatusMsg:  &biz.OkStatusMsg,
-		VideoList:  videoList,
+		VideoList:  queryVideoResp.VideoList,
 	}
 	return
 }
@@ -334,10 +248,9 @@ func (s *FavoriteServiceImpl) UserTotalFavoritedCount(ctx context.Context, req *
 	}
 	logger.WithFields(field).Info("process start")
 
-	var videoIds []uint32
-	err = gen.Q.Video.WithContext(ctx).
+	videos, err := gen.Q.Video.WithContext(ctx).
 		Where(gen.Q.Video.UserId.Eq(req.UserId)).
-		Pluck(gen.Q.Video.ID, &videoIds)
+		Find()
 	if err != nil {
 		logger.WithFields(field).
 			Errorf("Failed to get the number of favorites: %v", err)
@@ -345,6 +258,11 @@ func (s *FavoriteServiceImpl) UserTotalFavoritedCount(ctx context.Context, req *
 			StatusCode: biz.SQLQueryErrorStatusCode,
 			StatusMsg:  &biz.InternalServerErrorStatusMsg,
 		}, nil
+	}
+
+	videoIds := make([]uint32, 0, len(videos))
+	for _, video := range videos {
+		videoIds = append(videoIds, video.ID)
 	}
 
 	count, err := gen.Q.Favorite.WithContext(ctx).

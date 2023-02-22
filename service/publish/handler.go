@@ -12,13 +12,8 @@ import (
 	"net/http"
 	"toktik/constant/biz"
 	"toktik/constant/config"
-	"toktik/kitex_gen/douyin/comment"
-	"toktik/kitex_gen/douyin/comment/commentservice"
-	"toktik/kitex_gen/douyin/favorite"
-	favoriteService "toktik/kitex_gen/douyin/favorite/favoriteservice"
 	"toktik/kitex_gen/douyin/feed"
-	"toktik/kitex_gen/douyin/user"
-	"toktik/kitex_gen/douyin/user/userservice"
+	feedService "toktik/kitex_gen/douyin/feed/feedservice"
 	"toktik/logging"
 	"toktik/repo/model"
 
@@ -34,26 +29,16 @@ import (
 	"toktik/storage"
 )
 
-var UserClient userservice.Client
-var CommentClient commentservice.Client
-var FavoriteClient favoriteService.Client
+var FeedClient feedService.Client
 
 func init() {
 	r, err := consul.NewConsulResolver(config.EnvConfig.CONSUL_ADDR)
 	if err != nil {
 		log.Fatal(err)
 	}
-	UserClient, err = userservice.NewClient(config.UserServiceName, client.WithResolver(r))
+	FeedClient, err = feedService.NewClient(config.FeedServiceName, client.WithResolver(r))
 	if err != nil {
-		log.Fatal(err)
-	}
-	CommentClient, err = commentservice.NewClient(config.CommentServiceName, client.WithResolver(r))
-	if err != nil {
-		log.Fatal(err)
-	}
-	FavoriteClient, err = favoriteService.NewClient(config.FavoriteServiceName, client.WithResolver(r))
-	if err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
 }
 
@@ -207,7 +192,7 @@ func (s *PublishServiceImpl) ListVideo(ctx context.Context, req *publish.ListVid
 	logger := logging.Logger.WithFields(methodFields)
 	logger.Debug("Process start")
 
-	find, err := gen.Q.Video.WithContext(ctx).
+	videos, err := gen.Q.Video.WithContext(ctx).
 		Where(gen.Q.Video.UserId.Eq(req.UserId)).
 		Order(gen.Q.Video.CreatedAt.Desc()).
 		Find()
@@ -221,79 +206,15 @@ func (s *PublishServiceImpl) ListVideo(ctx context.Context, req *publish.ListVid
 		}, nil
 	}
 
-	rVideo := make([]*feed.Video, 0, len(find))
-	for _, m := range find {
-
-		userResponse, err := UserClient.GetUser(ctx, &user.UserRequest{
-			UserId:  m.UserId,
-			ActorId: req.ActorId,
-		})
-		if err != nil || userResponse.StatusCode != biz.OkStatusCode {
-			logger.WithFields(logrus.Fields{
-				"err": err,
-			}).Debug("failed to get user info")
-			continue
-		}
-
-		playUrl, err := storage.GetLink(m.FileName)
-		if err != nil {
-			logger.WithFields(logrus.Fields{
-				"err": err,
-			}).Debug("failed to fetch play url")
-			continue
-		}
-
-		coverUrl, err := storage.GetLink(m.CoverName)
-		if err != nil {
-			logger.WithFields(logrus.Fields{
-				"err": err,
-			}).Debug("failed to fetch cover url")
-			continue
-		}
-
-		favoriteCount, err := FavoriteClient.FavoriteCount(ctx, &favorite.FavoriteCountRequest{
-			VideoId: m.ID,
-		})
-		if err != nil {
-			logger.WithFields(logrus.Fields{
-				"err": err,
-			}).Debug("failed to fetch favorite count")
-			continue
-		}
-
-		commentCount, err := CommentClient.CountComment(ctx, &comment.CountCommentRequest{
-			ActorId: req.ActorId,
-			VideoId: m.ID,
-		})
-		if err != nil {
-			logger.WithFields(logrus.Fields{
-				"err": err,
-			}).Debug("failed to fetch comment count")
-			continue
-		}
-
-		isFavorite, err := FavoriteClient.IsFavorite(ctx, &favorite.IsFavoriteRequest{
-			UserId:  req.UserId,
-			VideoId: m.ID,
-		})
-		if err != nil {
-			logger.WithFields(logrus.Fields{
-				"err": err,
-			}).Debug("unable to determine if the user liked the video")
-			continue
-		}
-
-		rVideo = append(rVideo, &feed.Video{
-			Id:            m.ID,
-			Author:        userResponse.User,
-			PlayUrl:       playUrl,
-			CoverUrl:      coverUrl,
-			FavoriteCount: favoriteCount.Count,
-			CommentCount:  commentCount.CommentCount,
-			IsFavorite:    isFavorite.Result,
-			Title:         m.Title,
-		})
+	videoIds := make([]uint32, 0, len(videos))
+	for _, video := range videos {
+		videoIds = append(videoIds, video.ID)
 	}
+
+	queryVideoResp, err := FeedClient.QueryVideos(ctx, &feed.QueryVideosRequest{
+		ActorId:  req.ActorId,
+		VideoIds: videoIds,
+	})
 
 	logger.WithFields(logrus.Fields{
 		"response": resp,
@@ -301,7 +222,7 @@ func (s *PublishServiceImpl) ListVideo(ctx context.Context, req *publish.ListVid
 	return &publish.ListVideoResponse{
 		StatusCode: biz.OkStatusCode,
 		StatusMsg:  &biz.OkStatusMsg,
-		VideoList:  rVideo,
+		VideoList:  queryVideoResp.VideoList,
 	}, nil
 }
 

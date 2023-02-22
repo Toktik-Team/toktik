@@ -12,8 +12,6 @@ import (
 	"testing"
 	"time"
 	"toktik/constant/biz"
-	"toktik/kitex_gen/douyin/comment"
-	"toktik/kitex_gen/douyin/favorite"
 	"toktik/kitex_gen/douyin/feed"
 	"toktik/kitex_gen/douyin/publish"
 	"toktik/kitex_gen/douyin/user"
@@ -153,9 +151,7 @@ func TestPublishServiceImpl_ListVideo(t *testing.T) {
 		VideoList:  []*feed.Video{&mockVideoResp},
 	}
 
-	UserClient = MockUserClient{}
-	CommentClient = MockCommentClient{}
-	FavoriteClient = MockFavoriteClient{}
+	FeedClient = MockFeedClient{}
 
 	rows := sqlmock.NewRows([]string{"id", "created_at", "updated_at", "deleted_at", "user_id", "title", "file_name", "cover_name"})
 	rows.AddRow(mockVideoReq.ID, mockVideoReq.CreatedAt, nil, nil, mockVideoReq.UserId, mockVideoReq.Title, mockVideoReq.FileName, mockVideoReq.CoverName)
@@ -191,32 +187,6 @@ func TestPublishServiceImpl_ListVideo(t *testing.T) {
 	}
 }
 
-type MockUserClient struct {
-}
-
-func (m MockUserClient) GetUser(ctx context.Context, Req *user.UserRequest, callOptions ...callopt.Option) (r *user.UserResponse, err error) {
-	return &user.UserResponse{StatusCode: biz.OkStatusCode, User: &mockUser}, nil
-}
-
-type MockCommentClient struct {
-}
-
-func (m MockCommentClient) CountComment(ctx context.Context, Req *comment.CountCommentRequest, callOptions ...callopt.Option) (r *comment.CountCommentResponse, err error) {
-	return &comment.CountCommentResponse{
-		StatusCode:   biz.OkStatusCode,
-		StatusMsg:    &biz.OkStatusMsg,
-		CommentCount: 0,
-	}, nil
-}
-
-func (m MockCommentClient) ActionComment(ctx context.Context, Req *comment.ActionCommentRequest, callOptions ...callopt.Option) (r *comment.ActionCommentResponse, err error) {
-	panic("unimplemented")
-}
-
-func (m MockCommentClient) ListComment(ctx context.Context, Req *comment.ListCommentRequest, callOptions ...callopt.Option) (r *comment.ListCommentResponse, err error) {
-	panic("unimplemented")
-}
-
 type MockStorageProvider struct {
 }
 
@@ -229,36 +199,21 @@ func (m MockStorageProvider) GetLink(fileName string) (string, error) {
 	return "https://test.com/" + fileName, nil
 }
 
-type MockFavoriteClient struct {
+type MockFeedClient struct {
 }
 
-func (m MockFavoriteClient) UserFavoriteCount(ctx context.Context, Req *favorite.UserFavoriteCountRequest, callOptions ...callopt.Option) (r *favorite.UserFavoriteCountResponse, err error) {
-	return &favorite.UserFavoriteCountResponse{
-		Count: 0,
-	}, nil
-}
-func (m MockFavoriteClient) UserTotalFavoritedCount(ctx context.Context, Req *favorite.UserTotalFavoritedCountRequest, callOptions ...callopt.Option) (r *favorite.UserTotalFavoritedCountResponse, err error) {
-	return &favorite.UserTotalFavoritedCountResponse{
-		Count: 0,
+func (m MockFeedClient) ListVideos(ctx context.Context, Req *feed.ListFeedRequest, callOptions ...callopt.Option) (r *feed.ListFeedResponse, err error) {
+	return &feed.ListFeedResponse{
+		StatusCode: biz.OkStatusCode,
+		StatusMsg:  &biz.OkStatusMsg,
+		VideoList:  []*feed.Video{&mockVideoResp},
 	}, nil
 }
 
-func (m MockFavoriteClient) FavoriteAction(ctx context.Context, Req *favorite.FavoriteRequest, callOptions ...callopt.Option) (r *favorite.FavoriteResponse, err error) {
-	panic("unimplemented")
-}
-
-func (m MockFavoriteClient) FavoriteList(ctx context.Context, Req *favorite.FavoriteListRequest, callOptions ...callopt.Option) (r *favorite.FavoriteListResponse, err error) {
-	panic("unimplemented")
-}
-
-func (m MockFavoriteClient) IsFavorite(ctx context.Context, Req *favorite.IsFavoriteRequest, callOptions ...callopt.Option) (r *favorite.IsFavoriteResponse, err error) {
-	return &favorite.IsFavoriteResponse{
-		Result: false,
-	}, nil
-}
-
-func (m MockFavoriteClient) FavoriteCount(ctx context.Context, Req *favorite.FavoriteCountRequest, callOptions ...callopt.Option) (r *favorite.FavoriteCountResponse, err error) {
-	return &favorite.FavoriteCountResponse{
-		Count: 0,
+func (m MockFeedClient) QueryVideos(ctx context.Context, Req *feed.QueryVideosRequest, callOptions ...callopt.Option) (r *feed.QueryVideosResponse, err error) {
+	return &feed.QueryVideosResponse{
+		StatusCode: biz.OkStatusCode,
+		StatusMsg:  &biz.OkStatusMsg,
+		VideoList:  []*feed.Video{&mockVideoResp},
 	}, nil
 }

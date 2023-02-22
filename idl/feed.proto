@@ -28,6 +28,18 @@ message ListFeedResponse {
   repeated Video video_list = 4;
 }
 
+message QueryVideosRequest {
+  uint32 actor_id = 1;
+  repeated uint32 video_ids = 2;
+}
+
+message QueryVideosResponse {
+  uint32 status_code = 1;
+  optional string status_msg = 2;
+  repeated Video video_list = 3;
+}
+
 service FeedService {
   rpc ListVideos(ListFeedRequest) returns (ListFeedResponse);
+  rpc QueryVideos(QueryVideosRequest) returns (QueryVideosResponse);
 }
