@@ -30,7 +30,8 @@ func TestRelationServiceImpl_GetFollowList(t *testing.T) {
 		ctx context.Context
 		req *relation.FollowListRequest
 	}{ctx: context.Background(), req: &relation.FollowListRequest{
-		UserId: mockUserA.Id,
+		ActorId: mockUserA.Id,
+		UserId:  mockUserA.Id,
 	}}
 
 	var successResp = &relation.FollowListResponse{
@@ -94,7 +95,8 @@ func TestRelationServiceImpl_GetFollowerList(t *testing.T) {
 		ctx context.Context
 		req *relation.FollowerListRequest
 	}{ctx: context.Background(), req: &relation.FollowerListRequest{
-		UserId: mockUserB.Id,
+		ActorId: mockUserB.Id,
+		UserId:  mockUserA.Id,
 	}}
 
 	var successResp = &relation.FollowerListResponse{
@@ -147,8 +149,8 @@ func TestRelationServiceImpl_Follow(t *testing.T) {
 		ctx context.Context
 		req *relation.RelationActionRequest
 	}{ctx: context.Background(), req: &relation.RelationActionRequest{
-		UserId:   mockUserA.Id,
-		ToUserId: mockUserB.Id,
+		ActorId: mockUserA.Id,
+		UserId:  mockUserB.Id,
 	}}
 
 	var successResp = &relation.RelationActionResponse{
@@ -160,8 +162,8 @@ func TestRelationServiceImpl_Follow(t *testing.T) {
 		ctx context.Context
 		req *relation.RelationActionRequest
 	}{ctx: context.Background(), req: &relation.RelationActionRequest{
-		UserId:   mockUserA.Id,
-		ToUserId: mockUserA.Id,
+		ActorId: mockUserA.Id,
+		UserId:  mockUserA.Id,
 	}}
 
 	var followMyselfResp = &relation.RelationActionResponse{
@@ -173,8 +175,8 @@ func TestRelationServiceImpl_Follow(t *testing.T) {
 		ctx context.Context
 		req *relation.RelationActionRequest
 	}{ctx: context.Background(), req: &relation.RelationActionRequest{
-		UserId:   mockUserA.Id,
-		ToUserId: mockUserC.Id,
+		ActorId: mockUserA.Id,
+		UserId:  mockUserC.Id,
 	}}
 
 	var followAlreadyExistsResp = &relation.RelationActionResponse{
@@ -186,8 +188,8 @@ func TestRelationServiceImpl_Follow(t *testing.T) {
 		ctx context.Context
 		req *relation.RelationActionRequest
 	}{ctx: context.Background(), req: &relation.RelationActionRequest{
-		UserId:   mockUserA.Id,
-		ToUserId: 999,
+		ActorId: mockUserA.Id,
+		UserId:  999,
 	}}
 
 	var followUserNotFoundResp = &relation.RelationActionResponse{
@@ -255,8 +257,8 @@ func TestRelationServiceImpl_Unfollow(t *testing.T) {
 		ctx context.Context
 		req *relation.RelationActionRequest
 	}{ctx: context.Background(), req: &relation.RelationActionRequest{
-		UserId:   mockUserA.Id,
-		ToUserId: mockUserB.Id,
+		ActorId: mockUserA.Id,
+		UserId:  mockUserB.Id,
 	}}
 
 	var successResp = &relation.RelationActionResponse{
@@ -268,8 +270,8 @@ func TestRelationServiceImpl_Unfollow(t *testing.T) {
 		ctx context.Context
 		req *relation.RelationActionRequest
 	}{ctx: context.Background(), req: &relation.RelationActionRequest{
-		UserId:   mockUserA.Id,
-		ToUserId: mockUserC.Id,
+		ActorId: mockUserA.Id,
+		UserId:  mockUserC.Id,
 	}}
 
 	var unfollowNotFoundResp = &relation.RelationActionResponse{
@@ -332,13 +334,15 @@ func TestRelationServiceImpl_GetFriendList(t *testing.T) {
 		ctx context.Context
 		req *relation.FriendListRequest
 	}{ctx: context.Background(), req: &relation.FriendListRequest{
-		UserId: mockUserA.Id,
+		ActorId: mockUserA.Id,
+		UserId:  mockUserA.Id,
 	}}
 
 	var successResp = &relation.FriendListResponse{
 		StatusCode: biz.OkStatusCode,
 		StatusMsg:  biz.OkStatusMsg,
 		UserList: []*user.User{
+			biz.ChatGPTUser,
 			mockUserB,
 		},
 	}
