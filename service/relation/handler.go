@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"log"
-	"time"
 	"toktik/constant/biz"
 	"toktik/constant/config"
 	"toktik/kitex_gen/douyin/relation"
@@ -339,7 +338,6 @@ func (s *RelationServiceImpl) Unfollow(ctx context.Context, req *relation.Relati
 func (s *RelationServiceImpl) CountFollowList(ctx context.Context, req *relation.CountFollowListRequest) (resp *relation.CountFollowListResponse, err error) {
 	methodFields := logrus.Fields{
 		"user_id":  req.UserId,
-		"time":     time.Now(),
 		"function": "CountFollowList",
 	}
 	logger := logging.Logger.WithFields(methodFields)
@@ -350,7 +348,6 @@ func (s *RelationServiceImpl) CountFollowList(ctx context.Context, req *relation
 	if err != nil {
 		logger.WithFields(map[string]interface{}{
 			"user_id": req.UserId,
-			"time":    time.Now(),
 			"err":     err,
 		}).Debug("failed to count follow list")
 
@@ -372,7 +369,6 @@ func (s *RelationServiceImpl) CountFollowList(ctx context.Context, req *relation
 func (s *RelationServiceImpl) CountFollowerList(ctx context.Context, req *relation.CountFollowerListRequest) (resp *relation.CountFollowerListResponse, err error) {
 	methodFields := logrus.Fields{
 		"user_id":  req.UserId,
-		"time":     time.Now(),
 		"function": "CountFollowerList",
 	}
 	logger := logging.Logger.WithFields(methodFields)
@@ -383,7 +379,6 @@ func (s *RelationServiceImpl) CountFollowerList(ctx context.Context, req *relati
 	if err != nil {
 		logger.WithFields(map[string]interface{}{
 			"user_id": req.UserId,
-			"time":    time.Now(),
 			"err":     err,
 		}).Debug("failed to count follower list")
 
