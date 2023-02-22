@@ -24,6 +24,6 @@ jobs:
         with:
           context: .
           push: false
-          tags: toktik-srv:$(date +%s)
+          tags: toktik-srv:${{ github.sha }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
