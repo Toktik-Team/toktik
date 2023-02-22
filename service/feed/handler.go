@@ -8,6 +8,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"log"
 	"strconv"
+	"sync"
 	"time"
 	"toktik/constant/biz"
 	"toktik/constant/config"
@@ -167,6 +168,7 @@ func queryDetailed(
 	actorId uint32,
 	videos []*model.Video,
 ) (respVideoList []*feed.Video) {
+	wg := sync.WaitGroup{}
 	respVideoList = make([]*feed.Video, len(videos))
 	for i, v := range videos {
 		respVideoList[i] = &feed.Video{
@@ -174,8 +176,10 @@ func queryDetailed(
 			Title:  v.Title,
 			Author: &user.User{Id: v.UserId},
 		}
+		wg.Add(6)
 		// fill author
 		go func(i int, v *model.Video) {
+			defer wg.Done()
 			userResponse, localErr := UserClient.GetUser(ctx, &user.UserRequest{
 				UserId:  v.UserId,
 				ActorId: actorId,
@@ -193,6 +197,7 @@ func queryDetailed(
 
 		// fill play url
 		go func(i int, v *model.Video) {
+			defer wg.Done()
 			playUrl, localErr := storage.GetLink(v.FileName)
 			if localErr != nil {
 				logger.WithFields(logrus.Fields{
@@ -207,6 +212,7 @@ func queryDetailed(
 
 		// fill cover url
 		go func(i int, v *model.Video) {
+			defer wg.Done()
 			coverUrl, localErr := storage.GetLink(v.CoverName)
 			if localErr != nil {
 				logger.WithFields(logrus.Fields{
@@ -221,6 +227,7 @@ func queryDetailed(
 
 		// fill favorite count
 		go func(i int, v *model.Video) {
+			defer wg.Done()
 			favoriteCount, localErr := FavoriteClient.CountFavorite(ctx, &favorite.CountFavoriteRequest{
 				VideoId: v.ID,
 			})
@@ -236,6 +243,7 @@ func queryDetailed(
 
 		// fill comment count
 		go func(i int, v *model.Video) {
+			defer wg.Done()
 			commentCount, localErr := CommentClient.CountComment(ctx, &comment.CountCommentRequest{
 				ActorId: actorId,
 				VideoId: v.ID,
@@ -252,6 +260,7 @@ func queryDetailed(
 
 		// fill is favorite
 		go func(i int, v *model.Video) {
+			defer wg.Done()
 			isFavorite, localErr := FavoriteClient.IsFavorite(ctx, &favorite.IsFavoriteRequest{
 				UserId:  actorId,
 				VideoId: v.ID,
@@ -266,6 +275,8 @@ func queryDetailed(
 			respVideoList[i].IsFavorite = isFavorite.Result
 		}(i, v)
 	}
+	wg.Wait()
+
 	return
 }
 
