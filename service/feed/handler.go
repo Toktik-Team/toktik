@@ -7,6 +7,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"log"
 	"strconv"
+	"sync"
 	"time"
 	"toktik/constant/biz"
 	"toktik/constant/config"
@@ -149,77 +150,95 @@ func (s *FeedServiceImpl) QueryVideos(ctx context.Context, req *feed.QueryVideos
 }
 
 func queryDetailed(ctx context.Context, logger *logrus.Entry, actorId uint32, videos []*model.Video) (resp []*feed.Video, err error) {
-	rVideos := make([]*feed.Video, 0, len(videos))
+	var wg sync.WaitGroup
+	wg.Add(len(videos))
+
+	videoChannel := make(chan *feed.Video, len(videos))
 
 	for _, m := range videos {
 
-		userResponse, err := UserClient.GetUser(ctx, &user.UserRequest{
-			UserId:  m.UserId,
-			ActorId: actorId,
-		})
-		if err != nil || userResponse.StatusCode != biz.OkStatusCode {
-			logger.WithFields(logrus.Fields{
-				"err": err,
-			}).Debug("failed to get user info")
-			continue
-		}
+		go func(video *model.Video) {
+			defer wg.Done()
 
-		playUrl, err := storage.GetLink(m.FileName)
-		if err != nil {
-			logger.WithFields(logrus.Fields{
-				"err": err,
-			}).Debug("failed to fetch play url")
-			continue
-		}
+			userResponse, err := UserClient.GetUser(ctx, &user.UserRequest{
+				UserId:  video.UserId,
+				ActorId: actorId,
+			})
+			if err != nil || userResponse.StatusCode != biz.OkStatusCode {
+				logger.WithFields(logrus.Fields{
+					"err": err,
+				}).Debug("failed to get user info")
+				return
+			}
 
-		coverUrl, err := storage.GetLink(m.CoverName)
-		if err != nil {
-			logger.WithFields(logrus.Fields{
-				"err": err,
-			}).Debug("failed to fetch cover url")
-			continue
-		}
+			playUrl, err := storage.GetLink(video.FileName)
+			if err != nil {
+				logger.WithFields(logrus.Fields{
+					"err": err,
+				}).Debug("failed to fetch play url")
+				return
+			}
 
-		favoriteCount, err := FavoriteClient.FavoriteCount(ctx, &favorite.FavoriteCountRequest{
-			VideoId: m.ID,
-		})
-		if err != nil {
-			logger.WithFields(logrus.Fields{
-				"err": err,
-			}).Debug("failed to fetch favorite count")
-			continue
-		}
-		commentCount, err := CommentClient.CountComment(ctx, &comment.CountCommentRequest{
-			ActorId: actorId,
-			VideoId: m.ID,
-		})
-		if err != nil {
-			logger.WithFields(logrus.Fields{
-				"err": err,
-			}).Debug("failed to fetch comment count")
-			continue
-		}
-		isFavorite, err := FavoriteClient.IsFavorite(ctx, &favorite.IsFavoriteRequest{
-			UserId:  actorId,
-			VideoId: m.ID,
-		})
-		if err != nil {
-			logger.WithFields(logrus.Fields{
-				"err": err,
-			}).Debug("unable to determine if the user liked the video")
-			continue
-		}
+			coverUrl, err := storage.GetLink(video.CoverName)
+			if err != nil {
+				logger.WithFields(logrus.Fields{
+					"err": err,
+				}).Debug("failed to fetch cover url")
+				return
+			}
 
-		rVideos = append(rVideos, &feed.Video{
-			Id:            m.ID,
-			Author:        userResponse.User,
-			PlayUrl:       playUrl,
-			CoverUrl:      coverUrl,
-			FavoriteCount: favoriteCount.Count,
-			CommentCount:  commentCount.CommentCount,
-			IsFavorite:    isFavorite.Result,
-			Title:         m.Title,
-		})
+			favoriteCount, err := FavoriteClient.FavoriteCount(ctx, &favorite.FavoriteCountRequest{
+				VideoId: video.ID,
+			})
+			if err != nil {
+				logger.WithFields(logrus.Fields{
+					"err": err,
+				}).Debug("failed to fetch favorite count")
+				return
+			}
+			commentCount, err := CommentClient.CountComment(ctx, &comment.CountCommentRequest{
+				ActorId: actorId,
+				VideoId: video.ID,
+			})
+			if err != nil {
+				logger.WithFields(logrus.Fields{
+					"err": err,
+				}).Debug("failed to fetch comment count")
+				return
+			}
+			isFavorite, err := FavoriteClient.IsFavorite(ctx, &favorite.IsFavoriteRequest{
+				UserId:  actorId,
+				VideoId: video.ID,
+			})
+			if err != nil {
+				logger.WithFields(logrus.Fields{
+					"err": err,
+				}).Debug("unable to determine if the user liked the video")
+				return
+			}
+
+			videoChannel <- &feed.Video{
+				Id:            video.ID,
+				Author:        userResponse.User,
+				PlayUrl:       playUrl,
+				CoverUrl:      coverUrl,
+				FavoriteCount: favoriteCount.Count,
+				CommentCount:  commentCount.CommentCount,
+				IsFavorite:    isFavorite.Result,
+				Title:         video.Title,
+			}
+
+		}(m)
+	}
+
+	go func() {
+		wg.Wait()
+		close(videoChannel)
+	}()
+
+	rVideos := make([]*feed.Video, 0, len(videos))
+	for v := range videoChannel {
+		rVideos = append(rVideos, v)
 	}
 
 	return rVideos, nil
