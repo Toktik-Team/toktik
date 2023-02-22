@@ -3,7 +3,6 @@ package relation
 import (
 	"context"
 	"strconv"
-	"time"
 	bizConstant "toktik/constant/biz"
 	bizConfig "toktik/constant/config"
 	"toktik/kitex_gen/douyin/relation"
@@ -37,7 +36,6 @@ func RelationAction(ctx context.Context, c *app.RequestContext) {
 	var relationResp *relation.RelationActionResponse
 
 	methodFields := logrus.Fields{
-		"time":   time.Now(),
 		"method": "RelationAction",
 	}
 	logger := logging.Logger.WithFields(methodFields)
@@ -110,7 +108,6 @@ func RelationAction(ctx context.Context, c *app.RequestContext) {
 func GetFollowList(ctx context.Context, c *app.RequestContext) {
 
 	methodFields := logrus.Fields{
-		"time":   time.Now(),
 		"method": "GetFollowList",
 	}
 	logger := logging.Logger.WithFields(methodFields)
@@ -141,7 +138,6 @@ func GetFollowList(ctx context.Context, c *app.RequestContext) {
 func GetFollowerList(ctx context.Context, c *app.RequestContext) {
 
 	methodFields := logrus.Fields{
-		"time":   time.Now(),
 		"method": "GetFollowerList",
 	}
 	logger := logging.Logger.WithFields(methodFields)
@@ -172,7 +168,6 @@ func GetFollowerList(ctx context.Context, c *app.RequestContext) {
 func GetFriendList(ctx context.Context, c *app.RequestContext) {
 
 	methodFields := logrus.Fields{
-		"time":   time.Now(),
 		"method": "GetFriendList",
 	}
 	logger := logging.Logger.WithFields(methodFields)

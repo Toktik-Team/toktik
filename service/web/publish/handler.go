@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"mime/multipart"
 	"strconv"
-	"time"
 	bizConstant "toktik/constant/biz"
 	bizConfig "toktik/constant/config"
 	"toktik/kitex_gen/douyin/publish"
@@ -56,7 +55,6 @@ func paramValidate(ctx context.Context, c *app.RequestContext) (err error) {
 
 func Action(ctx context.Context, c *app.RequestContext) {
 	methodFields := logrus.Fields{
-		"time":   time.Now(),
 		"method": "PublishAction",
 	}
 	logger := logging.Logger.WithFields(methodFields)
@@ -116,7 +114,6 @@ func Action(ctx context.Context, c *app.RequestContext) {
 
 func List(ctx context.Context, c *app.RequestContext) {
 	methodFields := logrus.Fields{
-		"time":   time.Now(),
 		"method": "CommentAction",
 	}
 	logger := logging.Logger.WithFields(methodFields)

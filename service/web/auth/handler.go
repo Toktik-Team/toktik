@@ -3,7 +3,6 @@ package auth
 import (
 	"context"
 	"log"
-	"time"
 	bizConstant "toktik/constant/biz"
 	bizConfig "toktik/constant/config"
 	"toktik/kitex_gen/douyin/auth"
@@ -32,7 +31,6 @@ func init() {
 
 func Register(ctx context.Context, c *app.RequestContext) {
 	methodFields := logrus.Fields{
-		"time":   time.Now(),
 		"method": "Register",
 	}
 	logger := logging.Logger.WithFields(methodFields)
@@ -64,7 +62,6 @@ func Register(ctx context.Context, c *app.RequestContext) {
 
 func Login(ctx context.Context, c *app.RequestContext) {
 	methodFields := logrus.Fields{
-		"time":   time.Now(),
 		"method": "Login",
 	}
 	logger := logging.Logger.WithFields(methodFields)

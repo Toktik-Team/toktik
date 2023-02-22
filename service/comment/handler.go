@@ -6,7 +6,6 @@ import (
 	consul "github.com/kitex-contrib/registry-consul"
 	"github.com/sirupsen/logrus"
 	"log"
-	"time"
 	"toktik/constant/biz"
 	"toktik/constant/config"
 	"toktik/kitex_gen/douyin/comment"
@@ -41,7 +40,6 @@ func (s *CommentServiceImpl) ActionComment(ctx context.Context, req *comment.Act
 		"action_type":  req.ActionType,
 		"comment_text": req.GetCommentText(),
 		"comment_id":   req.GetCommentId(),
-		"time":         time.Now(),
 		"function":     "ActionComment",
 	})
 	logger.Debugf("Process start")
@@ -56,9 +54,7 @@ func (s *CommentServiceImpl) ActionComment(ctx context.Context, req *comment.Act
 	case comment.ActionCommentType_ACTION_COMMENT_TYPE_UNSPECIFIED:
 		fallthrough
 	default:
-		logger.WithFields(logrus.Fields{
-			"time": time.Now(),
-		}).Warnf("invalid action type")
+		logger.Warnf("invalid action type")
 		return &comment.ActionCommentResponse{
 			StatusCode: biz.InvalidCommentActionType,
 			StatusMsg:  &biz.BadRequestStatusMsg,
@@ -72,8 +68,7 @@ func (s *CommentServiceImpl) ActionComment(ctx context.Context, req *comment.Act
 		First()
 	if err != nil {
 		logger.WithFields(logrus.Fields{
-			"time": time.Now(),
-			"err":  err,
+			"err": err,
 		}).Warnf("video query error")
 		return &comment.ActionCommentResponse{
 			StatusCode: biz.UnableToQueryVideo,
@@ -81,9 +76,7 @@ func (s *CommentServiceImpl) ActionComment(ctx context.Context, req *comment.Act
 		}, nil
 	}
 	if pVideo == nil {
-		logger.WithFields(logrus.Fields{
-			"time": time.Now(),
-		}).Warnf("video not found")
+		logger.Warnf("video not found")
 		return &comment.ActionCommentResponse{
 			StatusCode: biz.VideoNotFound,
 			StatusMsg:  &biz.BadRequestStatusMsg,
@@ -97,8 +90,7 @@ func (s *CommentServiceImpl) ActionComment(ctx context.Context, req *comment.Act
 
 	if err != nil || userResponse.StatusCode != biz.OkStatusCode {
 		logger.WithFields(logrus.Fields{
-			"time": time.Now(),
-			"err":  err,
+			"err": err,
 		}).Warnf("user service error")
 		return &comment.ActionCommentResponse{
 			StatusCode: biz.UnableToQueryUser,
@@ -119,7 +111,6 @@ func (s *CommentServiceImpl) ActionComment(ctx context.Context, req *comment.Act
 	}
 
 	logger.WithFields(logrus.Fields{
-		"time":     time.Now(),
 		"response": resp,
 	}).Debug("all process done, ready to launch response")
 
@@ -130,8 +121,7 @@ func addComment(ctx context.Context, logger *logrus.Entry, pUser *user.User, pVi
 	count, err := count(ctx, pVideoID)
 	if err != nil {
 		logger.WithFields(logrus.Fields{
-			"time": time.Now(),
-			"err":  err,
+			"err": err,
 		}).Debug("failed to query db entry")
 		resp = &comment.ActionCommentResponse{
 			StatusCode: biz.UnableToQueryComment,
@@ -150,8 +140,7 @@ func addComment(ctx context.Context, logger *logrus.Entry, pUser *user.User, pVi
 	err = gen.Q.Comment.WithContext(ctx).Create(&rComment)
 	if err != nil {
 		logger.WithFields(logrus.Fields{
-			"time": time.Now(),
-			"err":  err,
+			"err": err,
 		}).Debug("failed to create db entry")
 		resp = &comment.ActionCommentResponse{
 			StatusCode: biz.UnableToCreateComment,
@@ -181,8 +170,7 @@ func deleteComment(ctx context.Context, logger *logrus.Entry, pUser *user.User, 
 
 	if err != nil {
 		logger.WithFields(logrus.Fields{
-			"time": time.Now(),
-			"err":  err,
+			"err": err,
 		}).Debug("failed to query db entry")
 		resp = &comment.ActionCommentResponse{
 			StatusCode: biz.UnableToQueryComment,
@@ -192,9 +180,7 @@ func deleteComment(ctx context.Context, logger *logrus.Entry, pUser *user.User, 
 	}
 
 	if rComment.UserId != pUser.Id {
-		logger.WithFields(logrus.Fields{
-			"time": time.Now(),
-		}).Debug("comment creator and actor not match")
+		logger.Debug("comment creator and actor not match")
 		return &comment.ActionCommentResponse{
 			StatusCode: biz.ActorIDNotMatch,
 			StatusMsg:  &biz.ForbiddenStatusMsg,
@@ -206,8 +192,7 @@ func deleteComment(ctx context.Context, logger *logrus.Entry, pUser *user.User, 
 		Delete()
 	if err != nil {
 		logger.WithFields(logrus.Fields{
-			"time": time.Now(),
-			"err":  err,
+			"err": err,
 		}).Debug("failed to delete db entry")
 		resp = &comment.ActionCommentResponse{
 			StatusCode: biz.UnableToDeleteComment,
@@ -228,7 +213,6 @@ func (s *CommentServiceImpl) ListComment(ctx context.Context, req *comment.ListC
 	logger := logging.Logger.WithFields(logrus.Fields{
 		"user_id":  req.ActorId,
 		"video_id": req.VideoId,
-		"time":     time.Now(),
 		"function": "ListComment",
 	})
 	logger.Debug("Process start")
@@ -239,8 +223,7 @@ func (s *CommentServiceImpl) ListComment(ctx context.Context, req *comment.ListC
 		First()
 	if err != nil {
 		logger.WithFields(logrus.Fields{
-			"time": time.Now(),
-			"err":  err,
+			"err": err,
 		}).Debug("video query error")
 		return &comment.ListCommentResponse{
 			StatusCode: biz.UnableToQueryVideo,
@@ -248,9 +231,7 @@ func (s *CommentServiceImpl) ListComment(ctx context.Context, req *comment.ListC
 		}, nil
 	}
 	if pVideo == nil {
-		logger.WithFields(logrus.Fields{
-			"time": time.Now(),
-		}).Debug("video not found")
+		logger.Debug("video not found")
 		return &comment.ListCommentResponse{
 			StatusCode: biz.VideoNotFound,
 			StatusMsg:  &biz.BadRequestStatusMsg,
@@ -265,8 +246,7 @@ func (s *CommentServiceImpl) ListComment(ctx context.Context, req *comment.ListC
 
 	if err != nil {
 		logger.WithFields(logrus.Fields{
-			"time": time.Now(),
-			"err":  err,
+			"err": err,
 		}).Debug("comment query error")
 		return &comment.ListCommentResponse{
 			StatusCode: biz.UnableToQueryComment,
@@ -285,7 +265,6 @@ func (s *CommentServiceImpl) ListComment(ctx context.Context, req *comment.ListC
 			logger.WithFields(logrus.Fields{
 				"pComment": pComment,
 				"err":      err,
-				"time":     time.Now(),
 			}).Debug("unable to get user info")
 		}
 
@@ -298,7 +277,6 @@ func (s *CommentServiceImpl) ListComment(ctx context.Context, req *comment.ListC
 	}
 
 	logger.WithFields(logrus.Fields{
-		"time":     time.Now(),
 		"response": resp,
 	}).Debug("all process done, ready to launch response")
 	return &comment.ListCommentResponse{
@@ -313,7 +291,6 @@ func (s *CommentServiceImpl) CountComment(ctx context.Context, req *comment.Coun
 	logger := logging.Logger.WithFields(logrus.Fields{
 		"user_id":  req.ActorId,
 		"video_id": req.VideoId,
-		"time":     time.Now(),
 		"function": "CountComment",
 	})
 	logger.Debug("Process start")
@@ -321,8 +298,7 @@ func (s *CommentServiceImpl) CountComment(ctx context.Context, req *comment.Coun
 	rCount, err := count(ctx, req.VideoId)
 	if err != nil {
 		logger.WithFields(logrus.Fields{
-			"time": time.Now(),
-			"err":  err,
+			"err": err,
 		}).Debug("failed to count comment")
 		return &comment.CountCommentResponse{
 			StatusCode: biz.UnableToQueryComment,
@@ -331,7 +307,6 @@ func (s *CommentServiceImpl) CountComment(ctx context.Context, req *comment.Coun
 	}
 
 	logger.WithFields(logrus.Fields{
-		"time":     time.Now(),
 		"response": resp,
 	}).Debug("all process done, ready to launch response")
 	return &comment.CountCommentResponse{
