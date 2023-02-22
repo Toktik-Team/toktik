@@ -158,6 +158,76 @@ func (x *FollowListResponse) fastReadField3(buf []byte, _type int8) (offset int,
 	return offset, nil
 }
 
+func (x *CountFollowListRequest) FastRead(buf []byte, _type int8, number int32) (offset int, err error) {
+	switch number {
+	case 1:
+		offset, err = x.fastReadField1(buf, _type)
+		if err != nil {
+			goto ReadFieldError
+		}
+	default:
+		offset, err = fastpb.Skip(buf, _type, number)
+		if err != nil {
+			goto SkipFieldError
+		}
+	}
+	return offset, nil
+SkipFieldError:
+	return offset, fmt.Errorf("%T cannot parse invalid wire-format data, error: %s", x, err)
+ReadFieldError:
+	return offset, fmt.Errorf("%T read field %d '%s' error: %s", x, number, fieldIDToName_CountFollowListRequest[number], err)
+}
+
+func (x *CountFollowListRequest) fastReadField1(buf []byte, _type int8) (offset int, err error) {
+	x.UserId, offset, err = fastpb.ReadUint32(buf, _type)
+	return offset, err
+}
+
+func (x *CountFollowListResponse) FastRead(buf []byte, _type int8, number int32) (offset int, err error) {
+	switch number {
+	case 1:
+		offset, err = x.fastReadField1(buf, _type)
+		if err != nil {
+			goto ReadFieldError
+		}
+	case 2:
+		offset, err = x.fastReadField2(buf, _type)
+		if err != nil {
+			goto ReadFieldError
+		}
+	case 3:
+		offset, err = x.fastReadField3(buf, _type)
+		if err != nil {
+			goto ReadFieldError
+		}
+	default:
+		offset, err = fastpb.Skip(buf, _type, number)
+		if err != nil {
+			goto SkipFieldError
+		}
+	}
+	return offset, nil
+SkipFieldError:
+	return offset, fmt.Errorf("%T cannot parse invalid wire-format data, error: %s", x, err)
+ReadFieldError:
+	return offset, fmt.Errorf("%T read field %d '%s' error: %s", x, number, fieldIDToName_CountFollowListResponse[number], err)
+}
+
+func (x *CountFollowListResponse) fastReadField1(buf []byte, _type int8) (offset int, err error) {
+	x.StatusCode, offset, err = fastpb.ReadInt32(buf, _type)
+	return offset, err
+}
+
+func (x *CountFollowListResponse) fastReadField2(buf []byte, _type int8) (offset int, err error) {
+	x.StatusMsg, offset, err = fastpb.ReadString(buf, _type)
+	return offset, err
+}
+
+func (x *CountFollowListResponse) fastReadField3(buf []byte, _type int8) (offset int, err error) {
+	x.Count, offset, err = fastpb.ReadUint32(buf, _type)
+	return offset, err
+}
+
 func (x *FollowerListRequest) FastRead(buf []byte, _type int8, number int32) (offset int, err error) {
 	switch number {
 	case 1:
@@ -231,6 +301,76 @@ func (x *FollowerListResponse) fastReadField3(buf []byte, _type int8) (offset in
 	}
 	x.UserList = append(x.UserList, &v)
 	return offset, nil
+}
+
+func (x *CountFollowerListRequest) FastRead(buf []byte, _type int8, number int32) (offset int, err error) {
+	switch number {
+	case 1:
+		offset, err = x.fastReadField1(buf, _type)
+		if err != nil {
+			goto ReadFieldError
+		}
+	default:
+		offset, err = fastpb.Skip(buf, _type, number)
+		if err != nil {
+			goto SkipFieldError
+		}
+	}
+	return offset, nil
+SkipFieldError:
+	return offset, fmt.Errorf("%T cannot parse invalid wire-format data, error: %s", x, err)
+ReadFieldError:
+	return offset, fmt.Errorf("%T read field %d '%s' error: %s", x, number, fieldIDToName_CountFollowerListRequest[number], err)
+}
+
+func (x *CountFollowerListRequest) fastReadField1(buf []byte, _type int8) (offset int, err error) {
+	x.UserId, offset, err = fastpb.ReadUint32(buf, _type)
+	return offset, err
+}
+
+func (x *CountFollowerListResponse) FastRead(buf []byte, _type int8, number int32) (offset int, err error) {
+	switch number {
+	case 1:
+		offset, err = x.fastReadField1(buf, _type)
+		if err != nil {
+			goto ReadFieldError
+		}
+	case 2:
+		offset, err = x.fastReadField2(buf, _type)
+		if err != nil {
+			goto ReadFieldError
+		}
+	case 3:
+		offset, err = x.fastReadField3(buf, _type)
+		if err != nil {
+			goto ReadFieldError
+		}
+	default:
+		offset, err = fastpb.Skip(buf, _type, number)
+		if err != nil {
+			goto SkipFieldError
+		}
+	}
+	return offset, nil
+SkipFieldError:
+	return offset, fmt.Errorf("%T cannot parse invalid wire-format data, error: %s", x, err)
+ReadFieldError:
+	return offset, fmt.Errorf("%T read field %d '%s' error: %s", x, number, fieldIDToName_CountFollowerListResponse[number], err)
+}
+
+func (x *CountFollowerListResponse) fastReadField1(buf []byte, _type int8) (offset int, err error) {
+	x.StatusCode, offset, err = fastpb.ReadInt32(buf, _type)
+	return offset, err
+}
+
+func (x *CountFollowerListResponse) fastReadField2(buf []byte, _type int8) (offset int, err error) {
+	x.StatusMsg, offset, err = fastpb.ReadString(buf, _type)
+	return offset, err
+}
+
+func (x *CountFollowerListResponse) fastReadField3(buf []byte, _type int8) (offset int, err error) {
+	x.Count, offset, err = fastpb.ReadUint32(buf, _type)
+	return offset, err
 }
 
 func (x *FriendListRequest) FastRead(buf []byte, _type int8, number int32) (offset int, err error) {
@@ -410,6 +550,56 @@ func (x *FollowListResponse) fastWriteField3(buf []byte) (offset int) {
 	return offset
 }
 
+func (x *CountFollowListRequest) FastWrite(buf []byte) (offset int) {
+	if x == nil {
+		return offset
+	}
+	offset += x.fastWriteField1(buf[offset:])
+	return offset
+}
+
+func (x *CountFollowListRequest) fastWriteField1(buf []byte) (offset int) {
+	if x.UserId == 0 {
+		return offset
+	}
+	offset += fastpb.WriteUint32(buf[offset:], 1, x.UserId)
+	return offset
+}
+
+func (x *CountFollowListResponse) FastWrite(buf []byte) (offset int) {
+	if x == nil {
+		return offset
+	}
+	offset += x.fastWriteField1(buf[offset:])
+	offset += x.fastWriteField2(buf[offset:])
+	offset += x.fastWriteField3(buf[offset:])
+	return offset
+}
+
+func (x *CountFollowListResponse) fastWriteField1(buf []byte) (offset int) {
+	if x.StatusCode == 0 {
+		return offset
+	}
+	offset += fastpb.WriteInt32(buf[offset:], 1, x.StatusCode)
+	return offset
+}
+
+func (x *CountFollowListResponse) fastWriteField2(buf []byte) (offset int) {
+	if x.StatusMsg == "" {
+		return offset
+	}
+	offset += fastpb.WriteString(buf[offset:], 2, x.StatusMsg)
+	return offset
+}
+
+func (x *CountFollowListResponse) fastWriteField3(buf []byte) (offset int) {
+	if x.Count == 0 {
+		return offset
+	}
+	offset += fastpb.WriteUint32(buf[offset:], 3, x.Count)
+	return offset
+}
+
 func (x *FollowerListRequest) FastWrite(buf []byte) (offset int) {
 	if x == nil {
 		return offset
@@ -459,6 +649,56 @@ func (x *FollowerListResponse) fastWriteField3(buf []byte) (offset int) {
 	for i := range x.UserList {
 		offset += fastpb.WriteMessage(buf[offset:], 3, x.UserList[i])
 	}
+	return offset
+}
+
+func (x *CountFollowerListRequest) FastWrite(buf []byte) (offset int) {
+	if x == nil {
+		return offset
+	}
+	offset += x.fastWriteField1(buf[offset:])
+	return offset
+}
+
+func (x *CountFollowerListRequest) fastWriteField1(buf []byte) (offset int) {
+	if x.UserId == 0 {
+		return offset
+	}
+	offset += fastpb.WriteUint32(buf[offset:], 1, x.UserId)
+	return offset
+}
+
+func (x *CountFollowerListResponse) FastWrite(buf []byte) (offset int) {
+	if x == nil {
+		return offset
+	}
+	offset += x.fastWriteField1(buf[offset:])
+	offset += x.fastWriteField2(buf[offset:])
+	offset += x.fastWriteField3(buf[offset:])
+	return offset
+}
+
+func (x *CountFollowerListResponse) fastWriteField1(buf []byte) (offset int) {
+	if x.StatusCode == 0 {
+		return offset
+	}
+	offset += fastpb.WriteInt32(buf[offset:], 1, x.StatusCode)
+	return offset
+}
+
+func (x *CountFollowerListResponse) fastWriteField2(buf []byte) (offset int) {
+	if x.StatusMsg == "" {
+		return offset
+	}
+	offset += fastpb.WriteString(buf[offset:], 2, x.StatusMsg)
+	return offset
+}
+
+func (x *CountFollowerListResponse) fastWriteField3(buf []byte) (offset int) {
+	if x.Count == 0 {
+		return offset
+	}
+	offset += fastpb.WriteUint32(buf[offset:], 3, x.Count)
 	return offset
 }
 
@@ -616,6 +856,56 @@ func (x *FollowListResponse) sizeField3() (n int) {
 	return n
 }
 
+func (x *CountFollowListRequest) Size() (n int) {
+	if x == nil {
+		return n
+	}
+	n += x.sizeField1()
+	return n
+}
+
+func (x *CountFollowListRequest) sizeField1() (n int) {
+	if x.UserId == 0 {
+		return n
+	}
+	n += fastpb.SizeUint32(1, x.UserId)
+	return n
+}
+
+func (x *CountFollowListResponse) Size() (n int) {
+	if x == nil {
+		return n
+	}
+	n += x.sizeField1()
+	n += x.sizeField2()
+	n += x.sizeField3()
+	return n
+}
+
+func (x *CountFollowListResponse) sizeField1() (n int) {
+	if x.StatusCode == 0 {
+		return n
+	}
+	n += fastpb.SizeInt32(1, x.StatusCode)
+	return n
+}
+
+func (x *CountFollowListResponse) sizeField2() (n int) {
+	if x.StatusMsg == "" {
+		return n
+	}
+	n += fastpb.SizeString(2, x.StatusMsg)
+	return n
+}
+
+func (x *CountFollowListResponse) sizeField3() (n int) {
+	if x.Count == 0 {
+		return n
+	}
+	n += fastpb.SizeUint32(3, x.Count)
+	return n
+}
+
 func (x *FollowerListRequest) Size() (n int) {
 	if x == nil {
 		return n
@@ -665,6 +955,56 @@ func (x *FollowerListResponse) sizeField3() (n int) {
 	for i := range x.UserList {
 		n += fastpb.SizeMessage(3, x.UserList[i])
 	}
+	return n
+}
+
+func (x *CountFollowerListRequest) Size() (n int) {
+	if x == nil {
+		return n
+	}
+	n += x.sizeField1()
+	return n
+}
+
+func (x *CountFollowerListRequest) sizeField1() (n int) {
+	if x.UserId == 0 {
+		return n
+	}
+	n += fastpb.SizeUint32(1, x.UserId)
+	return n
+}
+
+func (x *CountFollowerListResponse) Size() (n int) {
+	if x == nil {
+		return n
+	}
+	n += x.sizeField1()
+	n += x.sizeField2()
+	n += x.sizeField3()
+	return n
+}
+
+func (x *CountFollowerListResponse) sizeField1() (n int) {
+	if x.StatusCode == 0 {
+		return n
+	}
+	n += fastpb.SizeInt32(1, x.StatusCode)
+	return n
+}
+
+func (x *CountFollowerListResponse) sizeField2() (n int) {
+	if x.StatusMsg == "" {
+		return n
+	}
+	n += fastpb.SizeString(2, x.StatusMsg)
+	return n
+}
+
+func (x *CountFollowerListResponse) sizeField3() (n int) {
+	if x.Count == 0 {
+		return n
+	}
+	n += fastpb.SizeUint32(3, x.Count)
 	return n
 }
 
@@ -740,6 +1080,16 @@ var fieldIDToName_FollowListResponse = map[int32]string{
 	3: "UserList",
 }
 
+var fieldIDToName_CountFollowListRequest = map[int32]string{
+	1: "UserId",
+}
+
+var fieldIDToName_CountFollowListResponse = map[int32]string{
+	1: "StatusCode",
+	2: "StatusMsg",
+	3: "Count",
+}
+
 var fieldIDToName_FollowerListRequest = map[int32]string{
 	1: "UserId",
 }
@@ -748,6 +1098,16 @@ var fieldIDToName_FollowerListResponse = map[int32]string{
 	1: "StatusCode",
 	2: "StatusMsg",
 	3: "UserList",
+}
+
+var fieldIDToName_CountFollowerListRequest = map[int32]string{
+	1: "UserId",
+}
+
+var fieldIDToName_CountFollowerListResponse = map[int32]string{
+	1: "StatusCode",
+	2: "StatusMsg",
+	3: "Count",
 }
 
 var fieldIDToName_FriendListRequest = map[int32]string{

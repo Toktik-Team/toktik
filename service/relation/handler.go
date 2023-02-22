@@ -352,3 +352,15 @@ func (s *RelationServiceImpl) Unfollow(ctx context.Context, req *relation.Relati
 	}
 	return
 }
+
+// CountFollowList implements the RelationServiceImpl interface.
+func (s *RelationServiceImpl) CountFollowList(ctx context.Context, req *relation.CountFollowListRequest) (resp *relation.CountFollowListResponse, err error) {
+	// TODO: Your code here...
+	return
+}
+
+// CountFollowerList implements the RelationServiceImpl interface.
+func (s *RelationServiceImpl) CountFollowerList(ctx context.Context, req *relation.CountFollowerListRequest) (resp *relation.CountFollowerListResponse, err error) {
+	// TODO: Your code here...
+	return
+}

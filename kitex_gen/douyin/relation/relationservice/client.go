@@ -14,7 +14,9 @@ type Client interface {
 	Follow(ctx context.Context, Req *relation.RelationActionRequest, callOptions ...callopt.Option) (r *relation.RelationActionResponse, err error)
 	Unfollow(ctx context.Context, Req *relation.RelationActionRequest, callOptions ...callopt.Option) (r *relation.RelationActionResponse, err error)
 	GetFollowList(ctx context.Context, Req *relation.FollowListRequest, callOptions ...callopt.Option) (r *relation.FollowListResponse, err error)
+	CountFollowList(ctx context.Context, Req *relation.CountFollowListRequest, callOptions ...callopt.Option) (r *relation.CountFollowListResponse, err error)
 	GetFollowerList(ctx context.Context, Req *relation.FollowerListRequest, callOptions ...callopt.Option) (r *relation.FollowerListResponse, err error)
+	CountFollowerList(ctx context.Context, Req *relation.CountFollowerListRequest, callOptions ...callopt.Option) (r *relation.CountFollowerListResponse, err error)
 	GetFriendList(ctx context.Context, Req *relation.FriendListRequest, callOptions ...callopt.Option) (r *relation.FriendListResponse, err error)
 }
 
@@ -62,9 +64,19 @@ func (p *kRelationServiceClient) GetFollowList(ctx context.Context, Req *relatio
 	return p.kClient.GetFollowList(ctx, Req)
 }
 
+func (p *kRelationServiceClient) CountFollowList(ctx context.Context, Req *relation.CountFollowListRequest, callOptions ...callopt.Option) (r *relation.CountFollowListResponse, err error) {
+	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
+	return p.kClient.CountFollowList(ctx, Req)
+}
+
 func (p *kRelationServiceClient) GetFollowerList(ctx context.Context, Req *relation.FollowerListRequest, callOptions ...callopt.Option) (r *relation.FollowerListResponse, err error) {
 	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
 	return p.kClient.GetFollowerList(ctx, Req)
+}
+
+func (p *kRelationServiceClient) CountFollowerList(ctx context.Context, Req *relation.CountFollowerListRequest, callOptions ...callopt.Option) (r *relation.CountFollowerListResponse, err error) {
+	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
+	return p.kClient.CountFollowerList(ctx, Req)
 }
 
 func (p *kRelationServiceClient) GetFriendList(ctx context.Context, Req *relation.FriendListRequest, callOptions ...callopt.Option) (r *relation.FriendListResponse, err error) {
