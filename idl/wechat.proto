@@ -5,6 +5,7 @@ option go_package = "douyin/wechat";
 message MessageChatRequest {
   uint32 sender_id = 1;
   uint32 receiver_id = 2;
+  uint32 pre_msg_time = 6;
 }
 
 message Message {

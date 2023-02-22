@@ -24,6 +24,11 @@ func (x *MessageChatRequest) FastRead(buf []byte, _type int8, number int32) (off
 		if err != nil {
 			goto ReadFieldError
 		}
+	case 6:
+		offset, err = x.fastReadField6(buf, _type)
+		if err != nil {
+			goto ReadFieldError
+		}
 	default:
 		offset, err = fastpb.Skip(buf, _type, number)
 		if err != nil {
@@ -44,6 +49,11 @@ func (x *MessageChatRequest) fastReadField1(buf []byte, _type int8) (offset int,
 
 func (x *MessageChatRequest) fastReadField2(buf []byte, _type int8) (offset int, err error) {
 	x.ReceiverId, offset, err = fastpb.ReadUint32(buf, _type)
+	return offset, err
+}
+
+func (x *MessageChatRequest) fastReadField6(buf []byte, _type int8) (offset int, err error) {
+	x.PreMsgTime, offset, err = fastpb.ReadUint32(buf, _type)
 	return offset, err
 }
 
@@ -260,6 +270,7 @@ func (x *MessageChatRequest) FastWrite(buf []byte) (offset int) {
 	}
 	offset += x.fastWriteField1(buf[offset:])
 	offset += x.fastWriteField2(buf[offset:])
+	offset += x.fastWriteField6(buf[offset:])
 	return offset
 }
 
@@ -276,6 +287,14 @@ func (x *MessageChatRequest) fastWriteField2(buf []byte) (offset int) {
 		return offset
 	}
 	offset += fastpb.WriteUint32(buf[offset:], 2, x.ReceiverId)
+	return offset
+}
+
+func (x *MessageChatRequest) fastWriteField6(buf []byte) (offset int) {
+	if x.PreMsgTime == 0 {
+		return offset
+	}
+	offset += fastpb.WriteUint32(buf[offset:], 6, x.PreMsgTime)
 	return offset
 }
 
@@ -441,6 +460,7 @@ func (x *MessageChatRequest) Size() (n int) {
 	}
 	n += x.sizeField1()
 	n += x.sizeField2()
+	n += x.sizeField6()
 	return n
 }
 
@@ -457,6 +477,14 @@ func (x *MessageChatRequest) sizeField2() (n int) {
 		return n
 	}
 	n += fastpb.SizeUint32(2, x.ReceiverId)
+	return n
+}
+
+func (x *MessageChatRequest) sizeField6() (n int) {
+	if x.PreMsgTime == 0 {
+		return n
+	}
+	n += fastpb.SizeUint32(6, x.PreMsgTime)
 	return n
 }
 
@@ -619,6 +647,7 @@ func (x *MessageActionResponse) sizeField2() (n int) {
 var fieldIDToName_MessageChatRequest = map[int32]string{
 	1: "SenderId",
 	2: "ReceiverId",
+	6: "PreMsgTime",
 }
 
 var fieldIDToName_Message = map[int32]string{

@@ -3,8 +3,10 @@ package toktik.service.wechat.db;
 option go_package = "toktik/service/wechat/db";
 
 message ChatMessage {
-  string msg = 1;
-  int64 time = 2;
+  uint32 from = 1;
+  uint32 to = 2;
+  string msg = 3;
+  int64 time = 4;
 }
 
 message ChatGPTMessage {
