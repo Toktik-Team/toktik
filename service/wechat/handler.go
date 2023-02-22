@@ -129,7 +129,7 @@ func (s *WechatServiceImpl) WechatChat(ctx context.Context, req *wechat.MessageC
 	min := strconv.FormatInt(int64(req.PreMsgTime), 10)
 	max := "+inf"
 	key := *s.generateKey(&senderID, &receiverID)
-	zRangeCMD := rdb.ZRangeByScore(ctx, key, &redis.ZRangeBy{Min: fmt.Sprintf("%f", min), Max: max})
+	zRangeCMD := rdb.ZRangeByScore(ctx, key, &redis.ZRangeBy{Min: fmt.Sprintf("%s", min), Max: max})
 	if zRangeCMD.Err() != nil {
 		logger.Warningf("redis lrange error: %v", zRangeCMD.Err())
 		resp = &wechat.MessageChatResponse{
