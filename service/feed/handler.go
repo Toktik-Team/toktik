@@ -8,7 +8,6 @@ import (
 	"github.com/sirupsen/logrus"
 	"log"
 	"strconv"
-	"sync"
 	"time"
 	"toktik/constant/biz"
 	"toktik/constant/config"
@@ -115,7 +114,7 @@ func (s *FeedServiceImpl) ListVideos(ctx context.Context, req *feed.ListFeedRequ
 	if req.ActorId != nil {
 		actorId = *req.ActorId
 	}
-	videos, err := queryDetailed(ctx, logger, actorId, find)
+	videos := queryDetailed(ctx, logger, actorId, find)
 
 	return &feed.ListFeedResponse{
 		StatusCode: biz.OkStatusCode,
@@ -162,99 +161,112 @@ func (s *FeedServiceImpl) QueryVideos(ctx context.Context, req *feed.QueryVideos
 	}, nil
 }
 
-func queryDetailed(ctx context.Context, logger *logrus.Entry, actorId uint32, videos []*model.Video) (resp []*feed.Video, err error) {
-	var wg sync.WaitGroup
-	wg.Add(len(videos))
-
-	videoChannel := make(chan *feed.Video, len(videos))
-
-	for _, m := range videos {
-
-		go func(video *model.Video) {
-			defer wg.Done()
-
-			userResponse, err := UserClient.GetUser(ctx, &user.UserRequest{
-				UserId:  video.UserId,
+func queryDetailed(
+	ctx context.Context,
+	logger *logrus.Entry,
+	actorId uint32,
+	videos []*model.Video,
+) (respVideoList []*feed.Video) {
+	respVideoList = make([]*feed.Video, len(videos))
+	for i, v := range videos {
+		respVideoList[i] = &feed.Video{
+			Id:     v.ID,
+			Title:  v.Title,
+			Author: &user.User{Id: v.UserId},
+		}
+		// fill author
+		go func(i int, v *model.Video) {
+			userResponse, localErr := UserClient.GetUser(ctx, &user.UserRequest{
+				UserId:  v.UserId,
 				ActorId: actorId,
 			})
-			if err != nil || userResponse.StatusCode != biz.OkStatusCode {
+			if localErr != nil || userResponse.StatusCode != biz.OkStatusCode {
 				logger.WithFields(logrus.Fields{
-					"err": err,
-				}).Debug("failed to get user info")
+					"video_id": v.ID,
+					"user_id":  v.UserId,
+					"cause":    localErr,
+				}).Warning("failed to get user info")
 				return
 			}
+			respVideoList[i].Author = userResponse.User
+		}(i, v)
 
-			playUrl, err := storage.GetLink(video.FileName)
-			if err != nil {
+		// fill play url
+		go func(i int, v *model.Video) {
+			playUrl, localErr := storage.GetLink(v.FileName)
+			if localErr != nil {
 				logger.WithFields(logrus.Fields{
-					"err": err,
-				}).Debug("failed to fetch play url")
+					"video_id":  v.ID,
+					"file_name": v.FileName,
+					"err":       localErr,
+				}).Warning("failed to fetch play url")
 				return
 			}
+			respVideoList[i].PlayUrl = playUrl
+		}(i, v)
 
-			coverUrl, err := storage.GetLink(video.CoverName)
-			if err != nil {
+		// fill cover url
+		go func(i int, v *model.Video) {
+			coverUrl, localErr := storage.GetLink(v.CoverName)
+			if localErr != nil {
 				logger.WithFields(logrus.Fields{
-					"err": err,
-				}).Debug("failed to fetch cover url")
+					"video_id":   v.ID,
+					"cover_name": v.CoverName,
+					"err":        localErr,
+				}).Warning("failed to fetch cover url")
 				return
 			}
+			respVideoList[i].CoverUrl = coverUrl
+		}(i, v)
 
-			favoriteCount, err := FavoriteClient.FavoriteCount(ctx, &favorite.FavoriteCountRequest{
-				VideoId: video.ID,
+		// fill favorite count
+		go func(i int, v *model.Video) {
+			favoriteCount, localErr := FavoriteClient.FavoriteCount(ctx, &favorite.FavoriteCountRequest{
+				VideoId: v.ID,
 			})
-			if err != nil {
+			if localErr != nil {
 				logger.WithFields(logrus.Fields{
-					"err": err,
-				}).Debug("failed to fetch favorite count")
+					"video_id": v.ID,
+					"err":      localErr,
+				}).Warning("failed to fetch favorite count")
 				return
 			}
-			commentCount, err := CommentClient.CountComment(ctx, &comment.CountCommentRequest{
+			respVideoList[i].FavoriteCount = favoriteCount.Count
+		}(i, v)
+
+		// fill comment count
+		go func(i int, v *model.Video) {
+			commentCount, localErr := CommentClient.CountComment(ctx, &comment.CountCommentRequest{
 				ActorId: actorId,
-				VideoId: video.ID,
+				VideoId: v.ID,
 			})
-			if err != nil {
+			if localErr != nil {
 				logger.WithFields(logrus.Fields{
-					"err": err,
-				}).Debug("failed to fetch comment count")
+					"video_id": v.ID,
+					"err":      localErr,
+				}).Warning("failed to fetch comment count")
 				return
 			}
-			isFavorite, err := FavoriteClient.IsFavorite(ctx, &favorite.IsFavoriteRequest{
+			respVideoList[i].CommentCount = commentCount.CommentCount
+		}(i, v)
+
+		// fill is favorite
+		go func(i int, v *model.Video) {
+			isFavorite, localErr := FavoriteClient.IsFavorite(ctx, &favorite.IsFavoriteRequest{
 				UserId:  actorId,
-				VideoId: video.ID,
+				VideoId: v.ID,
 			})
-			if err != nil {
+			if localErr != nil {
 				logger.WithFields(logrus.Fields{
-					"err": err,
-				}).Debug("unable to determine if the user liked the video")
+					"video_id": v.ID,
+					"err":      localErr,
+				}).Warning("failed to fetch favorite status")
 				return
 			}
-
-			videoChannel <- &feed.Video{
-				Id:            video.ID,
-				Author:        userResponse.User,
-				PlayUrl:       playUrl,
-				CoverUrl:      coverUrl,
-				FavoriteCount: favoriteCount.Count,
-				CommentCount:  commentCount.CommentCount,
-				IsFavorite:    isFavorite.Result,
-				Title:         video.Title,
-			}
-
-		}(m)
+			respVideoList[i].IsFavorite = isFavorite.Result
+		}(i, v)
 	}
-
-	go func() {
-		wg.Wait()
-		close(videoChannel)
-	}()
-
-	rVideos := make([]*feed.Video, 0, len(videos))
-	for v := range videoChannel {
-		rVideos = append(rVideos, v)
-	}
-
-	return rVideos, nil
+	return
 }
 
 func query(ctx context.Context, logger *logrus.Entry, actorId uint32, videoIds []uint32) (resp []*feed.Video, err error) {
@@ -263,5 +275,5 @@ func query(ctx context.Context, logger *logrus.Entry, actorId uint32, videoIds [
 		return nil, err
 	}
 
-	return queryDetailed(ctx, logger, actorId, find)
+	return queryDetailed(ctx, logger, actorId, find), nil
 }
