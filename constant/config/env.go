@@ -37,6 +37,8 @@ var defaultConfig = envConfigSchema{
 
 	CONSUL_ADDR: "127.0.0.1:8500",
 
+	EXPORT_ENDPOINT: "127.0.0.1:4317",
+
 	PGSQL_HOST:     "localhost",
 	PGSQL_PORT:     "5432",
 	PGSQL_USER:     "postgres",
@@ -67,6 +69,8 @@ type envConfigSchema struct {
 	ENV string `env:"ENV,DREAM_ENV"`
 
 	CONSUL_ADDR string `env:"CONSUL_ADDR,DREAM_SERVICE_DISCOVERY_URI"`
+
+	EXPORT_ENDPOINT string
 
 	PGSQL_HOST     string
 	PGSQL_PORT     string

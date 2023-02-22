@@ -1,6 +1,8 @@
 package main
 
 import (
+	"github.com/kitex-contrib/obs-opentelemetry/provider"
+	"github.com/kitex-contrib/obs-opentelemetry/tracing"
 	"log"
 	"net"
 	"toktik/constant/config"
@@ -23,10 +25,17 @@ func main() {
 		panic(err)
 	}
 
+	provider.NewOpenTelemetryProvider(
+		provider.WithServiceName(config.RelationServiceName),
+		provider.WithExportEndpoint(config.EnvConfig.EXPORT_ENDPOINT),
+		provider.WithInsecure(),
+	)
+
 	srv := relation.NewServer(
 		new(RelationServiceImpl),
 		server.WithServiceAddr(addr),
 		server.WithRegistry(r),
+		server.WithSuite(tracing.NewServerSuite()),
 		server.WithServerBasicInfo(&rpcinfo.EndpointBasicInfo{
 			ServiceName: config.RelationServiceName,
 		}),

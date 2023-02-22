@@ -2,9 +2,11 @@ package feed
 
 import (
 	"context"
+	"github.com/kitex-contrib/obs-opentelemetry/provider"
+	"github.com/kitex-contrib/obs-opentelemetry/tracing"
 	"strconv"
 	bizConstant "toktik/constant/biz"
-	bizConfig "toktik/constant/config"
+	"toktik/constant/config"
 	"toktik/kitex_gen/douyin/feed"
 	feedService "toktik/kitex_gen/douyin/feed/feedservice"
 	"toktik/logging"
@@ -20,12 +22,21 @@ import (
 var feedClient feedService.Client
 
 func init() {
-	r, err := consul.NewConsulResolver(bizConfig.EnvConfig.CONSUL_ADDR)
+	r, err := consul.NewConsulResolver(config.EnvConfig.CONSUL_ADDR)
 	if err != nil {
 		logging.Logger.WithError(err).Fatal("init feed client failed")
 		panic(err)
 	}
-	feedClient, err = feedService.NewClient(bizConfig.FeedServiceName, client.WithResolver(r))
+	provider.NewOpenTelemetryProvider(
+		provider.WithServiceName(config.FeedServiceName),
+		provider.WithExportEndpoint(config.EnvConfig.EXPORT_ENDPOINT),
+		provider.WithInsecure(),
+	)
+	feedClient, err = feedService.NewClient(
+		config.FeedServiceName,
+		client.WithResolver(r),
+		client.WithSuite(tracing.NewClientSuite()),
+	)
 	if err != nil {
 		logging.Logger.WithError(err).Fatal("init feed client failed")
 		panic(err)

@@ -2,9 +2,11 @@ package user
 
 import (
 	"context"
+	"github.com/kitex-contrib/obs-opentelemetry/provider"
+	"github.com/kitex-contrib/obs-opentelemetry/tracing"
 	"strconv"
 	bizConstant "toktik/constant/biz"
-	bizConfig "toktik/constant/config"
+	"toktik/constant/config"
 	"toktik/kitex_gen/douyin/user"
 	userService "toktik/kitex_gen/douyin/user/userservice"
 	"toktik/logging"
@@ -20,11 +22,20 @@ import (
 var userClient userService.Client
 
 func init() {
-	r, err := consul.NewConsulResolver(bizConfig.EnvConfig.CONSUL_ADDR)
+	r, err := consul.NewConsulResolver(config.EnvConfig.CONSUL_ADDR)
 	if err != nil {
 		panic(err)
 	}
-	userClient, err = userService.NewClient(bizConfig.UserServiceName, client.WithResolver(r))
+	provider.NewOpenTelemetryProvider(
+		provider.WithServiceName(config.UserServiceName),
+		provider.WithExportEndpoint(config.EnvConfig.EXPORT_ENDPOINT),
+		provider.WithInsecure(),
+	)
+	userClient, err = userService.NewClient(
+		config.UserServiceName,
+		client.WithResolver(r),
+		client.WithSuite(tracing.NewClientSuite()),
+	)
 	if err != nil {
 		panic(err)
 	}

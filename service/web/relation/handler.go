@@ -2,9 +2,11 @@ package relation
 
 import (
 	"context"
+	"github.com/kitex-contrib/obs-opentelemetry/provider"
+	"github.com/kitex-contrib/obs-opentelemetry/tracing"
 	"strconv"
 	bizConstant "toktik/constant/biz"
-	bizConfig "toktik/constant/config"
+	"toktik/constant/config"
 	"toktik/kitex_gen/douyin/relation"
 	relationService "toktik/kitex_gen/douyin/relation/relationservice"
 	"toktik/logging"
@@ -20,11 +22,20 @@ import (
 var relationClient relationService.Client
 
 func init() {
-	r, err := consul.NewConsulResolver(bizConfig.EnvConfig.CONSUL_ADDR)
+	r, err := consul.NewConsulResolver(config.EnvConfig.CONSUL_ADDR)
 	if err != nil {
 		panic(err)
 	}
-	relationClient, err = relationService.NewClient(bizConfig.RelationServiceName, client.WithResolver(r))
+	provider.NewOpenTelemetryProvider(
+		provider.WithServiceName(config.RelationServiceName),
+		provider.WithExportEndpoint(config.EnvConfig.EXPORT_ENDPOINT),
+		provider.WithInsecure(),
+	)
+	relationClient, err = relationService.NewClient(
+		config.RelationServiceName,
+		client.WithResolver(r),
+		client.WithSuite(tracing.NewClientSuite()),
+	)
 	if err != nil {
 		panic(err)
 	}
@@ -40,7 +51,7 @@ func RelationAction(ctx context.Context, c *app.RequestContext) {
 	}
 	logger := logging.Logger.WithFields(methodFields)
 	logger.Debugf("Process start")
-	userId := mw.GetAuthActorId(c)
+	actorId := mw.GetAuthActorId(c)
 
 	actionType, exist := c.GetQuery("action_type")
 	if !exist {
@@ -57,12 +68,12 @@ func RelationAction(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	targetId, exist := c.GetQuery("to_user_id")
+	userId, exist := c.GetQuery("to_user_id")
 	if !exist {
 		bizConstant.InvalidArguments.WithFields(&methodFields).LaunchError(c)
 		return
 	}
-	targetIdInt, err := strconv.ParseInt(targetId, 10, 32)
+	userIdInt, err := strconv.ParseInt(userId, 10, 32)
 	if err != nil {
 		bizConstant.InvalidArguments.WithCause(err).WithFields(&methodFields).LaunchError(c)
 		return
@@ -70,21 +81,21 @@ func RelationAction(ctx context.Context, c *app.RequestContext) {
 	switch actionTypeInt {
 	case 1:
 		logger.WithFields(logrus.Fields{
-			"userId":   userId,
-			"toUserId": targetId,
+			"actorId": actorId,
+			"userId":  userId,
 		}).Debugf("Executing follow")
 		relationResp, err = relationClient.Follow(ctx, &relation.RelationActionRequest{
-			UserId:   userId,
-			ToUserId: uint32(targetIdInt),
+			UserId:  uint32(userIdInt),
+			ActorId: actorId,
 		})
 	case 2:
 		logger.WithFields(logrus.Fields{
-			"userId":   userId,
-			"toUserId": targetId,
+			"userId":  userId,
+			"actorId": actorId,
 		}).Debugf("Executing unfollow")
 		relationResp, err = relationClient.Unfollow(ctx, &relation.RelationActionRequest{
-			UserId:   userId,
-			ToUserId: uint32(targetIdInt),
+			UserId:  uint32(userIdInt),
+			ActorId: actorId,
 		})
 	default:
 		bizConstant.InvalidArguments.WithFields(&methodFields).LaunchError(c)
@@ -112,13 +123,23 @@ func GetFollowList(ctx context.Context, c *app.RequestContext) {
 	}
 	logger := logging.Logger.WithFields(methodFields)
 	logger.Debugf("Process start")
-	userId := mw.GetAuthActorId(c)
+
+	userId, idExist := c.GetQuery("user_id")
+	id, err := strconv.Atoi(userId)
+
+	if !idExist || err != nil {
+		bizConstant.InvalidUserID.WithCause(err).WithFields(&methodFields).LaunchError(c)
+		return
+	}
+	actorId := mw.GetAuthActorId(c)
 
 	logger.WithFields(logrus.Fields{
-		"userId": userId,
+		"actorId": actorId,
+		"userId":  id,
 	}).Debugf("Executing get follow list")
 	followListResp, err := relationClient.GetFollowList(ctx, &relation.FollowListRequest{
-		UserId: userId,
+		UserId:  uint32(id),
+		ActorId: actorId,
 	})
 
 	if err != nil {
@@ -142,13 +163,22 @@ func GetFollowerList(ctx context.Context, c *app.RequestContext) {
 	}
 	logger := logging.Logger.WithFields(methodFields)
 	logger.Debugf("Process start")
-	userId := mw.GetAuthActorId(c)
+	userId, idExist := c.GetQuery("user_id")
+	id, err := strconv.Atoi(userId)
+
+	if !idExist || err != nil {
+		bizConstant.InvalidUserID.WithCause(err).WithFields(&methodFields).LaunchError(c)
+		return
+	}
+	actorId := mw.GetAuthActorId(c)
 
 	logger.WithFields(logrus.Fields{
-		"userId": userId,
+		"actorId": actorId,
+		"userId":  id,
 	}).Debugf("Executing get follower list")
 	followerListResp, err := relationClient.GetFollowerList(ctx, &relation.FollowerListRequest{
-		UserId: userId,
+		UserId:  uint32(id),
+		ActorId: actorId,
 	})
 
 	if err != nil {
@@ -172,13 +202,22 @@ func GetFriendList(ctx context.Context, c *app.RequestContext) {
 	}
 	logger := logging.Logger.WithFields(methodFields)
 	logger.Debugf("Process start")
-	userId := mw.GetAuthActorId(c)
+	userId, idExist := c.GetQuery("user_id")
+	id, err := strconv.Atoi(userId)
+
+	if !idExist || err != nil {
+		bizConstant.InvalidUserID.WithCause(err).WithFields(&methodFields).LaunchError(c)
+		return
+	}
+	actorId := mw.GetAuthActorId(c)
 
 	logger.WithFields(logrus.Fields{
-		"userId": userId,
+		"userId":  userId,
+		"actorId": id,
 	}).Debugf("Executing get friend list")
 	friendListResp, err := relationClient.GetFriendList(ctx, &relation.FriendListRequest{
-		UserId: userId,
+		UserId:  uint32(id),
+		ActorId: actorId,
 	})
 
 	if err != nil {

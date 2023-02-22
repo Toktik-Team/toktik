@@ -6,8 +6,8 @@ option go_package = "douyin/relation";
 import "user.proto";
 
 message RelationActionRequest {
-  uint32 user_id = 1; // 用户鉴权token
-  uint32 to_user_id = 2; // 对方用户id
+  uint32 actor_id = 1; // 当前登录用户
+  uint32 user_id = 2; // 对方用户id
 }
 
 message RelationActionResponse {
@@ -17,7 +17,8 @@ message RelationActionResponse {
 
 
 message FollowListRequest {
-  uint32 user_id = 1; // 用户id
+  uint32 actor_id = 1; // 当前登录用户id
+  uint32 user_id = 2; // 对方用户id
 }
 
 message FollowListResponse {
@@ -37,7 +38,8 @@ message CountFollowListResponse {
 }
 
 message FollowerListRequest {
-  uint32 user_id = 1; // 用户id
+  uint32 actor_id = 1; // 当前登录用户id
+  uint32 user_id = 2; // 对方用户id
 }
 
 message FollowerListResponse {
@@ -58,7 +60,8 @@ message CountFollowerListResponse {
 
 
 message FriendListRequest {
-  uint32 user_id = 1; // 用户id
+  uint32 actor_id = 1; // 当前登录用户id
+  uint32 user_id = 2; // 对方用户id
 }
 
 message FriendListResponse {
