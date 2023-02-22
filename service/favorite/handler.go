@@ -64,7 +64,7 @@ func like(ctx context.Context, actorId uint32, videoId uint32, authorId uint32) 
 		// 增加作者总获赞数
 		_, err = tx.User.WithContext(ctx).
 			Where(tx.User.ID.Eq(authorId)).
-			Update(tx.User.FavoriteCount, tx.User.FavoriteCount.Add(1))
+			UpdateSimple(tx.User.TotalFavorited.Add(1))
 		if err != nil {
 			return err
 		}
@@ -119,7 +119,7 @@ func cancelLike(ctx context.Context, actorId uint32, videoId uint32, authorId ui
 		// 减少作者总获赞数
 		_, err = tx.User.WithContext(ctx).
 			Where(tx.User.ID.Eq(authorId)).
-			Update(tx.User.FavoriteCount, tx.User.FavoriteCount.Sub(1))
+			UpdateSimple(tx.User.TotalFavorited.Sub(1))
 		if err != nil {
 			return err
 		}
