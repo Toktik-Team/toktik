@@ -4,11 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/cloudwego/hertz/pkg/app"
-	"github.com/cloudwego/hertz/pkg/protocol/consts"
-	"github.com/cloudwego/kitex/client"
-	consul "github.com/kitex-contrib/registry-consul"
-	"github.com/sirupsen/logrus"
 	"log"
 	"strconv"
 	"time"
@@ -17,6 +12,13 @@ import (
 	"toktik/kitex_gen/douyin/comment"
 	"toktik/kitex_gen/douyin/comment/commentservice"
 	"toktik/logging"
+	"toktik/service/web/mw"
+
+	"github.com/cloudwego/hertz/pkg/app"
+	"github.com/cloudwego/hertz/pkg/protocol/consts"
+	"github.com/cloudwego/kitex/client"
+	consul "github.com/kitex-contrib/registry-consul"
+	"github.com/sirupsen/logrus"
 )
 
 var commentClient commentservice.Client
@@ -40,7 +42,7 @@ func Action(ctx context.Context, c *app.RequestContext) {
 	logger := logging.Logger.WithFields(methodFields)
 	logger.Debugf("Process start")
 
-	actorId := c.GetUint32("user_id")
+	actorId := mw.GetAuthActorId(c)
 	videoId, videoIdExists := c.GetQuery("video_id")
 	actionType, actionTypeExists := c.GetQuery("action_type")
 	commentText, commentTextExists := c.GetQuery("comment_text")
@@ -142,7 +144,7 @@ func List(ctx context.Context, c *app.RequestContext) {
 	logger := logging.Logger.WithFields(methodFields)
 	logger.Debugf("Process start")
 
-	actorId := c.GetUint32("user_id")
+	actorId := mw.GetAuthActorId(c)
 	videoId, videoIdExists := c.GetQuery("video_id")
 
 	if !videoIdExists {
