@@ -5,7 +5,6 @@ import (
 	"github.com/segmentio/ksuid"
 	"github.com/sirupsen/logrus"
 	"golang.org/x/crypto/bcrypt"
-	"time"
 	"toktik/constant/biz"
 	"toktik/kitex_gen/douyin/auth"
 	"toktik/logging"
@@ -31,7 +30,6 @@ type AuthServiceImpl struct{}
 // Authenticate implements the AuthServiceImpl interface.
 func (s *AuthServiceImpl) Authenticate(ctx context.Context, req *auth.AuthenticateRequest) (resp *auth.AuthenticateResponse, err error) {
 	logger := logging.Logger.WithFields(logrus.Fields{
-		"time":   time.Now(),
 		"method": "Authenticate",
 		"token":  req.Token,
 	})

@@ -10,7 +10,6 @@ import (
 	"io"
 	"log"
 	"net/http"
-	"time"
 	"toktik/constant/biz"
 	"toktik/constant/config"
 	"toktik/kitex_gen/douyin/comment"
@@ -80,7 +79,6 @@ func (s *PublishServiceImpl) CreateVideo(ctx context.Context, req *publish.Creat
 	methodFields := logrus.Fields{
 		"user_id":  req.UserId,
 		"title":    req.Title,
-		"time":     time.Now(),
 		"function": "CreateVideo",
 	}
 	logger := logging.Logger.WithFields(methodFields)
@@ -89,7 +87,6 @@ func (s *PublishServiceImpl) CreateVideo(ctx context.Context, req *publish.Creat
 	detectedContentType := http.DetectContentType(req.Data)
 	if detectedContentType != "video/mp4" {
 		logger.WithFields(logrus.Fields{
-			"time":         time.Now(),
 			"content_type": detectedContentType,
 		}).Debug("invalid content type")
 		return &publish.CreateVideoResponse{
@@ -104,8 +101,7 @@ func (s *PublishServiceImpl) CreateVideo(ctx context.Context, req *publish.Creat
 	generatedUUID, err := uuid.NewV7()
 	if err != nil {
 		logger.WithFields(logrus.Fields{
-			"time": time.Now(),
-			"err":  err,
+			"err": err,
 		}).Debug("error generating uuid")
 		return &publish.CreateVideoResponse{
 			StatusCode: biz.Unable2GenerateUUID,
@@ -115,16 +111,13 @@ func (s *PublishServiceImpl) CreateVideo(ctx context.Context, req *publish.Creat
 	logger = logger.WithFields(logrus.Fields{
 		"uuid": generatedUUID,
 	})
-	logger.WithFields(logrus.Fields{
-		"time": time.Now(),
-	}).Debug("generated uuid")
+	logger.Debug("generated uuid")
 
 	// Upload video file
 	fileName := fmt.Sprintf("%d/%s.%s", req.UserId, generatedUUID.String(), "mp4")
 	_, err = storage.Upload(fileName, reader)
 	if err != nil {
 		logger.WithFields(logrus.Fields{
-			"time":      time.Now(),
 			"file_name": fileName,
 			"err":       err,
 		}).Debug("failed to upload video")
@@ -134,7 +127,6 @@ func (s *PublishServiceImpl) CreateVideo(ctx context.Context, req *publish.Creat
 		}, nil
 	}
 	logger.WithFields(logrus.Fields{
-		"time":      time.Now(),
 		"file_name": fileName,
 	}).Debug("uploaded video")
 
@@ -143,7 +135,6 @@ func (s *PublishServiceImpl) CreateVideo(ctx context.Context, req *publish.Creat
 	thumbData, err := getThumbnail(reader)
 	if err != nil {
 		logger.WithFields(logrus.Fields{
-			"time":       time.Now(),
 			"file_name":  fileName,
 			"cover_name": coverName,
 			"err":        err,
@@ -154,7 +145,6 @@ func (s *PublishServiceImpl) CreateVideo(ctx context.Context, req *publish.Creat
 		}, nil
 	}
 	logger.WithFields(logrus.Fields{
-		"time":       time.Now(),
 		"cover_name": coverName,
 		"data_size":  len(thumbData),
 	}).Debug("generated thumbnail")
@@ -163,7 +153,6 @@ func (s *PublishServiceImpl) CreateVideo(ctx context.Context, req *publish.Creat
 	_, err = storage.Upload(coverName, bytes.NewReader(thumbData))
 	if err != nil {
 		logger.WithFields(logrus.Fields{
-			"time":       time.Now(),
 			"file_name":  fileName,
 			"cover_name": coverName,
 			"err":        err,
@@ -174,7 +163,6 @@ func (s *PublishServiceImpl) CreateVideo(ctx context.Context, req *publish.Creat
 		}, nil
 	}
 	logger.WithFields(logrus.Fields{
-		"time":       time.Now(),
 		"cover_name": coverName,
 		"data_size":  len(thumbData),
 	}).Debug("uploaded thumbnail")
@@ -189,7 +177,6 @@ func (s *PublishServiceImpl) CreateVideo(ctx context.Context, req *publish.Creat
 	err = gen.Q.Video.WithContext(ctx).Create(&publishModel)
 	if err != nil {
 		logger.WithFields(logrus.Fields{
-			"time":       time.Now(),
 			"file_name":  fileName,
 			"cover_name": coverName,
 			"err":        err,
@@ -200,13 +187,11 @@ func (s *PublishServiceImpl) CreateVideo(ctx context.Context, req *publish.Creat
 		}, nil
 	}
 	logger.WithFields(logrus.Fields{
-		"time":  time.Now(),
 		"entry": publishModel,
 	}).Debug("saved db entry")
 
 	resp = &publish.CreateVideoResponse{StatusCode: 0, StatusMsg: biz.PublishActionSuccess}
 	logger.WithFields(logrus.Fields{
-		"time":     time.Now(),
 		"response": resp,
 	}).Debug("all process done, ready to launch response")
 	return resp, nil
@@ -217,7 +202,6 @@ func (s *PublishServiceImpl) ListVideo(ctx context.Context, req *publish.ListVid
 	methodFields := logrus.Fields{
 		"user_id":  req.UserId,
 		"actor_id": req.ActorId,
-		"time":     time.Now(),
 		"function": "ListVideo",
 	}
 	logger := logging.Logger.WithFields(methodFields)
@@ -229,8 +213,7 @@ func (s *PublishServiceImpl) ListVideo(ctx context.Context, req *publish.ListVid
 		Find()
 	if err != nil {
 		logger.WithFields(logrus.Fields{
-			"time": time.Now(),
-			"err":  err,
+			"err": err,
 		}).Debug("failed to query video")
 		return &publish.ListVideoResponse{
 			StatusCode: biz.UnableToQueryVideo,
@@ -307,7 +290,6 @@ func (s *PublishServiceImpl) ListVideo(ctx context.Context, req *publish.ListVid
 	}
 
 	logger.WithFields(logrus.Fields{
-		"time":     time.Now(),
 		"response": resp,
 	}).Debug("all process done, ready to launch response")
 	return &publish.ListVideoResponse{

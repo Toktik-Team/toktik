@@ -3,12 +3,12 @@ package user
 import (
 	"context"
 	"strconv"
-	"time"
 	bizConstant "toktik/constant/biz"
 	bizConfig "toktik/constant/config"
 	"toktik/kitex_gen/douyin/user"
 	userService "toktik/kitex_gen/douyin/user/userservice"
 	"toktik/logging"
+	"toktik/service/web/mw"
 
 	"github.com/cloudwego/hertz/pkg/app"
 	httpStatus "github.com/cloudwego/hertz/pkg/protocol/consts"
@@ -32,14 +32,13 @@ func init() {
 
 func GetUserInfo(ctx context.Context, c *app.RequestContext) {
 	methodFields := logrus.Fields{
-		"time":   time.Now(),
 		"method": "GetUserInfo",
 	}
 	logger := logging.Logger.WithFields(methodFields)
 	logger.Debugf("Process start")
 
 	userId, idExist := c.GetQuery("user_id")
-	actorId := c.GetUint32("user_id")
+	actorId := mw.GetAuthActorId(c)
 	id, err := strconv.Atoi(userId)
 
 	if !idExist || err != nil {

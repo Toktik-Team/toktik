@@ -6,7 +6,6 @@ import (
 	"net/url"
 	"os"
 	"path"
-	"time"
 	"toktik/constant/config"
 	"toktik/logging"
 )
@@ -16,7 +15,6 @@ type FSStorage struct {
 
 func (f FSStorage) Upload(fileName string, content io.Reader) (output *PutObjectOutput, err error) {
 	methodFields := logrus.Fields{
-		"time":      time.Now(),
 		"function":  "FSStorage.Upload",
 		"file_name": fileName,
 	}
@@ -26,8 +24,7 @@ func (f FSStorage) Upload(fileName string, content io.Reader) (output *PutObject
 	all, err := io.ReadAll(content)
 	if err != nil {
 		logger.WithFields(logrus.Fields{
-			"time": time.Now(),
-			"err":  err,
+			"err": err,
 		}).Debug("failed reading content")
 		return nil, err
 	}
@@ -36,16 +33,14 @@ func (f FSStorage) Upload(fileName string, content io.Reader) (output *PutObject
 	err = os.MkdirAll(dir, os.FileMode(0755))
 	if err != nil {
 		logger.WithFields(logrus.Fields{
-			"time": time.Now(),
-			"err":  err,
+			"err": err,
 		}).Debug("failed writing creating directory before writing file")
 		return nil, err
 	}
 	err = os.WriteFile(filePath, all, os.FileMode(0755))
 	if err != nil {
 		logger.WithFields(logrus.Fields{
-			"time": time.Now(),
-			"err":  err,
+			"err": err,
 		}).Debug("failed writing content to file")
 		return nil, err
 	}

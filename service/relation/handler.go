@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"log"
-	"time"
 	"toktik/constant/biz"
 	"toktik/constant/config"
 	"toktik/kitex_gen/douyin/relation"
@@ -63,12 +62,10 @@ type RelationServiceImpl struct{}
 
 // GetFollowList implements the RelationServiceImpl interface.
 func (s *RelationServiceImpl) GetFollowList(ctx context.Context, req *relation.FollowListRequest) (resp *relation.FollowListResponse, err error) {
-	methodFields := logrus.Fields{
+	logger := logging.Logger.WithFields(logrus.Fields{
 		"user_id":  req.UserId,
-		"time":     time.Now(),
 		"function": "GetFollowList",
-	}
-	logger := logging.Logger.WithFields(methodFields)
+	})
 	logger.Debug("Process start")
 
 	r := repo.Q.Relation
@@ -94,8 +91,7 @@ func (s *RelationServiceImpl) GetFollowList(ctx context.Context, req *relation.F
 		userList = append(userList, userResponse.User)
 	}
 
-	logger.WithFields(map[string]interface{}{
-		"time":     time.Now(),
+	logger.WithFields(logrus.Fields{
 		"response": resp,
 	}).Debug("all process done, ready to launch response")
 	resp = &relation.FollowListResponse{
@@ -110,7 +106,6 @@ func (s *RelationServiceImpl) GetFollowList(ctx context.Context, req *relation.F
 func (s *RelationServiceImpl) GetFollowerList(ctx context.Context, req *relation.FollowerListRequest) (resp *relation.FollowerListResponse, err error) {
 	methodFields := logrus.Fields{
 		"user_id":  req.UserId,
-		"time":     time.Now(),
 		"function": "GetFollowerList",
 	}
 	logger := logging.Logger.WithFields(methodFields)
@@ -139,8 +134,7 @@ func (s *RelationServiceImpl) GetFollowerList(ctx context.Context, req *relation
 		userList = append(userList, userResponse.User)
 	}
 
-	logger.WithFields(map[string]interface{}{
-		"time":     time.Now(),
+	logger.WithFields(logrus.Fields{
 		"response": resp,
 	}).Debug("all process done, ready to launch response")
 	resp = &relation.FollowerListResponse{
@@ -153,12 +147,10 @@ func (s *RelationServiceImpl) GetFollowerList(ctx context.Context, req *relation
 
 // GetFriendList implements the RelationServiceImpl interface.
 func (s *RelationServiceImpl) GetFriendList(ctx context.Context, req *relation.FriendListRequest) (resp *relation.FriendListResponse, err error) {
-	methodFields := logrus.Fields{
+	logger := logging.Logger.WithFields(logrus.Fields{
 		"user_id":  req.UserId,
-		"time":     time.Now(),
 		"function": "GetFriendList",
-	}
-	logger := logging.Logger.WithFields(methodFields)
+	})
 	logger.Debug("Process start")
 
 	r := repo.Q.Relation
@@ -215,8 +207,7 @@ func (s *RelationServiceImpl) GetFriendList(ctx context.Context, req *relation.F
 		UserList:   userList,
 	}
 
-	logger.WithFields(map[string]interface{}{
-		"time":     time.Now(),
+	logger.WithFields(logrus.Fields{
 		"response": resp,
 	}).Debug("all process done, ready to launch response")
 	return
@@ -224,13 +215,11 @@ func (s *RelationServiceImpl) GetFriendList(ctx context.Context, req *relation.F
 
 // Follow implements the RelationServiceImpl interface.
 func (s *RelationServiceImpl) Follow(ctx context.Context, req *relation.RelationActionRequest) (resp *relation.RelationActionResponse, err error) {
-	methodFields := logrus.Fields{
+	logger := logging.Logger.WithFields(logrus.Fields{
 		"user_id":    req.UserId,
 		"to_user_id": req.ToUserId,
-		"time":       time.Now(),
 		"function":   "RelationAction",
-	}
-	logger := logging.Logger.WithFields(methodFields)
+	})
 	logger.Debug("Process start")
 
 	if req.ToUserId == req.UserId {
@@ -271,8 +260,7 @@ func (s *RelationServiceImpl) Follow(ctx context.Context, req *relation.Relation
 		}
 		return
 	}
-	logger.WithFields(map[string]interface{}{
-		"time":  time.Now(),
+	logger.WithFields(logrus.Fields{
 		"entry": relationModel,
 	}).Debug("create relation")
 
@@ -281,8 +269,7 @@ func (s *RelationServiceImpl) Follow(ctx context.Context, req *relation.Relation
 		StatusMsg:  biz.OkStatusMsg,
 	}
 
-	logger.WithFields(map[string]interface{}{
-		"time":     time.Now(),
+	logger.WithFields(logrus.Fields{
 		"response": resp,
 	}).Debug("all process done, ready to launch response")
 	return
@@ -290,13 +277,11 @@ func (s *RelationServiceImpl) Follow(ctx context.Context, req *relation.Relation
 
 // Unfollow implements the RelationServiceImpl interface.
 func (s *RelationServiceImpl) Unfollow(ctx context.Context, req *relation.RelationActionRequest) (resp *relation.RelationActionResponse, err error) {
-	methodFields := logrus.Fields{
+	logger := logging.Logger.WithFields(logrus.Fields{
 		"user_id":    req.UserId,
 		"to_user_id": req.ToUserId,
-		"time":       time.Now(),
 		"function":   "RelationAction",
-	}
-	logger := logging.Logger.WithFields(methodFields)
+	})
 	logger.Debug("Process start")
 	if req.ToUserId == req.UserId {
 		resp = &relation.RelationActionResponse{
@@ -310,10 +295,9 @@ func (s *RelationServiceImpl) Unfollow(ctx context.Context, req *relation.Relati
 
 	relationModel, err := r.WithContext(ctx).Where(r.UserId.Eq(req.UserId), r.TargetId.Eq(req.ToUserId)).First()
 	if err != nil {
-		logger.WithFields(map[string]interface{}{
+		logger.WithFields(logrus.Fields{
 			"user_id":    req.UserId,
 			"to_user_id": req.ToUserId,
-			"time":       time.Now(),
 		}).Debug("record not found")
 		// Unfollow a user that was not followed before
 		resp = &relation.RelationActionResponse{
@@ -324,8 +308,7 @@ func (s *RelationServiceImpl) Unfollow(ctx context.Context, req *relation.Relati
 	}
 
 	if _, err = r.Where(r.UserId.Eq(req.UserId), r.TargetId.Eq(req.ToUserId)).Delete(); err != nil {
-		logger.WithFields(map[string]interface{}{
-			"time":  time.Now(),
+		logger.WithFields(logrus.Fields{
 			"entry": relationModel,
 			"err":   err,
 		}).Debug("failed to delete")
@@ -337,13 +320,11 @@ func (s *RelationServiceImpl) Unfollow(ctx context.Context, req *relation.Relati
 		return
 	}
 
-	logger.WithFields(map[string]interface{}{
-		"time":  time.Now(),
+	logger.WithFields(logrus.Fields{
 		"entry": relationModel,
 	}).Debug("deleted db entry")
 
-	logger.WithFields(map[string]interface{}{
-		"time":     time.Now(),
+	logger.WithFields(logrus.Fields{
 		"response": resp,
 	}).Debug("all process done, ready to launch response")
 	resp = &relation.RelationActionResponse{

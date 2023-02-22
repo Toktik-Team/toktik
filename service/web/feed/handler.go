@@ -3,7 +3,6 @@ package feed
 import (
 	"context"
 	"strconv"
-	"time"
 	bizConstant "toktik/constant/biz"
 	bizConfig "toktik/constant/config"
 	"toktik/kitex_gen/douyin/feed"
@@ -34,7 +33,6 @@ func init() {
 }
 func Action(ctx context.Context, c *app.RequestContext) {
 	methodFields := logrus.Fields{
-		"time":   time.Now(),
 		"method": "FeedAction",
 	}
 	logger := logging.Logger.WithFields(methodFields)
@@ -53,7 +51,7 @@ func Action(ctx context.Context, c *app.RequestContext) {
 	authResult := mw.GetAuthResult(c)
 	switch authResult {
 	case mw.AUTH_RESULT_SUCCESS:
-		actorId := c.GetUint32("user_id")
+		actorId := mw.GetAuthActorId(c)
 		actorIdPtr = &actorId
 	case mw.AUTH_RESULT_NO_TOKEN:
 		actorIdPtr = nil
