@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/cloudwego/kitex/client"
+	"github.com/kitex-contrib/obs-opentelemetry/tracing"
 	consul "github.com/kitex-contrib/registry-consul"
 	"io"
 	"log"
@@ -36,7 +37,11 @@ func init() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	FeedClient, err = feedService.NewClient(config.FeedServiceName, client.WithResolver(r))
+	FeedClient, err = feedService.NewClient(
+		config.FeedServiceName,
+		client.WithResolver(r),
+		client.WithSuite(tracing.NewClientSuite()),
+	)
 	if err != nil {
 		panic(err)
 	}

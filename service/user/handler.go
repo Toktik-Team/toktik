@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"github.com/cloudwego/kitex/client"
+	"github.com/kitex-contrib/obs-opentelemetry/tracing"
 	consul "github.com/kitex-contrib/registry-consul"
 	"github.com/sirupsen/logrus"
 	"log"
@@ -31,15 +32,28 @@ func init() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	FavoriteClient, err = favoriteService.NewClient(bizConfig.FavoriteServiceName, client.WithResolver(r))
+	FavoriteClient, err = favoriteService.NewClient(
+		bizConfig.FavoriteServiceName,
+		client.WithResolver(r),
+		client.WithSuite(tracing.NewClientSuite()),
+	)
 	if err != nil {
 		log.Fatal(err)
 	}
-	RelationClient, err = relationService.NewClient(bizConfig.RelationServiceName, client.WithResolver(r))
+	RelationClient, err = relationService.NewClient(
+		bizConfig.RelationServiceName,
+		client.WithResolver(r),
+		client.WithSuite(tracing.NewClientSuite()),
+	)
 	if err != nil {
 		log.Fatal(err)
 	}
-	PublishClient, err = publishService.NewClient(bizConfig.PublishServiceName, client.WithResolver(r))
+	PublishClient, err = publishService.NewClient(
+		bizConfig.PublishServiceName,
+		client.WithResolver(r),
+		client.WithSuite(tracing.NewClientSuite()),
+	)
+
 	if err != nil {
 		log.Fatal(err)
 	}

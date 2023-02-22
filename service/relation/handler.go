@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"github.com/kitex-contrib/obs-opentelemetry/tracing"
 	"log"
 	"sync"
 	"toktik/constant/biz"
@@ -25,7 +26,11 @@ func init() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	UserClient, err = userservice.NewClient(config.UserServiceName, client.WithResolver(r))
+	UserClient, err = userservice.NewClient(
+		config.UserServiceName,
+		client.WithResolver(r),
+		client.WithSuite(tracing.NewClientSuite()),
+	)
 	if err != nil {
 		log.Fatal(err)
 	}

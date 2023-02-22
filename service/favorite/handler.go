@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"github.com/cloudwego/kitex/client"
+	"github.com/kitex-contrib/obs-opentelemetry/tracing"
 	consul "github.com/kitex-contrib/registry-consul"
 	"github.com/sirupsen/logrus"
 	"toktik/constant/biz"
@@ -22,7 +23,11 @@ func init() {
 	if err != nil {
 		panic(err)
 	}
-	FeedClient, err = feedService.NewClient(config.FeedServiceName, client.WithResolver(r))
+	FeedClient, err = feedService.NewClient(
+		config.FeedServiceName,
+		client.WithResolver(r),
+		client.WithSuite(tracing.NewClientSuite()),
+	)
 	if err != nil {
 		panic(err)
 	}
