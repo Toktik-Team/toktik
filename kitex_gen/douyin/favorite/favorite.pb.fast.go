@@ -230,7 +230,7 @@ func (x *IsFavoriteResponse) fastReadField1(buf []byte, _type int8) (offset int,
 	return offset, err
 }
 
-func (x *FavoriteCountRequest) FastRead(buf []byte, _type int8, number int32) (offset int, err error) {
+func (x *CountFavoriteRequest) FastRead(buf []byte, _type int8, number int32) (offset int, err error) {
 	switch number {
 	case 1:
 		offset, err = x.fastReadField1(buf, _type)
@@ -247,15 +247,15 @@ func (x *FavoriteCountRequest) FastRead(buf []byte, _type int8, number int32) (o
 SkipFieldError:
 	return offset, fmt.Errorf("%T cannot parse invalid wire-format data, error: %s", x, err)
 ReadFieldError:
-	return offset, fmt.Errorf("%T read field %d '%s' error: %s", x, number, fieldIDToName_FavoriteCountRequest[number], err)
+	return offset, fmt.Errorf("%T read field %d '%s' error: %s", x, number, fieldIDToName_CountFavoriteRequest[number], err)
 }
 
-func (x *FavoriteCountRequest) fastReadField1(buf []byte, _type int8) (offset int, err error) {
+func (x *CountFavoriteRequest) fastReadField1(buf []byte, _type int8) (offset int, err error) {
 	x.VideoId, offset, err = fastpb.ReadUint32(buf, _type)
 	return offset, err
 }
 
-func (x *FavoriteCountResponse) FastRead(buf []byte, _type int8, number int32) (offset int, err error) {
+func (x *CountFavoriteResponse) FastRead(buf []byte, _type int8, number int32) (offset int, err error) {
 	switch number {
 	case 1:
 		offset, err = x.fastReadField1(buf, _type)
@@ -282,26 +282,26 @@ func (x *FavoriteCountResponse) FastRead(buf []byte, _type int8, number int32) (
 SkipFieldError:
 	return offset, fmt.Errorf("%T cannot parse invalid wire-format data, error: %s", x, err)
 ReadFieldError:
-	return offset, fmt.Errorf("%T read field %d '%s' error: %s", x, number, fieldIDToName_FavoriteCountResponse[number], err)
+	return offset, fmt.Errorf("%T read field %d '%s' error: %s", x, number, fieldIDToName_CountFavoriteResponse[number], err)
 }
 
-func (x *FavoriteCountResponse) fastReadField1(buf []byte, _type int8) (offset int, err error) {
+func (x *CountFavoriteResponse) fastReadField1(buf []byte, _type int8) (offset int, err error) {
 	x.StatusCode, offset, err = fastpb.ReadUint32(buf, _type)
 	return offset, err
 }
 
-func (x *FavoriteCountResponse) fastReadField2(buf []byte, _type int8) (offset int, err error) {
+func (x *CountFavoriteResponse) fastReadField2(buf []byte, _type int8) (offset int, err error) {
 	tmp, offset, err := fastpb.ReadString(buf, _type)
 	x.StatusMsg = &tmp
 	return offset, err
 }
 
-func (x *FavoriteCountResponse) fastReadField3(buf []byte, _type int8) (offset int, err error) {
+func (x *CountFavoriteResponse) fastReadField3(buf []byte, _type int8) (offset int, err error) {
 	x.Count, offset, err = fastpb.ReadUint32(buf, _type)
 	return offset, err
 }
 
-func (x *UserFavoriteCountRequest) FastRead(buf []byte, _type int8, number int32) (offset int, err error) {
+func (x *CountUserFavoriteRequest) FastRead(buf []byte, _type int8, number int32) (offset int, err error) {
 	switch number {
 	case 1:
 		offset, err = x.fastReadField1(buf, _type)
@@ -318,15 +318,15 @@ func (x *UserFavoriteCountRequest) FastRead(buf []byte, _type int8, number int32
 SkipFieldError:
 	return offset, fmt.Errorf("%T cannot parse invalid wire-format data, error: %s", x, err)
 ReadFieldError:
-	return offset, fmt.Errorf("%T read field %d '%s' error: %s", x, number, fieldIDToName_UserFavoriteCountRequest[number], err)
+	return offset, fmt.Errorf("%T read field %d '%s' error: %s", x, number, fieldIDToName_CountUserFavoriteRequest[number], err)
 }
 
-func (x *UserFavoriteCountRequest) fastReadField1(buf []byte, _type int8) (offset int, err error) {
+func (x *CountUserFavoriteRequest) fastReadField1(buf []byte, _type int8) (offset int, err error) {
 	x.UserId, offset, err = fastpb.ReadUint32(buf, _type)
 	return offset, err
 }
 
-func (x *UserFavoriteCountResponse) FastRead(buf []byte, _type int8, number int32) (offset int, err error) {
+func (x *CountUserFavoriteResponse) FastRead(buf []byte, _type int8, number int32) (offset int, err error) {
 	switch number {
 	case 1:
 		offset, err = x.fastReadField1(buf, _type)
@@ -353,26 +353,26 @@ func (x *UserFavoriteCountResponse) FastRead(buf []byte, _type int8, number int3
 SkipFieldError:
 	return offset, fmt.Errorf("%T cannot parse invalid wire-format data, error: %s", x, err)
 ReadFieldError:
-	return offset, fmt.Errorf("%T read field %d '%s' error: %s", x, number, fieldIDToName_UserFavoriteCountResponse[number], err)
+	return offset, fmt.Errorf("%T read field %d '%s' error: %s", x, number, fieldIDToName_CountUserFavoriteResponse[number], err)
 }
 
-func (x *UserFavoriteCountResponse) fastReadField1(buf []byte, _type int8) (offset int, err error) {
+func (x *CountUserFavoriteResponse) fastReadField1(buf []byte, _type int8) (offset int, err error) {
 	x.StatusCode, offset, err = fastpb.ReadUint32(buf, _type)
 	return offset, err
 }
 
-func (x *UserFavoriteCountResponse) fastReadField2(buf []byte, _type int8) (offset int, err error) {
+func (x *CountUserFavoriteResponse) fastReadField2(buf []byte, _type int8) (offset int, err error) {
 	tmp, offset, err := fastpb.ReadString(buf, _type)
 	x.StatusMsg = &tmp
 	return offset, err
 }
 
-func (x *UserFavoriteCountResponse) fastReadField3(buf []byte, _type int8) (offset int, err error) {
+func (x *CountUserFavoriteResponse) fastReadField3(buf []byte, _type int8) (offset int, err error) {
 	x.Count, offset, err = fastpb.ReadUint32(buf, _type)
 	return offset, err
 }
 
-func (x *UserTotalFavoritedCountRequest) FastRead(buf []byte, _type int8, number int32) (offset int, err error) {
+func (x *CountUserTotalFavoritedRequest) FastRead(buf []byte, _type int8, number int32) (offset int, err error) {
 	switch number {
 	case 1:
 		offset, err = x.fastReadField1(buf, _type)
@@ -394,20 +394,20 @@ func (x *UserTotalFavoritedCountRequest) FastRead(buf []byte, _type int8, number
 SkipFieldError:
 	return offset, fmt.Errorf("%T cannot parse invalid wire-format data, error: %s", x, err)
 ReadFieldError:
-	return offset, fmt.Errorf("%T read field %d '%s' error: %s", x, number, fieldIDToName_UserTotalFavoritedCountRequest[number], err)
+	return offset, fmt.Errorf("%T read field %d '%s' error: %s", x, number, fieldIDToName_CountUserTotalFavoritedRequest[number], err)
 }
 
-func (x *UserTotalFavoritedCountRequest) fastReadField1(buf []byte, _type int8) (offset int, err error) {
+func (x *CountUserTotalFavoritedRequest) fastReadField1(buf []byte, _type int8) (offset int, err error) {
 	x.ActorId, offset, err = fastpb.ReadUint32(buf, _type)
 	return offset, err
 }
 
-func (x *UserTotalFavoritedCountRequest) fastReadField2(buf []byte, _type int8) (offset int, err error) {
+func (x *CountUserTotalFavoritedRequest) fastReadField2(buf []byte, _type int8) (offset int, err error) {
 	x.UserId, offset, err = fastpb.ReadUint32(buf, _type)
 	return offset, err
 }
 
-func (x *UserTotalFavoritedCountResponse) FastRead(buf []byte, _type int8, number int32) (offset int, err error) {
+func (x *CountUserTotalFavoritedResponse) FastRead(buf []byte, _type int8, number int32) (offset int, err error) {
 	switch number {
 	case 1:
 		offset, err = x.fastReadField1(buf, _type)
@@ -434,21 +434,21 @@ func (x *UserTotalFavoritedCountResponse) FastRead(buf []byte, _type int8, numbe
 SkipFieldError:
 	return offset, fmt.Errorf("%T cannot parse invalid wire-format data, error: %s", x, err)
 ReadFieldError:
-	return offset, fmt.Errorf("%T read field %d '%s' error: %s", x, number, fieldIDToName_UserTotalFavoritedCountResponse[number], err)
+	return offset, fmt.Errorf("%T read field %d '%s' error: %s", x, number, fieldIDToName_CountUserTotalFavoritedResponse[number], err)
 }
 
-func (x *UserTotalFavoritedCountResponse) fastReadField1(buf []byte, _type int8) (offset int, err error) {
+func (x *CountUserTotalFavoritedResponse) fastReadField1(buf []byte, _type int8) (offset int, err error) {
 	x.StatusCode, offset, err = fastpb.ReadUint32(buf, _type)
 	return offset, err
 }
 
-func (x *UserTotalFavoritedCountResponse) fastReadField2(buf []byte, _type int8) (offset int, err error) {
+func (x *CountUserTotalFavoritedResponse) fastReadField2(buf []byte, _type int8) (offset int, err error) {
 	tmp, offset, err := fastpb.ReadString(buf, _type)
 	x.StatusMsg = &tmp
 	return offset, err
 }
 
-func (x *UserTotalFavoritedCountResponse) fastReadField3(buf []byte, _type int8) (offset int, err error) {
+func (x *CountUserTotalFavoritedResponse) fastReadField3(buf []byte, _type int8) (offset int, err error) {
 	x.Count, offset, err = fastpb.ReadUint32(buf, _type)
 	return offset, err
 }
@@ -467,7 +467,7 @@ func (x *FavoriteRequest) fastWriteField1(buf []byte) (offset int) {
 	if x.ActorId == 0 {
 		return offset
 	}
-	offset += fastpb.WriteUint32(buf[offset:], 1, x.GetActorId())
+	offset += fastpb.WriteUint32(buf[offset:], 1, x.ActorId)
 	return offset
 }
 
@@ -475,7 +475,7 @@ func (x *FavoriteRequest) fastWriteField2(buf []byte) (offset int) {
 	if x.VideoId == 0 {
 		return offset
 	}
-	offset += fastpb.WriteUint32(buf[offset:], 2, x.GetVideoId())
+	offset += fastpb.WriteUint32(buf[offset:], 2, x.VideoId)
 	return offset
 }
 
@@ -483,7 +483,7 @@ func (x *FavoriteRequest) fastWriteField3(buf []byte) (offset int) {
 	if x.ActionType == 0 {
 		return offset
 	}
-	offset += fastpb.WriteUint32(buf[offset:], 3, x.GetActionType())
+	offset += fastpb.WriteUint32(buf[offset:], 3, x.ActionType)
 	return offset
 }
 
@@ -500,7 +500,7 @@ func (x *FavoriteResponse) fastWriteField1(buf []byte) (offset int) {
 	if x.StatusCode == 0 {
 		return offset
 	}
-	offset += fastpb.WriteUint32(buf[offset:], 1, x.GetStatusCode())
+	offset += fastpb.WriteUint32(buf[offset:], 1, x.StatusCode)
 	return offset
 }
 
@@ -508,7 +508,7 @@ func (x *FavoriteResponse) fastWriteField2(buf []byte) (offset int) {
 	if x.StatusMsg == nil {
 		return offset
 	}
-	offset += fastpb.WriteString(buf[offset:], 2, x.GetStatusMsg())
+	offset += fastpb.WriteString(buf[offset:], 2, *x.StatusMsg)
 	return offset
 }
 
@@ -524,7 +524,7 @@ func (x *FavoriteListRequest) fastWriteField1(buf []byte) (offset int) {
 	if x.UserId == 0 {
 		return offset
 	}
-	offset += fastpb.WriteUint32(buf[offset:], 1, x.GetUserId())
+	offset += fastpb.WriteUint32(buf[offset:], 1, x.UserId)
 	return offset
 }
 
@@ -542,7 +542,7 @@ func (x *FavoriteListResponse) fastWriteField1(buf []byte) (offset int) {
 	if x.StatusCode == 0 {
 		return offset
 	}
-	offset += fastpb.WriteUint32(buf[offset:], 1, x.GetStatusCode())
+	offset += fastpb.WriteUint32(buf[offset:], 1, x.StatusCode)
 	return offset
 }
 
@@ -550,7 +550,7 @@ func (x *FavoriteListResponse) fastWriteField2(buf []byte) (offset int) {
 	if x.StatusMsg == nil {
 		return offset
 	}
-	offset += fastpb.WriteString(buf[offset:], 2, x.GetStatusMsg())
+	offset += fastpb.WriteString(buf[offset:], 2, *x.StatusMsg)
 	return offset
 }
 
@@ -558,8 +558,8 @@ func (x *FavoriteListResponse) fastWriteField3(buf []byte) (offset int) {
 	if x.VideoList == nil {
 		return offset
 	}
-	for i := range x.GetVideoList() {
-		offset += fastpb.WriteMessage(buf[offset:], 3, x.GetVideoList()[i])
+	for i := range x.VideoList {
+		offset += fastpb.WriteMessage(buf[offset:], 3, x.VideoList[i])
 	}
 	return offset
 }
@@ -577,7 +577,7 @@ func (x *IsFavoriteRequest) fastWriteField1(buf []byte) (offset int) {
 	if x.UserId == 0 {
 		return offset
 	}
-	offset += fastpb.WriteUint32(buf[offset:], 1, x.GetUserId())
+	offset += fastpb.WriteUint32(buf[offset:], 1, x.UserId)
 	return offset
 }
 
@@ -585,7 +585,7 @@ func (x *IsFavoriteRequest) fastWriteField2(buf []byte) (offset int) {
 	if x.VideoId == 0 {
 		return offset
 	}
-	offset += fastpb.WriteUint32(buf[offset:], 2, x.GetVideoId())
+	offset += fastpb.WriteUint32(buf[offset:], 2, x.VideoId)
 	return offset
 }
 
@@ -601,11 +601,11 @@ func (x *IsFavoriteResponse) fastWriteField1(buf []byte) (offset int) {
 	if !x.Result {
 		return offset
 	}
-	offset += fastpb.WriteBool(buf[offset:], 1, x.GetResult())
+	offset += fastpb.WriteBool(buf[offset:], 1, x.Result)
 	return offset
 }
 
-func (x *FavoriteCountRequest) FastWrite(buf []byte) (offset int) {
+func (x *CountFavoriteRequest) FastWrite(buf []byte) (offset int) {
 	if x == nil {
 		return offset
 	}
@@ -613,7 +613,7 @@ func (x *FavoriteCountRequest) FastWrite(buf []byte) (offset int) {
 	return offset
 }
 
-func (x *FavoriteCountRequest) fastWriteField1(buf []byte) (offset int) {
+func (x *CountFavoriteRequest) fastWriteField1(buf []byte) (offset int) {
 	if x.VideoId == 0 {
 		return offset
 	}
@@ -621,7 +621,7 @@ func (x *FavoriteCountRequest) fastWriteField1(buf []byte) (offset int) {
 	return offset
 }
 
-func (x *FavoriteCountResponse) FastWrite(buf []byte) (offset int) {
+func (x *CountFavoriteResponse) FastWrite(buf []byte) (offset int) {
 	if x == nil {
 		return offset
 	}
@@ -631,7 +631,7 @@ func (x *FavoriteCountResponse) FastWrite(buf []byte) (offset int) {
 	return offset
 }
 
-func (x *FavoriteCountResponse) fastWriteField1(buf []byte) (offset int) {
+func (x *CountFavoriteResponse) fastWriteField1(buf []byte) (offset int) {
 	if x.StatusCode == 0 {
 		return offset
 	}
@@ -639,7 +639,7 @@ func (x *FavoriteCountResponse) fastWriteField1(buf []byte) (offset int) {
 	return offset
 }
 
-func (x *FavoriteCountResponse) fastWriteField2(buf []byte) (offset int) {
+func (x *CountFavoriteResponse) fastWriteField2(buf []byte) (offset int) {
 	if x.StatusMsg == nil {
 		return offset
 	}
@@ -647,7 +647,7 @@ func (x *FavoriteCountResponse) fastWriteField2(buf []byte) (offset int) {
 	return offset
 }
 
-func (x *FavoriteCountResponse) fastWriteField3(buf []byte) (offset int) {
+func (x *CountFavoriteResponse) fastWriteField3(buf []byte) (offset int) {
 	if x.Count == 0 {
 		return offset
 	}
@@ -655,7 +655,7 @@ func (x *FavoriteCountResponse) fastWriteField3(buf []byte) (offset int) {
 	return offset
 }
 
-func (x *UserFavoriteCountRequest) FastWrite(buf []byte) (offset int) {
+func (x *CountUserFavoriteRequest) FastWrite(buf []byte) (offset int) {
 	if x == nil {
 		return offset
 	}
@@ -663,7 +663,7 @@ func (x *UserFavoriteCountRequest) FastWrite(buf []byte) (offset int) {
 	return offset
 }
 
-func (x *UserFavoriteCountRequest) fastWriteField1(buf []byte) (offset int) {
+func (x *CountUserFavoriteRequest) fastWriteField1(buf []byte) (offset int) {
 	if x.UserId == 0 {
 		return offset
 	}
@@ -671,7 +671,7 @@ func (x *UserFavoriteCountRequest) fastWriteField1(buf []byte) (offset int) {
 	return offset
 }
 
-func (x *UserFavoriteCountResponse) FastWrite(buf []byte) (offset int) {
+func (x *CountUserFavoriteResponse) FastWrite(buf []byte) (offset int) {
 	if x == nil {
 		return offset
 	}
@@ -681,7 +681,7 @@ func (x *UserFavoriteCountResponse) FastWrite(buf []byte) (offset int) {
 	return offset
 }
 
-func (x *UserFavoriteCountResponse) fastWriteField1(buf []byte) (offset int) {
+func (x *CountUserFavoriteResponse) fastWriteField1(buf []byte) (offset int) {
 	if x.StatusCode == 0 {
 		return offset
 	}
@@ -689,7 +689,7 @@ func (x *UserFavoriteCountResponse) fastWriteField1(buf []byte) (offset int) {
 	return offset
 }
 
-func (x *UserFavoriteCountResponse) fastWriteField2(buf []byte) (offset int) {
+func (x *CountUserFavoriteResponse) fastWriteField2(buf []byte) (offset int) {
 	if x.StatusMsg == nil {
 		return offset
 	}
@@ -697,7 +697,7 @@ func (x *UserFavoriteCountResponse) fastWriteField2(buf []byte) (offset int) {
 	return offset
 }
 
-func (x *UserFavoriteCountResponse) fastWriteField3(buf []byte) (offset int) {
+func (x *CountUserFavoriteResponse) fastWriteField3(buf []byte) (offset int) {
 	if x.Count == 0 {
 		return offset
 	}
@@ -705,7 +705,7 @@ func (x *UserFavoriteCountResponse) fastWriteField3(buf []byte) (offset int) {
 	return offset
 }
 
-func (x *UserTotalFavoritedCountRequest) FastWrite(buf []byte) (offset int) {
+func (x *CountUserTotalFavoritedRequest) FastWrite(buf []byte) (offset int) {
 	if x == nil {
 		return offset
 	}
@@ -714,7 +714,7 @@ func (x *UserTotalFavoritedCountRequest) FastWrite(buf []byte) (offset int) {
 	return offset
 }
 
-func (x *UserTotalFavoritedCountRequest) fastWriteField1(buf []byte) (offset int) {
+func (x *CountUserTotalFavoritedRequest) fastWriteField1(buf []byte) (offset int) {
 	if x.ActorId == 0 {
 		return offset
 	}
@@ -722,7 +722,7 @@ func (x *UserTotalFavoritedCountRequest) fastWriteField1(buf []byte) (offset int
 	return offset
 }
 
-func (x *UserTotalFavoritedCountRequest) fastWriteField2(buf []byte) (offset int) {
+func (x *CountUserTotalFavoritedRequest) fastWriteField2(buf []byte) (offset int) {
 	if x.UserId == 0 {
 		return offset
 	}
@@ -730,7 +730,7 @@ func (x *UserTotalFavoritedCountRequest) fastWriteField2(buf []byte) (offset int
 	return offset
 }
 
-func (x *UserTotalFavoritedCountResponse) FastWrite(buf []byte) (offset int) {
+func (x *CountUserTotalFavoritedResponse) FastWrite(buf []byte) (offset int) {
 	if x == nil {
 		return offset
 	}
@@ -740,7 +740,7 @@ func (x *UserTotalFavoritedCountResponse) FastWrite(buf []byte) (offset int) {
 	return offset
 }
 
-func (x *UserTotalFavoritedCountResponse) fastWriteField1(buf []byte) (offset int) {
+func (x *CountUserTotalFavoritedResponse) fastWriteField1(buf []byte) (offset int) {
 	if x.StatusCode == 0 {
 		return offset
 	}
@@ -748,7 +748,7 @@ func (x *UserTotalFavoritedCountResponse) fastWriteField1(buf []byte) (offset in
 	return offset
 }
 
-func (x *UserTotalFavoritedCountResponse) fastWriteField2(buf []byte) (offset int) {
+func (x *CountUserTotalFavoritedResponse) fastWriteField2(buf []byte) (offset int) {
 	if x.StatusMsg == nil {
 		return offset
 	}
@@ -756,7 +756,7 @@ func (x *UserTotalFavoritedCountResponse) fastWriteField2(buf []byte) (offset in
 	return offset
 }
 
-func (x *UserTotalFavoritedCountResponse) fastWriteField3(buf []byte) (offset int) {
+func (x *CountUserTotalFavoritedResponse) fastWriteField3(buf []byte) (offset int) {
 	if x.Count == 0 {
 		return offset
 	}
@@ -778,7 +778,7 @@ func (x *FavoriteRequest) sizeField1() (n int) {
 	if x.ActorId == 0 {
 		return n
 	}
-	n += fastpb.SizeUint32(1, x.GetActorId())
+	n += fastpb.SizeUint32(1, x.ActorId)
 	return n
 }
 
@@ -786,7 +786,7 @@ func (x *FavoriteRequest) sizeField2() (n int) {
 	if x.VideoId == 0 {
 		return n
 	}
-	n += fastpb.SizeUint32(2, x.GetVideoId())
+	n += fastpb.SizeUint32(2, x.VideoId)
 	return n
 }
 
@@ -794,7 +794,7 @@ func (x *FavoriteRequest) sizeField3() (n int) {
 	if x.ActionType == 0 {
 		return n
 	}
-	n += fastpb.SizeUint32(3, x.GetActionType())
+	n += fastpb.SizeUint32(3, x.ActionType)
 	return n
 }
 
@@ -811,7 +811,7 @@ func (x *FavoriteResponse) sizeField1() (n int) {
 	if x.StatusCode == 0 {
 		return n
 	}
-	n += fastpb.SizeUint32(1, x.GetStatusCode())
+	n += fastpb.SizeUint32(1, x.StatusCode)
 	return n
 }
 
@@ -819,7 +819,7 @@ func (x *FavoriteResponse) sizeField2() (n int) {
 	if x.StatusMsg == nil {
 		return n
 	}
-	n += fastpb.SizeString(2, x.GetStatusMsg())
+	n += fastpb.SizeString(2, *x.StatusMsg)
 	return n
 }
 
@@ -835,7 +835,7 @@ func (x *FavoriteListRequest) sizeField1() (n int) {
 	if x.UserId == 0 {
 		return n
 	}
-	n += fastpb.SizeUint32(1, x.GetUserId())
+	n += fastpb.SizeUint32(1, x.UserId)
 	return n
 }
 
@@ -853,7 +853,7 @@ func (x *FavoriteListResponse) sizeField1() (n int) {
 	if x.StatusCode == 0 {
 		return n
 	}
-	n += fastpb.SizeUint32(1, x.GetStatusCode())
+	n += fastpb.SizeUint32(1, x.StatusCode)
 	return n
 }
 
@@ -861,7 +861,7 @@ func (x *FavoriteListResponse) sizeField2() (n int) {
 	if x.StatusMsg == nil {
 		return n
 	}
-	n += fastpb.SizeString(2, x.GetStatusMsg())
+	n += fastpb.SizeString(2, *x.StatusMsg)
 	return n
 }
 
@@ -869,8 +869,8 @@ func (x *FavoriteListResponse) sizeField3() (n int) {
 	if x.VideoList == nil {
 		return n
 	}
-	for i := range x.GetVideoList() {
-		n += fastpb.SizeMessage(3, x.GetVideoList()[i])
+	for i := range x.VideoList {
+		n += fastpb.SizeMessage(3, x.VideoList[i])
 	}
 	return n
 }
@@ -888,7 +888,7 @@ func (x *IsFavoriteRequest) sizeField1() (n int) {
 	if x.UserId == 0 {
 		return n
 	}
-	n += fastpb.SizeUint32(1, x.GetUserId())
+	n += fastpb.SizeUint32(1, x.UserId)
 	return n
 }
 
@@ -896,7 +896,7 @@ func (x *IsFavoriteRequest) sizeField2() (n int) {
 	if x.VideoId == 0 {
 		return n
 	}
-	n += fastpb.SizeUint32(2, x.GetVideoId())
+	n += fastpb.SizeUint32(2, x.VideoId)
 	return n
 }
 
@@ -912,11 +912,11 @@ func (x *IsFavoriteResponse) sizeField1() (n int) {
 	if !x.Result {
 		return n
 	}
-	n += fastpb.SizeBool(1, x.GetResult())
+	n += fastpb.SizeBool(1, x.Result)
 	return n
 }
 
-func (x *FavoriteCountRequest) Size() (n int) {
+func (x *CountFavoriteRequest) Size() (n int) {
 	if x == nil {
 		return n
 	}
@@ -924,7 +924,7 @@ func (x *FavoriteCountRequest) Size() (n int) {
 	return n
 }
 
-func (x *FavoriteCountRequest) sizeField1() (n int) {
+func (x *CountFavoriteRequest) sizeField1() (n int) {
 	if x.VideoId == 0 {
 		return n
 	}
@@ -932,7 +932,7 @@ func (x *FavoriteCountRequest) sizeField1() (n int) {
 	return n
 }
 
-func (x *FavoriteCountResponse) Size() (n int) {
+func (x *CountFavoriteResponse) Size() (n int) {
 	if x == nil {
 		return n
 	}
@@ -942,7 +942,7 @@ func (x *FavoriteCountResponse) Size() (n int) {
 	return n
 }
 
-func (x *FavoriteCountResponse) sizeField1() (n int) {
+func (x *CountFavoriteResponse) sizeField1() (n int) {
 	if x.StatusCode == 0 {
 		return n
 	}
@@ -950,7 +950,7 @@ func (x *FavoriteCountResponse) sizeField1() (n int) {
 	return n
 }
 
-func (x *FavoriteCountResponse) sizeField2() (n int) {
+func (x *CountFavoriteResponse) sizeField2() (n int) {
 	if x.StatusMsg == nil {
 		return n
 	}
@@ -958,7 +958,7 @@ func (x *FavoriteCountResponse) sizeField2() (n int) {
 	return n
 }
 
-func (x *FavoriteCountResponse) sizeField3() (n int) {
+func (x *CountFavoriteResponse) sizeField3() (n int) {
 	if x.Count == 0 {
 		return n
 	}
@@ -966,7 +966,7 @@ func (x *FavoriteCountResponse) sizeField3() (n int) {
 	return n
 }
 
-func (x *UserFavoriteCountRequest) Size() (n int) {
+func (x *CountUserFavoriteRequest) Size() (n int) {
 	if x == nil {
 		return n
 	}
@@ -974,7 +974,7 @@ func (x *UserFavoriteCountRequest) Size() (n int) {
 	return n
 }
 
-func (x *UserFavoriteCountRequest) sizeField1() (n int) {
+func (x *CountUserFavoriteRequest) sizeField1() (n int) {
 	if x.UserId == 0 {
 		return n
 	}
@@ -982,7 +982,7 @@ func (x *UserFavoriteCountRequest) sizeField1() (n int) {
 	return n
 }
 
-func (x *UserFavoriteCountResponse) Size() (n int) {
+func (x *CountUserFavoriteResponse) Size() (n int) {
 	if x == nil {
 		return n
 	}
@@ -992,7 +992,7 @@ func (x *UserFavoriteCountResponse) Size() (n int) {
 	return n
 }
 
-func (x *UserFavoriteCountResponse) sizeField1() (n int) {
+func (x *CountUserFavoriteResponse) sizeField1() (n int) {
 	if x.StatusCode == 0 {
 		return n
 	}
@@ -1000,7 +1000,7 @@ func (x *UserFavoriteCountResponse) sizeField1() (n int) {
 	return n
 }
 
-func (x *UserFavoriteCountResponse) sizeField2() (n int) {
+func (x *CountUserFavoriteResponse) sizeField2() (n int) {
 	if x.StatusMsg == nil {
 		return n
 	}
@@ -1008,7 +1008,7 @@ func (x *UserFavoriteCountResponse) sizeField2() (n int) {
 	return n
 }
 
-func (x *UserFavoriteCountResponse) sizeField3() (n int) {
+func (x *CountUserFavoriteResponse) sizeField3() (n int) {
 	if x.Count == 0 {
 		return n
 	}
@@ -1016,7 +1016,7 @@ func (x *UserFavoriteCountResponse) sizeField3() (n int) {
 	return n
 }
 
-func (x *UserTotalFavoritedCountRequest) Size() (n int) {
+func (x *CountUserTotalFavoritedRequest) Size() (n int) {
 	if x == nil {
 		return n
 	}
@@ -1025,7 +1025,7 @@ func (x *UserTotalFavoritedCountRequest) Size() (n int) {
 	return n
 }
 
-func (x *UserTotalFavoritedCountRequest) sizeField1() (n int) {
+func (x *CountUserTotalFavoritedRequest) sizeField1() (n int) {
 	if x.ActorId == 0 {
 		return n
 	}
@@ -1033,7 +1033,7 @@ func (x *UserTotalFavoritedCountRequest) sizeField1() (n int) {
 	return n
 }
 
-func (x *UserTotalFavoritedCountRequest) sizeField2() (n int) {
+func (x *CountUserTotalFavoritedRequest) sizeField2() (n int) {
 	if x.UserId == 0 {
 		return n
 	}
@@ -1041,7 +1041,7 @@ func (x *UserTotalFavoritedCountRequest) sizeField2() (n int) {
 	return n
 }
 
-func (x *UserTotalFavoritedCountResponse) Size() (n int) {
+func (x *CountUserTotalFavoritedResponse) Size() (n int) {
 	if x == nil {
 		return n
 	}
@@ -1051,7 +1051,7 @@ func (x *UserTotalFavoritedCountResponse) Size() (n int) {
 	return n
 }
 
-func (x *UserTotalFavoritedCountResponse) sizeField1() (n int) {
+func (x *CountUserTotalFavoritedResponse) sizeField1() (n int) {
 	if x.StatusCode == 0 {
 		return n
 	}
@@ -1059,7 +1059,7 @@ func (x *UserTotalFavoritedCountResponse) sizeField1() (n int) {
 	return n
 }
 
-func (x *UserTotalFavoritedCountResponse) sizeField2() (n int) {
+func (x *CountUserTotalFavoritedResponse) sizeField2() (n int) {
 	if x.StatusMsg == nil {
 		return n
 	}
@@ -1067,7 +1067,7 @@ func (x *UserTotalFavoritedCountResponse) sizeField2() (n int) {
 	return n
 }
 
-func (x *UserTotalFavoritedCountResponse) sizeField3() (n int) {
+func (x *CountUserTotalFavoritedResponse) sizeField3() (n int) {
 	if x.Count == 0 {
 		return n
 	}
@@ -1105,32 +1105,32 @@ var fieldIDToName_IsFavoriteResponse = map[int32]string{
 	1: "Result",
 }
 
-var fieldIDToName_FavoriteCountRequest = map[int32]string{
+var fieldIDToName_CountFavoriteRequest = map[int32]string{
 	1: "VideoId",
 }
 
-var fieldIDToName_FavoriteCountResponse = map[int32]string{
+var fieldIDToName_CountFavoriteResponse = map[int32]string{
 	1: "StatusCode",
 	2: "StatusMsg",
 	3: "Count",
 }
 
-var fieldIDToName_UserFavoriteCountRequest = map[int32]string{
+var fieldIDToName_CountUserFavoriteRequest = map[int32]string{
 	1: "UserId",
 }
 
-var fieldIDToName_UserFavoriteCountResponse = map[int32]string{
+var fieldIDToName_CountUserFavoriteResponse = map[int32]string{
 	1: "StatusCode",
 	2: "StatusMsg",
 	3: "Count",
 }
 
-var fieldIDToName_UserTotalFavoritedCountRequest = map[int32]string{
+var fieldIDToName_CountUserTotalFavoritedRequest = map[int32]string{
 	1: "ActorId",
 	2: "UserId",
 }
 
-var fieldIDToName_UserTotalFavoritedCountResponse = map[int32]string{
+var fieldIDToName_CountUserTotalFavoritedResponse = map[int32]string{
 	1: "StatusCode",
 	2: "StatusMsg",
 	3: "Count",

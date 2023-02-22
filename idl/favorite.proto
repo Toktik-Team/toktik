@@ -34,32 +34,32 @@ message IsFavoriteResponse {
   bool result = 1; // 结果
 }
 
-message FavoriteCountRequest {
+message CountFavoriteRequest {
   uint32 video_id = 1; // 视频id
 }
 
-message FavoriteCountResponse {
+message CountFavoriteResponse {
   uint32 status_code = 1;
   optional string status_msg = 2;
   uint32 count = 3; // 点赞数
 }
 
-message UserFavoriteCountRequest {
+message CountUserFavoriteRequest {
   uint32 user_id = 1; // 用户id
 }
 
-message UserFavoriteCountResponse {
+message CountUserFavoriteResponse {
   uint32 status_code = 1;
   optional string status_msg = 2;
   uint32 count = 3; // 点赞数
 }
 
-message UserTotalFavoritedCountRequest {
+message CountUserTotalFavoritedRequest {
   uint32 actor_id = 1;
   uint32 user_id = 2;
 }
 
-message UserTotalFavoritedCountResponse {
+message CountUserTotalFavoritedResponse {
   uint32 status_code = 1;
   optional string status_msg = 2;
   uint32 count = 3; // 点赞数
@@ -72,10 +72,10 @@ service FavoriteService {
   }
   rpc IsFavorite (IsFavoriteRequest) returns (IsFavoriteResponse) {
   }
-  rpc FavoriteCount (FavoriteCountRequest) returns (FavoriteCountResponse) {
+  rpc CountFavorite (CountFavoriteRequest) returns (CountFavoriteResponse) {
   }
-  rpc UserFavoriteCount (UserFavoriteCountRequest) returns (UserFavoriteCountResponse) {
+  rpc CountUserFavorite (CountUserFavoriteRequest) returns (CountUserFavoriteResponse) {
   }
-  rpc UserTotalFavoritedCount (UserTotalFavoritedCountRequest) returns (UserTotalFavoritedCountResponse) {
+  rpc CountUserTotalFavorited (CountUserTotalFavoritedRequest) returns (CountUserTotalFavoritedResponse) {
   }
 }

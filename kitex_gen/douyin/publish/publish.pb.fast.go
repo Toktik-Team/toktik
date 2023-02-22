@@ -44,7 +44,7 @@ ReadFieldError:
 }
 
 func (x *CreateVideoRequest) fastReadField1(buf []byte, _type int8) (offset int, err error) {
-	x.UserId, offset, err = fastpb.ReadUint32(buf, _type)
+	x.ActorId, offset, err = fastpb.ReadUint32(buf, _type)
 	return offset, err
 }
 
@@ -261,10 +261,10 @@ func (x *CreateVideoRequest) FastWrite(buf []byte) (offset int) {
 }
 
 func (x *CreateVideoRequest) fastWriteField1(buf []byte) (offset int) {
-	if x.UserId == 0 {
+	if x.ActorId == 0 {
 		return offset
 	}
-	offset += fastpb.WriteUint32(buf[offset:], 1, x.GetUserId())
+	offset += fastpb.WriteUint32(buf[offset:], 1, x.ActorId)
 	return offset
 }
 
@@ -272,7 +272,7 @@ func (x *CreateVideoRequest) fastWriteField2(buf []byte) (offset int) {
 	if len(x.Data) == 0 {
 		return offset
 	}
-	offset += fastpb.WriteBytes(buf[offset:], 2, x.GetData())
+	offset += fastpb.WriteBytes(buf[offset:], 2, x.Data)
 	return offset
 }
 
@@ -280,7 +280,7 @@ func (x *CreateVideoRequest) fastWriteField3(buf []byte) (offset int) {
 	if x.Title == "" {
 		return offset
 	}
-	offset += fastpb.WriteString(buf[offset:], 3, x.GetTitle())
+	offset += fastpb.WriteString(buf[offset:], 3, x.Title)
 	return offset
 }
 
@@ -297,7 +297,7 @@ func (x *CreateVideoResponse) fastWriteField1(buf []byte) (offset int) {
 	if x.StatusCode == 0 {
 		return offset
 	}
-	offset += fastpb.WriteUint32(buf[offset:], 1, x.GetStatusCode())
+	offset += fastpb.WriteUint32(buf[offset:], 1, x.StatusCode)
 	return offset
 }
 
@@ -305,7 +305,7 @@ func (x *CreateVideoResponse) fastWriteField2(buf []byte) (offset int) {
 	if x.StatusMsg == "" {
 		return offset
 	}
-	offset += fastpb.WriteString(buf[offset:], 2, x.GetStatusMsg())
+	offset += fastpb.WriteString(buf[offset:], 2, x.StatusMsg)
 	return offset
 }
 
@@ -322,7 +322,7 @@ func (x *ListVideoRequest) fastWriteField1(buf []byte) (offset int) {
 	if x.UserId == 0 {
 		return offset
 	}
-	offset += fastpb.WriteUint32(buf[offset:], 1, x.GetUserId())
+	offset += fastpb.WriteUint32(buf[offset:], 1, x.UserId)
 	return offset
 }
 
@@ -330,7 +330,7 @@ func (x *ListVideoRequest) fastWriteField2(buf []byte) (offset int) {
 	if x.ActorId == 0 {
 		return offset
 	}
-	offset += fastpb.WriteUint32(buf[offset:], 2, x.GetActorId())
+	offset += fastpb.WriteUint32(buf[offset:], 2, x.ActorId)
 	return offset
 }
 
@@ -348,7 +348,7 @@ func (x *ListVideoResponse) fastWriteField1(buf []byte) (offset int) {
 	if x.StatusCode == 0 {
 		return offset
 	}
-	offset += fastpb.WriteUint32(buf[offset:], 1, x.GetStatusCode())
+	offset += fastpb.WriteUint32(buf[offset:], 1, x.StatusCode)
 	return offset
 }
 
@@ -356,7 +356,7 @@ func (x *ListVideoResponse) fastWriteField2(buf []byte) (offset int) {
 	if x.StatusMsg == nil {
 		return offset
 	}
-	offset += fastpb.WriteString(buf[offset:], 2, x.GetStatusMsg())
+	offset += fastpb.WriteString(buf[offset:], 2, *x.StatusMsg)
 	return offset
 }
 
@@ -364,8 +364,8 @@ func (x *ListVideoResponse) fastWriteField3(buf []byte) (offset int) {
 	if x.VideoList == nil {
 		return offset
 	}
-	for i := range x.GetVideoList() {
-		offset += fastpb.WriteMessage(buf[offset:], 3, x.GetVideoList()[i])
+	for i := range x.VideoList {
+		offset += fastpb.WriteMessage(buf[offset:], 3, x.VideoList[i])
 	}
 	return offset
 }
@@ -431,10 +431,10 @@ func (x *CreateVideoRequest) Size() (n int) {
 }
 
 func (x *CreateVideoRequest) sizeField1() (n int) {
-	if x.UserId == 0 {
+	if x.ActorId == 0 {
 		return n
 	}
-	n += fastpb.SizeUint32(1, x.GetUserId())
+	n += fastpb.SizeUint32(1, x.ActorId)
 	return n
 }
 
@@ -442,7 +442,7 @@ func (x *CreateVideoRequest) sizeField2() (n int) {
 	if len(x.Data) == 0 {
 		return n
 	}
-	n += fastpb.SizeBytes(2, x.GetData())
+	n += fastpb.SizeBytes(2, x.Data)
 	return n
 }
 
@@ -450,7 +450,7 @@ func (x *CreateVideoRequest) sizeField3() (n int) {
 	if x.Title == "" {
 		return n
 	}
-	n += fastpb.SizeString(3, x.GetTitle())
+	n += fastpb.SizeString(3, x.Title)
 	return n
 }
 
@@ -467,7 +467,7 @@ func (x *CreateVideoResponse) sizeField1() (n int) {
 	if x.StatusCode == 0 {
 		return n
 	}
-	n += fastpb.SizeUint32(1, x.GetStatusCode())
+	n += fastpb.SizeUint32(1, x.StatusCode)
 	return n
 }
 
@@ -475,7 +475,7 @@ func (x *CreateVideoResponse) sizeField2() (n int) {
 	if x.StatusMsg == "" {
 		return n
 	}
-	n += fastpb.SizeString(2, x.GetStatusMsg())
+	n += fastpb.SizeString(2, x.StatusMsg)
 	return n
 }
 
@@ -492,7 +492,7 @@ func (x *ListVideoRequest) sizeField1() (n int) {
 	if x.UserId == 0 {
 		return n
 	}
-	n += fastpb.SizeUint32(1, x.GetUserId())
+	n += fastpb.SizeUint32(1, x.UserId)
 	return n
 }
 
@@ -500,7 +500,7 @@ func (x *ListVideoRequest) sizeField2() (n int) {
 	if x.ActorId == 0 {
 		return n
 	}
-	n += fastpb.SizeUint32(2, x.GetActorId())
+	n += fastpb.SizeUint32(2, x.ActorId)
 	return n
 }
 
@@ -518,7 +518,7 @@ func (x *ListVideoResponse) sizeField1() (n int) {
 	if x.StatusCode == 0 {
 		return n
 	}
-	n += fastpb.SizeUint32(1, x.GetStatusCode())
+	n += fastpb.SizeUint32(1, x.StatusCode)
 	return n
 }
 
@@ -526,7 +526,7 @@ func (x *ListVideoResponse) sizeField2() (n int) {
 	if x.StatusMsg == nil {
 		return n
 	}
-	n += fastpb.SizeString(2, x.GetStatusMsg())
+	n += fastpb.SizeString(2, *x.StatusMsg)
 	return n
 }
 
@@ -534,8 +534,8 @@ func (x *ListVideoResponse) sizeField3() (n int) {
 	if x.VideoList == nil {
 		return n
 	}
-	for i := range x.GetVideoList() {
-		n += fastpb.SizeMessage(3, x.GetVideoList()[i])
+	for i := range x.VideoList {
+		n += fastpb.SizeMessage(3, x.VideoList[i])
 	}
 	return n
 }
@@ -591,7 +591,7 @@ func (x *CountVideoResponse) sizeField3() (n int) {
 }
 
 var fieldIDToName_CreateVideoRequest = map[int32]string{
-	1: "UserId",
+	1: "ActorId",
 	2: "Data",
 	3: "Title",
 }

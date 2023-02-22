@@ -14,9 +14,9 @@ type Client interface {
 	FavoriteAction(ctx context.Context, Req *favorite.FavoriteRequest, callOptions ...callopt.Option) (r *favorite.FavoriteResponse, err error)
 	FavoriteList(ctx context.Context, Req *favorite.FavoriteListRequest, callOptions ...callopt.Option) (r *favorite.FavoriteListResponse, err error)
 	IsFavorite(ctx context.Context, Req *favorite.IsFavoriteRequest, callOptions ...callopt.Option) (r *favorite.IsFavoriteResponse, err error)
-	FavoriteCount(ctx context.Context, Req *favorite.FavoriteCountRequest, callOptions ...callopt.Option) (r *favorite.FavoriteCountResponse, err error)
-	UserFavoriteCount(ctx context.Context, Req *favorite.UserFavoriteCountRequest, callOptions ...callopt.Option) (r *favorite.UserFavoriteCountResponse, err error)
-	UserTotalFavoritedCount(ctx context.Context, Req *favorite.UserTotalFavoritedCountRequest, callOptions ...callopt.Option) (r *favorite.UserTotalFavoritedCountResponse, err error)
+	CountFavorite(ctx context.Context, Req *favorite.CountFavoriteRequest, callOptions ...callopt.Option) (r *favorite.CountFavoriteResponse, err error)
+	CountUserFavorite(ctx context.Context, Req *favorite.CountUserFavoriteRequest, callOptions ...callopt.Option) (r *favorite.CountUserFavoriteResponse, err error)
+	CountUserTotalFavorited(ctx context.Context, Req *favorite.CountUserTotalFavoritedRequest, callOptions ...callopt.Option) (r *favorite.CountUserTotalFavoritedResponse, err error)
 }
 
 // NewClient creates a client for the service defined in IDL.
@@ -63,17 +63,17 @@ func (p *kFavoriteServiceClient) IsFavorite(ctx context.Context, Req *favorite.I
 	return p.kClient.IsFavorite(ctx, Req)
 }
 
-func (p *kFavoriteServiceClient) FavoriteCount(ctx context.Context, Req *favorite.FavoriteCountRequest, callOptions ...callopt.Option) (r *favorite.FavoriteCountResponse, err error) {
+func (p *kFavoriteServiceClient) CountFavorite(ctx context.Context, Req *favorite.CountFavoriteRequest, callOptions ...callopt.Option) (r *favorite.CountFavoriteResponse, err error) {
 	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
-	return p.kClient.FavoriteCount(ctx, Req)
+	return p.kClient.CountFavorite(ctx, Req)
 }
 
-func (p *kFavoriteServiceClient) UserFavoriteCount(ctx context.Context, Req *favorite.UserFavoriteCountRequest, callOptions ...callopt.Option) (r *favorite.UserFavoriteCountResponse, err error) {
+func (p *kFavoriteServiceClient) CountUserFavorite(ctx context.Context, Req *favorite.CountUserFavoriteRequest, callOptions ...callopt.Option) (r *favorite.CountUserFavoriteResponse, err error) {
 	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
-	return p.kClient.UserFavoriteCount(ctx, Req)
+	return p.kClient.CountUserFavorite(ctx, Req)
 }
 
-func (p *kFavoriteServiceClient) UserTotalFavoritedCount(ctx context.Context, Req *favorite.UserTotalFavoritedCountRequest, callOptions ...callopt.Option) (r *favorite.UserTotalFavoritedCountResponse, err error) {
+func (p *kFavoriteServiceClient) CountUserTotalFavorited(ctx context.Context, Req *favorite.CountUserTotalFavoritedRequest, callOptions ...callopt.Option) (r *favorite.CountUserTotalFavoritedResponse, err error) {
 	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
-	return p.kClient.UserTotalFavoritedCount(ctx, Req)
+	return p.kClient.CountUserTotalFavorited(ctx, Req)
 }

@@ -180,7 +180,7 @@ func queryDetailed(ctx context.Context, logger *logrus.Entry, actorId uint32, vi
 			continue
 		}
 
-		favoriteCount, err := FavoriteClient.FavoriteCount(ctx, &favorite.FavoriteCountRequest{
+		favoriteCount, err := FavoriteClient.CountFavorite(ctx, &favorite.CountFavoriteRequest{
 			VideoId: m.ID,
 		})
 		if err != nil {
