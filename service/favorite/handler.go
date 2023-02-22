@@ -11,9 +11,7 @@ import (
 	"toktik/kitex_gen/douyin/comment"
 	commentService "toktik/kitex_gen/douyin/comment/commentservice"
 	"toktik/kitex_gen/douyin/favorite"
-	favoriteService "toktik/kitex_gen/douyin/favorite/favoriteservice"
 	"toktik/kitex_gen/douyin/feed"
-	publishService "toktik/kitex_gen/douyin/publish/publishservice"
 	"toktik/kitex_gen/douyin/user"
 	userService "toktik/kitex_gen/douyin/user/userservice"
 	"toktik/logging"
@@ -24,8 +22,6 @@ import (
 
 var UserClient userService.Client
 var CommentClient commentService.Client
-var FavoriteClient favoriteService.Client
-var PublishClient publishService.Client
 
 func init() {
 	r, err := consul.NewConsulResolver(config.EnvConfig.CONSUL_ADDR)
@@ -216,7 +212,7 @@ func (s *FavoriteServiceImpl) FavoriteList(ctx context.Context, req *favorite.Fa
 			continue
 		}
 
-		favoriteCount, err := FavoriteClient.FavoriteCount(ctx, &favorite.FavoriteCountRequest{
+		favoriteCount, err := s.FavoriteCount(ctx, &favorite.FavoriteCountRequest{
 			VideoId: video.ID,
 		})
 		if err != nil {

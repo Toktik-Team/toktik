@@ -132,7 +132,7 @@ func addComment(ctx context.Context, logger *logrus.Entry, pUser *user.User, pVi
 
 	rComment := model.Comment{
 		VideoId:   pVideoID,
-		CommentId: uint32(count + 1),
+		CommentId: count + 1,
 		UserId:    pUser.Id,
 		Content:   pCommentText,
 	}

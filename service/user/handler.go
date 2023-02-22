@@ -2,8 +2,12 @@ package main
 
 import (
 	"context"
+	"github.com/cloudwego/kitex/client"
+	consul "github.com/kitex-contrib/registry-consul"
 	"github.com/sirupsen/logrus"
+	"log"
 	"toktik/constant/biz"
+	bizConfig "toktik/constant/config"
 	"toktik/kitex_gen/douyin/favorite"
 	favoriteService "toktik/kitex_gen/douyin/favorite/favoriteservice"
 	"toktik/kitex_gen/douyin/publish"
@@ -21,6 +25,25 @@ type UserServiceImpl struct{}
 var FavoriteClient favoriteService.Client
 var RelationClient relationService.Client
 var PublishClient publishService.Client
+
+func init() {
+	r, err := consul.NewConsulResolver(bizConfig.EnvConfig.CONSUL_ADDR)
+	if err != nil {
+		log.Fatal(err)
+	}
+	FavoriteClient, err = favoriteService.NewClient(bizConfig.FavoriteServiceName, client.WithResolver(r))
+	if err != nil {
+		log.Fatal(err)
+	}
+	RelationClient, err = relationService.NewClient(bizConfig.RelationServiceName, client.WithResolver(r))
+	if err != nil {
+		log.Fatal(err)
+	}
+	PublishClient, err = publishService.NewClient(bizConfig.PublishServiceName, client.WithResolver(r))
+	if err != nil {
+		log.Fatal(err)
+	}
+}
 
 // GetUser implements the UserServiceImpl interface.
 func (s *UserServiceImpl) GetUser(ctx context.Context, req *user.UserRequest) (resp *user.UserResponse, err error) {
