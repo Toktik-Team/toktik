@@ -1,5 +1,19 @@
 version: "3.7"
 services:
+  # PostgreSQL
+
+  db:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: example
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080
+
   # Collector
   otel-collector:
     image: otel/opentelemetry-collector-contrib-dev:latest
