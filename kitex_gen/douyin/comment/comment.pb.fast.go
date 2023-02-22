@@ -380,7 +380,7 @@ func (x *Comment) fastWriteField1(buf []byte) (offset int) {
 	if x.Id == 0 {
 		return offset
 	}
-	offset += fastpb.WriteUint32(buf[offset:], 1, x.Id)
+	offset += fastpb.WriteUint32(buf[offset:], 1, x.GetId())
 	return offset
 }
 
@@ -388,7 +388,7 @@ func (x *Comment) fastWriteField2(buf []byte) (offset int) {
 	if x.User == nil {
 		return offset
 	}
-	offset += fastpb.WriteMessage(buf[offset:], 2, x.User)
+	offset += fastpb.WriteMessage(buf[offset:], 2, x.GetUser())
 	return offset
 }
 
@@ -396,7 +396,7 @@ func (x *Comment) fastWriteField3(buf []byte) (offset int) {
 	if x.Content == "" {
 		return offset
 	}
-	offset += fastpb.WriteString(buf[offset:], 3, x.Content)
+	offset += fastpb.WriteString(buf[offset:], 3, x.GetContent())
 	return offset
 }
 
@@ -404,7 +404,7 @@ func (x *Comment) fastWriteField4(buf []byte) (offset int) {
 	if x.CreateDate == "" {
 		return offset
 	}
-	offset += fastpb.WriteString(buf[offset:], 4, x.CreateDate)
+	offset += fastpb.WriteString(buf[offset:], 4, x.GetCreateDate())
 	return offset
 }
 
@@ -424,7 +424,7 @@ func (x *ActionCommentRequest) fastWriteField1(buf []byte) (offset int) {
 	if x.ActorId == 0 {
 		return offset
 	}
-	offset += fastpb.WriteUint32(buf[offset:], 1, x.ActorId)
+	offset += fastpb.WriteUint32(buf[offset:], 1, x.GetActorId())
 	return offset
 }
 
@@ -432,7 +432,7 @@ func (x *ActionCommentRequest) fastWriteField2(buf []byte) (offset int) {
 	if x.VideoId == 0 {
 		return offset
 	}
-	offset += fastpb.WriteUint32(buf[offset:], 2, x.VideoId)
+	offset += fastpb.WriteUint32(buf[offset:], 2, x.GetVideoId())
 	return offset
 }
 
@@ -440,7 +440,7 @@ func (x *ActionCommentRequest) fastWriteField3(buf []byte) (offset int) {
 	if x.ActionType == 0 {
 		return offset
 	}
-	offset += fastpb.WriteInt32(buf[offset:], 3, int32(x.ActionType))
+	offset += fastpb.WriteInt32(buf[offset:], 3, int32(x.GetActionType()))
 	return offset
 }
 
@@ -474,7 +474,7 @@ func (x *ActionCommentResponse) fastWriteField1(buf []byte) (offset int) {
 	if x.StatusCode == 0 {
 		return offset
 	}
-	offset += fastpb.WriteUint32(buf[offset:], 1, x.StatusCode)
+	offset += fastpb.WriteUint32(buf[offset:], 1, x.GetStatusCode())
 	return offset
 }
 
@@ -482,7 +482,7 @@ func (x *ActionCommentResponse) fastWriteField2(buf []byte) (offset int) {
 	if x.StatusMsg == nil {
 		return offset
 	}
-	offset += fastpb.WriteString(buf[offset:], 2, *x.StatusMsg)
+	offset += fastpb.WriteString(buf[offset:], 2, x.GetStatusMsg())
 	return offset
 }
 
@@ -490,7 +490,7 @@ func (x *ActionCommentResponse) fastWriteField3(buf []byte) (offset int) {
 	if x.Comment == nil {
 		return offset
 	}
-	offset += fastpb.WriteMessage(buf[offset:], 3, x.Comment)
+	offset += fastpb.WriteMessage(buf[offset:], 3, x.GetComment())
 	return offset
 }
 
@@ -507,7 +507,7 @@ func (x *ListCommentRequest) fastWriteField1(buf []byte) (offset int) {
 	if x.ActorId == 0 {
 		return offset
 	}
-	offset += fastpb.WriteUint32(buf[offset:], 1, x.ActorId)
+	offset += fastpb.WriteUint32(buf[offset:], 1, x.GetActorId())
 	return offset
 }
 
@@ -515,7 +515,7 @@ func (x *ListCommentRequest) fastWriteField2(buf []byte) (offset int) {
 	if x.VideoId == 0 {
 		return offset
 	}
-	offset += fastpb.WriteUint32(buf[offset:], 2, x.VideoId)
+	offset += fastpb.WriteUint32(buf[offset:], 2, x.GetVideoId())
 	return offset
 }
 
@@ -533,7 +533,7 @@ func (x *ListCommentResponse) fastWriteField1(buf []byte) (offset int) {
 	if x.StatusCode == 0 {
 		return offset
 	}
-	offset += fastpb.WriteUint32(buf[offset:], 1, x.StatusCode)
+	offset += fastpb.WriteUint32(buf[offset:], 1, x.GetStatusCode())
 	return offset
 }
 
@@ -541,7 +541,7 @@ func (x *ListCommentResponse) fastWriteField2(buf []byte) (offset int) {
 	if x.StatusMsg == nil {
 		return offset
 	}
-	offset += fastpb.WriteString(buf[offset:], 2, *x.StatusMsg)
+	offset += fastpb.WriteString(buf[offset:], 2, x.GetStatusMsg())
 	return offset
 }
 
@@ -549,8 +549,8 @@ func (x *ListCommentResponse) fastWriteField3(buf []byte) (offset int) {
 	if x.CommentList == nil {
 		return offset
 	}
-	for i := range x.CommentList {
-		offset += fastpb.WriteMessage(buf[offset:], 3, x.CommentList[i])
+	for i := range x.GetCommentList() {
+		offset += fastpb.WriteMessage(buf[offset:], 3, x.GetCommentList()[i])
 	}
 	return offset
 }
@@ -568,7 +568,7 @@ func (x *CountCommentRequest) fastWriteField1(buf []byte) (offset int) {
 	if x.ActorId == 0 {
 		return offset
 	}
-	offset += fastpb.WriteUint32(buf[offset:], 1, x.ActorId)
+	offset += fastpb.WriteUint32(buf[offset:], 1, x.GetActorId())
 	return offset
 }
 
@@ -576,7 +576,7 @@ func (x *CountCommentRequest) fastWriteField2(buf []byte) (offset int) {
 	if x.VideoId == 0 {
 		return offset
 	}
-	offset += fastpb.WriteUint32(buf[offset:], 2, x.VideoId)
+	offset += fastpb.WriteUint32(buf[offset:], 2, x.GetVideoId())
 	return offset
 }
 
@@ -594,7 +594,7 @@ func (x *CountCommentResponse) fastWriteField1(buf []byte) (offset int) {
 	if x.StatusCode == 0 {
 		return offset
 	}
-	offset += fastpb.WriteUint32(buf[offset:], 1, x.StatusCode)
+	offset += fastpb.WriteUint32(buf[offset:], 1, x.GetStatusCode())
 	return offset
 }
 
@@ -602,7 +602,7 @@ func (x *CountCommentResponse) fastWriteField2(buf []byte) (offset int) {
 	if x.StatusMsg == nil {
 		return offset
 	}
-	offset += fastpb.WriteString(buf[offset:], 2, *x.StatusMsg)
+	offset += fastpb.WriteString(buf[offset:], 2, x.GetStatusMsg())
 	return offset
 }
 
@@ -610,7 +610,7 @@ func (x *CountCommentResponse) fastWriteField3(buf []byte) (offset int) {
 	if x.CommentCount == 0 {
 		return offset
 	}
-	offset += fastpb.WriteUint32(buf[offset:], 3, x.CommentCount)
+	offset += fastpb.WriteUint32(buf[offset:], 3, x.GetCommentCount())
 	return offset
 }
 
@@ -629,7 +629,7 @@ func (x *Comment) sizeField1() (n int) {
 	if x.Id == 0 {
 		return n
 	}
-	n += fastpb.SizeUint32(1, x.Id)
+	n += fastpb.SizeUint32(1, x.GetId())
 	return n
 }
 
@@ -637,7 +637,7 @@ func (x *Comment) sizeField2() (n int) {
 	if x.User == nil {
 		return n
 	}
-	n += fastpb.SizeMessage(2, x.User)
+	n += fastpb.SizeMessage(2, x.GetUser())
 	return n
 }
 
@@ -645,7 +645,7 @@ func (x *Comment) sizeField3() (n int) {
 	if x.Content == "" {
 		return n
 	}
-	n += fastpb.SizeString(3, x.Content)
+	n += fastpb.SizeString(3, x.GetContent())
 	return n
 }
 
@@ -653,7 +653,7 @@ func (x *Comment) sizeField4() (n int) {
 	if x.CreateDate == "" {
 		return n
 	}
-	n += fastpb.SizeString(4, x.CreateDate)
+	n += fastpb.SizeString(4, x.GetCreateDate())
 	return n
 }
 
@@ -673,7 +673,7 @@ func (x *ActionCommentRequest) sizeField1() (n int) {
 	if x.ActorId == 0 {
 		return n
 	}
-	n += fastpb.SizeUint32(1, x.ActorId)
+	n += fastpb.SizeUint32(1, x.GetActorId())
 	return n
 }
 
@@ -681,7 +681,7 @@ func (x *ActionCommentRequest) sizeField2() (n int) {
 	if x.VideoId == 0 {
 		return n
 	}
-	n += fastpb.SizeUint32(2, x.VideoId)
+	n += fastpb.SizeUint32(2, x.GetVideoId())
 	return n
 }
 
@@ -689,7 +689,7 @@ func (x *ActionCommentRequest) sizeField3() (n int) {
 	if x.ActionType == 0 {
 		return n
 	}
-	n += fastpb.SizeInt32(3, int32(x.ActionType))
+	n += fastpb.SizeInt32(3, int32(x.GetActionType()))
 	return n
 }
 
@@ -723,7 +723,7 @@ func (x *ActionCommentResponse) sizeField1() (n int) {
 	if x.StatusCode == 0 {
 		return n
 	}
-	n += fastpb.SizeUint32(1, x.StatusCode)
+	n += fastpb.SizeUint32(1, x.GetStatusCode())
 	return n
 }
 
@@ -731,7 +731,7 @@ func (x *ActionCommentResponse) sizeField2() (n int) {
 	if x.StatusMsg == nil {
 		return n
 	}
-	n += fastpb.SizeString(2, *x.StatusMsg)
+	n += fastpb.SizeString(2, x.GetStatusMsg())
 	return n
 }
 
@@ -739,7 +739,7 @@ func (x *ActionCommentResponse) sizeField3() (n int) {
 	if x.Comment == nil {
 		return n
 	}
-	n += fastpb.SizeMessage(3, x.Comment)
+	n += fastpb.SizeMessage(3, x.GetComment())
 	return n
 }
 
@@ -756,7 +756,7 @@ func (x *ListCommentRequest) sizeField1() (n int) {
 	if x.ActorId == 0 {
 		return n
 	}
-	n += fastpb.SizeUint32(1, x.ActorId)
+	n += fastpb.SizeUint32(1, x.GetActorId())
 	return n
 }
 
@@ -764,7 +764,7 @@ func (x *ListCommentRequest) sizeField2() (n int) {
 	if x.VideoId == 0 {
 		return n
 	}
-	n += fastpb.SizeUint32(2, x.VideoId)
+	n += fastpb.SizeUint32(2, x.GetVideoId())
 	return n
 }
 
@@ -782,7 +782,7 @@ func (x *ListCommentResponse) sizeField1() (n int) {
 	if x.StatusCode == 0 {
 		return n
 	}
-	n += fastpb.SizeUint32(1, x.StatusCode)
+	n += fastpb.SizeUint32(1, x.GetStatusCode())
 	return n
 }
 
@@ -790,7 +790,7 @@ func (x *ListCommentResponse) sizeField2() (n int) {
 	if x.StatusMsg == nil {
 		return n
 	}
-	n += fastpb.SizeString(2, *x.StatusMsg)
+	n += fastpb.SizeString(2, x.GetStatusMsg())
 	return n
 }
 
@@ -798,8 +798,8 @@ func (x *ListCommentResponse) sizeField3() (n int) {
 	if x.CommentList == nil {
 		return n
 	}
-	for i := range x.CommentList {
-		n += fastpb.SizeMessage(3, x.CommentList[i])
+	for i := range x.GetCommentList() {
+		n += fastpb.SizeMessage(3, x.GetCommentList()[i])
 	}
 	return n
 }
@@ -817,7 +817,7 @@ func (x *CountCommentRequest) sizeField1() (n int) {
 	if x.ActorId == 0 {
 		return n
 	}
-	n += fastpb.SizeUint32(1, x.ActorId)
+	n += fastpb.SizeUint32(1, x.GetActorId())
 	return n
 }
 
@@ -825,7 +825,7 @@ func (x *CountCommentRequest) sizeField2() (n int) {
 	if x.VideoId == 0 {
 		return n
 	}
-	n += fastpb.SizeUint32(2, x.VideoId)
+	n += fastpb.SizeUint32(2, x.GetVideoId())
 	return n
 }
 
@@ -843,7 +843,7 @@ func (x *CountCommentResponse) sizeField1() (n int) {
 	if x.StatusCode == 0 {
 		return n
 	}
-	n += fastpb.SizeUint32(1, x.StatusCode)
+	n += fastpb.SizeUint32(1, x.GetStatusCode())
 	return n
 }
 
@@ -851,7 +851,7 @@ func (x *CountCommentResponse) sizeField2() (n int) {
 	if x.StatusMsg == nil {
 		return n
 	}
-	n += fastpb.SizeString(2, *x.StatusMsg)
+	n += fastpb.SizeString(2, x.GetStatusMsg())
 	return n
 }
 
@@ -859,7 +859,7 @@ func (x *CountCommentResponse) sizeField3() (n int) {
 	if x.CommentCount == 0 {
 		return n
 	}
-	n += fastpb.SizeUint32(3, x.CommentCount)
+	n += fastpb.SizeUint32(3, x.GetCommentCount())
 	return n
 }
 
