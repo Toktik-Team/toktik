@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"time"
 	"toktik/constant/biz"
 	"toktik/constant/config"
 	"toktik/kitex_gen/douyin/relation"
@@ -404,7 +405,6 @@ func (s *RelationServiceImpl) CountFollowerList(ctx context.Context, req *relati
 func (s *RelationServiceImpl) IsFollow(ctx context.Context, req *relation.IsFollowRequest) (resp *relation.IsFollowResponse, err error) {
 	methodFields := logrus.Fields{
 		"user_id":  req.UserId,
-		"time":     time.Now(),
 		"function": "IsFollow",
 	}
 	logger := logging.Logger.WithFields(methodFields)
@@ -415,7 +415,6 @@ func (s *RelationServiceImpl) IsFollow(ctx context.Context, req *relation.IsFoll
 	if err != nil {
 		logger.WithFields(map[string]interface{}{
 			"user_id": req.UserId,
-			"time":    time.Now(),
 			"err":     err,
 		}).Debug("failed to count follower list")
 

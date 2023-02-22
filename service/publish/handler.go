@@ -303,7 +303,6 @@ func (s *PublishServiceImpl) ListVideo(ctx context.Context, req *publish.ListVid
 func (s *PublishServiceImpl) CountVideo(ctx context.Context, req *publish.CountVideoRequest) (resp *publish.CountVideoResponse, err error) {
 	methodFields := logrus.Fields{
 		"user_id":  req.UserId,
-		"time":     time.Now(),
 		"function": "CountVideo",
 	}
 	logger := logging.Logger.WithFields(methodFields)
@@ -312,8 +311,7 @@ func (s *PublishServiceImpl) CountVideo(ctx context.Context, req *publish.CountV
 	count, err := gen.Q.Video.WithContext(ctx).Where(gen.Q.Video.UserId.Eq(req.UserId)).Count()
 	if err != nil {
 		logger.WithFields(logrus.Fields{
-			"time": time.Now(),
-			"err":  err,
+			"err": err,
 		}).Debug("failed to query video")
 		return &publish.CountVideoResponse{
 			StatusCode: biz.UnableToQueryVideo,
