@@ -94,4 +94,6 @@ service RelationService {
 
   rpc GetFriendList (FriendListRequest) returns (FriendListResponse) {
   }
+  rpc IsFollow (IsFollowRequest) returns (IsFollowResponse) {
+  }
 }

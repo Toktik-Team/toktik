@@ -364,3 +364,9 @@ func (s *RelationServiceImpl) CountFollowerList(ctx context.Context, req *relati
 	// TODO: Your code here...
 	return
 }
+
+// IsFollow implements the RelationServiceImpl interface.
+func (s *RelationServiceImpl) IsFollow(ctx context.Context, req *relation.IsFollowRequest) (resp *relation.IsFollowResponse, err error) {
+	// TODO: Your code here...
+	return
+}
