@@ -22,10 +22,12 @@ func NewServiceInfo() *kitex.ServiceInfo {
 	serviceName := "FavoriteService"
 	handlerType := (*favorite.FavoriteService)(nil)
 	methods := map[string]kitex.MethodInfo{
-		"FavoriteAction": kitex.NewMethodInfo(favoriteActionHandler, newFavoriteActionArgs, newFavoriteActionResult, false),
-		"FavoriteList":   kitex.NewMethodInfo(favoriteListHandler, newFavoriteListArgs, newFavoriteListResult, false),
-		"IsFavorite":     kitex.NewMethodInfo(isFavoriteHandler, newIsFavoriteArgs, newIsFavoriteResult, false),
-		"FavoriteCount":  kitex.NewMethodInfo(favoriteCountHandler, newFavoriteCountArgs, newFavoriteCountResult, false),
+		"FavoriteAction":          kitex.NewMethodInfo(favoriteActionHandler, newFavoriteActionArgs, newFavoriteActionResult, false),
+		"FavoriteList":            kitex.NewMethodInfo(favoriteListHandler, newFavoriteListArgs, newFavoriteListResult, false),
+		"IsFavorite":              kitex.NewMethodInfo(isFavoriteHandler, newIsFavoriteArgs, newIsFavoriteResult, false),
+		"FavoriteCount":           kitex.NewMethodInfo(favoriteCountHandler, newFavoriteCountArgs, newFavoriteCountResult, false),
+		"UserFavoriteCount":       kitex.NewMethodInfo(userFavoriteCountHandler, newUserFavoriteCountArgs, newUserFavoriteCountResult, false),
+		"UserTotalFavoritedCount": kitex.NewMethodInfo(userTotalFavoritedCountHandler, newUserTotalFavoritedCountArgs, newUserTotalFavoritedCountResult, false),
 	}
 	extra := map[string]interface{}{
 		"PackageName": "douyin.favorite",
@@ -621,6 +623,296 @@ func (p *FavoriteCountResult) IsSetSuccess() bool {
 	return p.Success != nil
 }
 
+func userFavoriteCountHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
+	switch s := arg.(type) {
+	case *streaming.Args:
+		st := s.Stream
+		req := new(favorite.UserFavoriteCountRequest)
+		if err := st.RecvMsg(req); err != nil {
+			return err
+		}
+		resp, err := handler.(favorite.FavoriteService).UserFavoriteCount(ctx, req)
+		if err != nil {
+			return err
+		}
+		if err := st.SendMsg(resp); err != nil {
+			return err
+		}
+	case *UserFavoriteCountArgs:
+		success, err := handler.(favorite.FavoriteService).UserFavoriteCount(ctx, s.Req)
+		if err != nil {
+			return err
+		}
+		realResult := result.(*UserFavoriteCountResult)
+		realResult.Success = success
+	}
+	return nil
+}
+func newUserFavoriteCountArgs() interface{} {
+	return &UserFavoriteCountArgs{}
+}
+
+func newUserFavoriteCountResult() interface{} {
+	return &UserFavoriteCountResult{}
+}
+
+type UserFavoriteCountArgs struct {
+	Req *favorite.UserFavoriteCountRequest
+}
+
+func (p *UserFavoriteCountArgs) FastRead(buf []byte, _type int8, number int32) (n int, err error) {
+	if !p.IsSetReq() {
+		p.Req = new(favorite.UserFavoriteCountRequest)
+	}
+	return p.Req.FastRead(buf, _type, number)
+}
+
+func (p *UserFavoriteCountArgs) FastWrite(buf []byte) (n int) {
+	if !p.IsSetReq() {
+		return 0
+	}
+	return p.Req.FastWrite(buf)
+}
+
+func (p *UserFavoriteCountArgs) Size() (n int) {
+	if !p.IsSetReq() {
+		return 0
+	}
+	return p.Req.Size()
+}
+
+func (p *UserFavoriteCountArgs) Marshal(out []byte) ([]byte, error) {
+	if !p.IsSetReq() {
+		return out, fmt.Errorf("No req in UserFavoriteCountArgs")
+	}
+	return proto.Marshal(p.Req)
+}
+
+func (p *UserFavoriteCountArgs) Unmarshal(in []byte) error {
+	msg := new(favorite.UserFavoriteCountRequest)
+	if err := proto.Unmarshal(in, msg); err != nil {
+		return err
+	}
+	p.Req = msg
+	return nil
+}
+
+var UserFavoriteCountArgs_Req_DEFAULT *favorite.UserFavoriteCountRequest
+
+func (p *UserFavoriteCountArgs) GetReq() *favorite.UserFavoriteCountRequest {
+	if !p.IsSetReq() {
+		return UserFavoriteCountArgs_Req_DEFAULT
+	}
+	return p.Req
+}
+
+func (p *UserFavoriteCountArgs) IsSetReq() bool {
+	return p.Req != nil
+}
+
+type UserFavoriteCountResult struct {
+	Success *favorite.UserFavoriteCountResponse
+}
+
+var UserFavoriteCountResult_Success_DEFAULT *favorite.UserFavoriteCountResponse
+
+func (p *UserFavoriteCountResult) FastRead(buf []byte, _type int8, number int32) (n int, err error) {
+	if !p.IsSetSuccess() {
+		p.Success = new(favorite.UserFavoriteCountResponse)
+	}
+	return p.Success.FastRead(buf, _type, number)
+}
+
+func (p *UserFavoriteCountResult) FastWrite(buf []byte) (n int) {
+	if !p.IsSetSuccess() {
+		return 0
+	}
+	return p.Success.FastWrite(buf)
+}
+
+func (p *UserFavoriteCountResult) Size() (n int) {
+	if !p.IsSetSuccess() {
+		return 0
+	}
+	return p.Success.Size()
+}
+
+func (p *UserFavoriteCountResult) Marshal(out []byte) ([]byte, error) {
+	if !p.IsSetSuccess() {
+		return out, fmt.Errorf("No req in UserFavoriteCountResult")
+	}
+	return proto.Marshal(p.Success)
+}
+
+func (p *UserFavoriteCountResult) Unmarshal(in []byte) error {
+	msg := new(favorite.UserFavoriteCountResponse)
+	if err := proto.Unmarshal(in, msg); err != nil {
+		return err
+	}
+	p.Success = msg
+	return nil
+}
+
+func (p *UserFavoriteCountResult) GetSuccess() *favorite.UserFavoriteCountResponse {
+	if !p.IsSetSuccess() {
+		return UserFavoriteCountResult_Success_DEFAULT
+	}
+	return p.Success
+}
+
+func (p *UserFavoriteCountResult) SetSuccess(x interface{}) {
+	p.Success = x.(*favorite.UserFavoriteCountResponse)
+}
+
+func (p *UserFavoriteCountResult) IsSetSuccess() bool {
+	return p.Success != nil
+}
+
+func userTotalFavoritedCountHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
+	switch s := arg.(type) {
+	case *streaming.Args:
+		st := s.Stream
+		req := new(favorite.UserTotalFavoritedCountRequest)
+		if err := st.RecvMsg(req); err != nil {
+			return err
+		}
+		resp, err := handler.(favorite.FavoriteService).UserTotalFavoritedCount(ctx, req)
+		if err != nil {
+			return err
+		}
+		if err := st.SendMsg(resp); err != nil {
+			return err
+		}
+	case *UserTotalFavoritedCountArgs:
+		success, err := handler.(favorite.FavoriteService).UserTotalFavoritedCount(ctx, s.Req)
+		if err != nil {
+			return err
+		}
+		realResult := result.(*UserTotalFavoritedCountResult)
+		realResult.Success = success
+	}
+	return nil
+}
+func newUserTotalFavoritedCountArgs() interface{} {
+	return &UserTotalFavoritedCountArgs{}
+}
+
+func newUserTotalFavoritedCountResult() interface{} {
+	return &UserTotalFavoritedCountResult{}
+}
+
+type UserTotalFavoritedCountArgs struct {
+	Req *favorite.UserTotalFavoritedCountRequest
+}
+
+func (p *UserTotalFavoritedCountArgs) FastRead(buf []byte, _type int8, number int32) (n int, err error) {
+	if !p.IsSetReq() {
+		p.Req = new(favorite.UserTotalFavoritedCountRequest)
+	}
+	return p.Req.FastRead(buf, _type, number)
+}
+
+func (p *UserTotalFavoritedCountArgs) FastWrite(buf []byte) (n int) {
+	if !p.IsSetReq() {
+		return 0
+	}
+	return p.Req.FastWrite(buf)
+}
+
+func (p *UserTotalFavoritedCountArgs) Size() (n int) {
+	if !p.IsSetReq() {
+		return 0
+	}
+	return p.Req.Size()
+}
+
+func (p *UserTotalFavoritedCountArgs) Marshal(out []byte) ([]byte, error) {
+	if !p.IsSetReq() {
+		return out, fmt.Errorf("No req in UserTotalFavoritedCountArgs")
+	}
+	return proto.Marshal(p.Req)
+}
+
+func (p *UserTotalFavoritedCountArgs) Unmarshal(in []byte) error {
+	msg := new(favorite.UserTotalFavoritedCountRequest)
+	if err := proto.Unmarshal(in, msg); err != nil {
+		return err
+	}
+	p.Req = msg
+	return nil
+}
+
+var UserTotalFavoritedCountArgs_Req_DEFAULT *favorite.UserTotalFavoritedCountRequest
+
+func (p *UserTotalFavoritedCountArgs) GetReq() *favorite.UserTotalFavoritedCountRequest {
+	if !p.IsSetReq() {
+		return UserTotalFavoritedCountArgs_Req_DEFAULT
+	}
+	return p.Req
+}
+
+func (p *UserTotalFavoritedCountArgs) IsSetReq() bool {
+	return p.Req != nil
+}
+
+type UserTotalFavoritedCountResult struct {
+	Success *favorite.UserTotalFavoritedCountResponse
+}
+
+var UserTotalFavoritedCountResult_Success_DEFAULT *favorite.UserTotalFavoritedCountResponse
+
+func (p *UserTotalFavoritedCountResult) FastRead(buf []byte, _type int8, number int32) (n int, err error) {
+	if !p.IsSetSuccess() {
+		p.Success = new(favorite.UserTotalFavoritedCountResponse)
+	}
+	return p.Success.FastRead(buf, _type, number)
+}
+
+func (p *UserTotalFavoritedCountResult) FastWrite(buf []byte) (n int) {
+	if !p.IsSetSuccess() {
+		return 0
+	}
+	return p.Success.FastWrite(buf)
+}
+
+func (p *UserTotalFavoritedCountResult) Size() (n int) {
+	if !p.IsSetSuccess() {
+		return 0
+	}
+	return p.Success.Size()
+}
+
+func (p *UserTotalFavoritedCountResult) Marshal(out []byte) ([]byte, error) {
+	if !p.IsSetSuccess() {
+		return out, fmt.Errorf("No req in UserTotalFavoritedCountResult")
+	}
+	return proto.Marshal(p.Success)
+}
+
+func (p *UserTotalFavoritedCountResult) Unmarshal(in []byte) error {
+	msg := new(favorite.UserTotalFavoritedCountResponse)
+	if err := proto.Unmarshal(in, msg); err != nil {
+		return err
+	}
+	p.Success = msg
+	return nil
+}
+
+func (p *UserTotalFavoritedCountResult) GetSuccess() *favorite.UserTotalFavoritedCountResponse {
+	if !p.IsSetSuccess() {
+		return UserTotalFavoritedCountResult_Success_DEFAULT
+	}
+	return p.Success
+}
+
+func (p *UserTotalFavoritedCountResult) SetSuccess(x interface{}) {
+	p.Success = x.(*favorite.UserTotalFavoritedCountResponse)
+}
+
+func (p *UserTotalFavoritedCountResult) IsSetSuccess() bool {
+	return p.Success != nil
+}
+
 type kClient struct {
 	c client.Client
 }
@@ -666,6 +958,26 @@ func (p *kClient) FavoriteCount(ctx context.Context, Req *favorite.FavoriteCount
 	_args.Req = Req
 	var _result FavoriteCountResult
 	if err = p.c.Call(ctx, "FavoriteCount", &_args, &_result); err != nil {
+		return
+	}
+	return _result.GetSuccess(), nil
+}
+
+func (p *kClient) UserFavoriteCount(ctx context.Context, Req *favorite.UserFavoriteCountRequest) (r *favorite.UserFavoriteCountResponse, err error) {
+	var _args UserFavoriteCountArgs
+	_args.Req = Req
+	var _result UserFavoriteCountResult
+	if err = p.c.Call(ctx, "UserFavoriteCount", &_args, &_result); err != nil {
+		return
+	}
+	return _result.GetSuccess(), nil
+}
+
+func (p *kClient) UserTotalFavoritedCount(ctx context.Context, Req *favorite.UserTotalFavoritedCountRequest) (r *favorite.UserTotalFavoritedCountResponse, err error) {
+	var _args UserTotalFavoritedCountArgs
+	_args.Req = Req
+	var _result UserTotalFavoritedCountResult
+	if err = p.c.Call(ctx, "UserTotalFavoritedCount", &_args, &_result); err != nil {
 		return
 	}
 	return _result.GetSuccess(), nil

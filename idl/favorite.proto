@@ -44,6 +44,26 @@ message FavoriteCountResponse {
   uint32 count = 3; // 点赞数
 }
 
+message UserFavoriteCountRequest {
+  uint32 user_id = 1; // 用户id
+}
+
+message UserFavoriteCountResponse {
+  uint32 status_code = 1;
+  optional string status_msg = 2;
+  uint32 count = 3; // 点赞数
+}
+
+message UserTotalFavoritedCountRequest {
+  uint32 user_id = 1; // 用户id
+}
+
+message UserTotalFavoritedCountResponse {
+  uint32 status_code = 1;
+  optional string status_msg = 2;
+  uint32 count = 3; // 点赞数
+}
+
 service FavoriteService {
   rpc FavoriteAction (FavoriteRequest) returns (FavoriteResponse){
   }
@@ -52,5 +72,9 @@ service FavoriteService {
   rpc IsFavorite (IsFavoriteRequest) returns (IsFavoriteResponse) {
   }
   rpc FavoriteCount (FavoriteCountRequest) returns (FavoriteCountResponse) {
+  }
+  rpc UserFavoriteCount (UserFavoriteCountRequest) returns (UserFavoriteCountResponse) {
+  }
+  rpc UserTotalFavoritedCount (UserTotalFavoritedCountRequest) returns (UserTotalFavoritedCountResponse) {
   }
 }
