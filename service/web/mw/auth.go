@@ -96,7 +96,7 @@ func WithAuthRequired() Option {
 
 func Auth(c *app.RequestContext, opts ...Option) (actorIdPtr *uint32, ok bool) {
 	cfg := newConfig(opts)
-
+	actorIdPtr = new(uint32)
 	switch c.GetString(authResultKey) {
 	case authResultSuccess:
 		*actorIdPtr = c.GetUint32(userIdKey)
