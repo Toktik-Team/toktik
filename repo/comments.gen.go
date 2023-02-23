@@ -180,7 +180,7 @@ type ICommentDo interface {
 	FilterWithNameAndRole(name string, role string) (result []model.Comment, err error)
 }
 
-// SELECT * FROM @@table WHERE name = @name{{if role !=""}} AND role = @role{{end}}
+// FilterWithNameAndRole SELECT * FROM @@table WHERE name = @name{{if role !=""}} AND role = @role{{end}}
 func (c commentDo) FilterWithNameAndRole(name string, role string) (result []model.Comment, err error) {
 	var params []interface{}
 

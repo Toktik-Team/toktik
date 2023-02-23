@@ -184,7 +184,7 @@ type IUserDo interface {
 	FilterWithNameAndRole(name string, role string) (result []model.User, err error)
 }
 
-// SELECT * FROM @@table WHERE name = @name{{if role !=""}} AND role = @role{{end}}
+// FilterWithNameAndRole SELECT * FROM @@table WHERE name = @name{{if role !=""}} AND role = @role{{end}}
 func (u userDo) FilterWithNameAndRole(name string, role string) (result []model.User, err error) {
 	var params []interface{}
 

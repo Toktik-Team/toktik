@@ -17,7 +17,7 @@ import (
 
 	"gorm.io/plugin/dbresolver"
 
-	"toktik/service/auth/model"
+	"toktik/repo/model"
 )
 
 func newUserToken(db *gorm.DB, opts ...gen.DOOption) userToken {
@@ -164,7 +164,7 @@ type IUserTokenDo interface {
 	FilterWithNameAndRole(name string, role string) (result []model.UserToken, err error)
 }
 
-// SELECT * FROM @@table WHERE name = @name{{if role !=""}} AND role = @role{{end}}
+// FilterWithNameAndRole SELECT * FROM @@table WHERE name = @name{{if role !=""}} AND role = @role{{end}}
 func (u userTokenDo) FilterWithNameAndRole(name string, role string) (result []model.UserToken, err error) {
 	var params []interface{}
 
