@@ -49,15 +49,11 @@ func MessageAction(ctx context.Context, c *app.RequestContext) {
 	logger := logging.Logger
 	logger.WithFields(methodFields).Debugf("Process start")
 
-	var userId uint32
-	switch c.GetString(mw.AuthResultKey) {
-	case mw.AUTH_RESULT_SUCCESS:
-		userId = c.GetUint32(mw.UserIdKey)
-	default:
-		bizConstant.UnAuthorized.WithFields(&methodFields).LaunchError(c)
+	actorIdPtr, ok := mw.Auth(c, mw.WithAuthRequired())
+	actorId := *actorIdPtr
+	if !ok {
 		return
 	}
-
 	actionType, exist := c.GetQuery("action_type")
 	if !exist {
 		bizConstant.InvalidActionType.WithFields(&methodFields).LaunchError(c)
@@ -96,7 +92,7 @@ func MessageAction(ctx context.Context, c *app.RequestContext) {
 	}).Debugf("Executing message action")
 
 	messageActionResponse, err := Client.WechatAction(ctx, &wechat.MessageActionRequest{
-		SenderId:   userId,
+		SenderId:   actorId,
 		ReceiverId: uint32(receiverIDInt),
 		ActionType: 1,
 		Content:    content,

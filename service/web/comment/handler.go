@@ -52,12 +52,9 @@ func Action(ctx context.Context, c *app.RequestContext) {
 	logger := logging.Logger.WithFields(methodFields)
 	logger.Debugf("Process start")
 
-	var actorId uint32
-	switch c.GetString(mw.AuthResultKey) {
-	case mw.AUTH_RESULT_SUCCESS:
-		actorId = c.GetUint32(mw.UserIdKey)
-	default:
-		biz.UnAuthorized.WithFields(&methodFields).LaunchError(c)
+	actorIdPtr, ok := mw.Auth(c, mw.WithAuthRequired())
+	actorId := *actorIdPtr
+	if !ok {
 		return
 	}
 
@@ -161,12 +158,9 @@ func List(ctx context.Context, c *app.RequestContext) {
 	logger := logging.Logger.WithFields(methodFields)
 	logger.Debugf("Process start")
 
-	var actorId uint32
-	switch c.GetString(mw.AuthResultKey) {
-	case mw.AUTH_RESULT_SUCCESS, mw.AUTH_RESULT_NO_TOKEN:
-		actorId = c.GetUint32(mw.UserIdKey)
-	default:
-		biz.UnAuthorized.WithFields(&methodFields).LaunchError(c)
+	actorIdPtr, ok := mw.Auth(c)
+	actorId := *actorIdPtr
+	if !ok {
 		return
 	}
 

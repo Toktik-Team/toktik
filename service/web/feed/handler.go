@@ -59,18 +59,15 @@ func Action(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	var actorIdPtr *uint32
-	switch c.GetString(mw.AuthResultKey) {
-	case mw.AUTH_RESULT_SUCCESS, mw.AUTH_RESULT_NO_TOKEN:
-		*actorIdPtr = c.GetUint32(mw.UserIdKey)
-	default:
-		bizConstant.UnAuthorized.WithFields(&methodFields).LaunchError(c)
+	actorIdPtr, ok := mw.Auth(c)
+	actorId := *actorIdPtr
+	if !ok {
 		return
 	}
 
 	logger.WithFields(logrus.Fields{
 		"latestTime": latestTime,
-		"actorId":    actorIdPtr,
+		"actorId":    actorId,
 	}).Debugf("Executing get feed")
 	response, err := feedClient.ListVideos(ctx, &feed.ListFeedRequest{
 		LatestTime: &latestTime,
