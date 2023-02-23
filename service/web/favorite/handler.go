@@ -149,10 +149,7 @@ func List(ctx context.Context, c *app.RequestContext) {
 	}
 	logger.WithFields(field).Info("Process start")
 
-	if mw.GetAuthResult(c) != mw.AUTH_RESULT_SUCCESS {
-		biz.AuthFailed.WithFields(&field).LaunchError(c)
-		return
-	}
+	actorId := mw.GetAuthActorId(c)
 
 	qUserId, userIdExist := c.GetQuery("user_id")
 	if !userIdExist {
@@ -167,7 +164,8 @@ func List(ctx context.Context, c *app.RequestContext) {
 	}
 
 	response, err := Client.FavoriteList(ctx, &favorite.FavoriteListRequest{
-		UserId: uint32(userId),
+		ActorId: actorId,
+		UserId:  uint32(userId),
 	})
 
 	if err != nil {
