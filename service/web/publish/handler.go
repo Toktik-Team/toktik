@@ -71,6 +71,15 @@ func Action(ctx context.Context, c *app.RequestContext) {
 	logger := logging.Logger.WithFields(methodFields)
 	logger.Debugf("Process start")
 
+	var actorId uint32
+	switch c.GetString(mw.AuthResultKey) {
+	case mw.AUTH_RESULT_SUCCESS:
+		actorId = c.GetUint32(mw.UserIdKey)
+	default:
+		bizConstant.UnAuthorized.WithFields(&methodFields).LaunchError(c)
+		return
+	}
+
 	if err := paramValidate(c); err != nil {
 		bizConstant.InvalidArguments.WithCause(err).WithFields(&methodFields).LaunchError(c)
 		return
@@ -98,7 +107,6 @@ func Action(ctx context.Context, c *app.RequestContext) {
 		bizConstant.SizeNotMatchError.WithCause(err).WithFields(&methodFields).LaunchError(c)
 		return
 	}
-	actorId := mw.GetAuthActorId(c)
 
 	logger.WithFields(logrus.Fields{
 		"actorId":  actorId,
@@ -130,7 +138,15 @@ func List(ctx context.Context, c *app.RequestContext) {
 	logger := logging.Logger.WithFields(methodFields)
 	logger.Debugf("Process start")
 
-	actorId := c.GetUint32("user_id")
+	var actorId uint32
+	switch c.GetString(mw.AuthResultKey) {
+	case mw.AUTH_RESULT_SUCCESS, mw.AUTH_RESULT_NO_TOKEN:
+		actorId = c.GetUint32(mw.UserIdKey)
+	default:
+		bizConstant.UnAuthorized.WithFields(&methodFields).LaunchError(c)
+		return
+	}
+
 	userId, userIdExists := c.GetQuery("user_id")
 
 	if actorId == 0 {

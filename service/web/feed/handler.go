@@ -59,15 +59,13 @@ func Action(ctx context.Context, c *app.RequestContext) {
 	}
 
 	var actorIdPtr *uint32
-	authResult := mw.GetAuthResult(c)
-	switch authResult {
-	case mw.AUTH_RESULT_SUCCESS:
-		actorId := mw.GetAuthActorId(c)
-		actorIdPtr = &actorId
-	case mw.AUTH_RESULT_NO_TOKEN:
-		actorIdPtr = nil
-	case mw.AUTH_RESULT_UNKNOWN:
-		actorIdPtr = nil
+	switch c.GetString(mw.AuthResultKey) {
+	case mw.AUTH_RESULT_SUCCESS, mw.AUTH_RESULT_NO_TOKEN:
+		actorIdPtr = new(uint32)
+		*actorIdPtr = c.GetUint32(mw.UserIdKey)
+	default:
+		bizConstant.UnAuthorized.WithFields(&methodFields).LaunchError(c)
+		return
 	}
 
 	logger.WithFields(logrus.Fields{
