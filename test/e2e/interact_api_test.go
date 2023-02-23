@@ -12,6 +12,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+// TestFavorite tests the procedure of like & unlike
 func TestFavorite(t *testing.T) {
 	e := newExpect(t)
 
@@ -23,11 +24,6 @@ func TestFavorite(t *testing.T) {
 
 	userId, token := getTestUserToken(testUserA, e)
 
-	// Sample:
-	//{
-	//    "status_code": 0,
-	//    "status_msg": "string"
-	//}
 	favoriteResp := e.POST("/douyin/favorite/action/").
 		WithQuery("token", token).WithQuery("video_id", videoId).WithQuery("action_type", 1).
 		WithFormField("token", token).WithFormField("video_id", videoId).WithFormField("action_type", 1).
@@ -37,35 +33,6 @@ func TestFavorite(t *testing.T) {
 	favoriteResp.Value("status_code").Number().Equal(0)
 	favoriteResp.Value("status_msg").String().NotEmpty()
 
-	// Sample:
-	//{
-	//    "status_code": "string",
-	//    "status_msg": "string",
-	//    "video_list": [
-	//        {
-	//            "id": 0,
-	//            "author": {
-	//                "id": 0,
-	//                "name": "string",
-	//                "follow_count": 0,
-	//                "follower_count": 0,
-	//                "is_follow": true,
-	//                "avatar": "string",
-	//                "background_image": "string",
-	//                "signature": "string",
-	//                "total_favorited": "string",
-	//                "work_count": 0,
-	//                "favorite_count": 0
-	//            },
-	//            "play_url": "string",
-	//            "cover_url": "string",
-	//            "favorite_count": 0,
-	//            "comment_count": 0,
-	//            "is_favorite": true,
-	//            "title": "string"
-	//        }
-	//    ]
-	//}
 	favoriteListResp := e.GET("/douyin/favorite/list/").
 		WithQuery("token", token).WithQuery("user_id", userId).
 		WithFormField("token", token).WithFormField("user_id", userId).
@@ -85,8 +52,18 @@ func TestFavorite(t *testing.T) {
 		video.ContainsKey("is_favorite")
 		video.Value("title").String().NotEmpty()
 	}
+
+	unlikeResp := e.POST("/douyin/favorite/action/").
+		WithQuery("token", token).WithQuery("video_id", videoId).WithQuery("action_type", 2).
+		WithFormField("token", token).WithFormField("video_id", videoId).WithFormField("action_type", 2).
+		Expect().
+		Status(http.StatusOK).
+		JSON().Object()
+	unlikeResp.Value("status_code").Number().Equal(0)
+	unlikeResp.Value("status_msg").String().NotEmpty()
 }
 
+// TestComment tests the procedure of add, list & delete a comment.
 func TestComment(t *testing.T) {
 	e := newExpect(t)
 
@@ -98,29 +75,6 @@ func TestComment(t *testing.T) {
 
 	_, token := getTestUserToken(testUserA, e)
 
-	// Sample:
-	//{
-	//    "status_code": 0,
-	//    "status_msg": "string",
-	//    "comment": {
-	//        "id": 0,
-	//        "user": {
-	//            "id": 0,
-	//            "name": "string",
-	//            "follow_count": 0,
-	//            "follower_count": 0,
-	//            "is_follow": true,
-	//            "avatar": "string",
-	//            "background_image": "string",
-	//            "signature": "string",
-	//            "total_favorited": "string",
-	//            "work_count": 0,
-	//            "favorite_count": 0
-	//        },
-	//        "content": "string",
-	//        "create_date": "string"
-	//    }
-	//}
 	addCommentResp := e.POST("/douyin/comment/action/").
 		WithQuery("token", token).WithQuery("video_id", videoId).WithQuery("action_type", 1).WithQuery("comment_text", "测试评论").
 		WithFormField("token", token).WithFormField("video_id", videoId).WithFormField("action_type", 1).WithFormField("comment_text", "测试评论").
@@ -133,31 +87,6 @@ func TestComment(t *testing.T) {
 	ValidateUser(addCommentResp.Value("comment").Object().Value("user").Object())
 	commentId := int(addCommentResp.Value("comment").Object().Value("id").Number().Raw())
 
-	// Sample:
-	//{
-	//    "status_code": 0,
-	//    "status_msg": "string",
-	//    "comment_list": [
-	//        {
-	//            "id": 0,
-	//            "user": {
-	//                "id": 0,
-	//                "name": "string",
-	//                "follow_count": 0,
-	//                "follower_count": 0,
-	//                "is_follow": true,
-	//                "avatar": "string",
-	//                "background_image": "string",
-	//                "signature": "string",
-	//                "total_favorited": "string",
-	//                "work_count": 0,
-	//                "favorite_count": 0
-	//            },
-	//            "content": "string",
-	//            "create_date": "string"
-	//        }
-	//    ]
-	//}
 	commentListResp := e.GET("/douyin/comment/list/").
 		WithQuery("token", token).WithQuery("video_id", videoId).
 		WithFormField("token", token).WithFormField("video_id", videoId).

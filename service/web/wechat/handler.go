@@ -121,12 +121,12 @@ func MessageChat(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	senderId, exist := c.GetQuery("to_user_id")
+	receiverIdPtr, exist := c.GetQuery("to_user_id")
 	if !exist {
 		bizConstant.InvalidArguments.WithFields(&methodFields).LaunchError(c)
 		return
 	}
-	senderIdInt, err := strconv.ParseInt(senderId, 10, 32)
+	receiverId, err := strconv.ParseInt(receiverIdPtr, 10, 32)
 	if err != nil {
 		bizConstant.InvalidArguments.WithCause(err).WithFields(&methodFields).LaunchError(c)
 		return
@@ -143,12 +143,13 @@ func MessageChat(ctx context.Context, c *app.RequestContext) {
 	}
 
 	logger.WithFields(logrus.Fields{
-		"to_user_id": senderIdInt,
+		"to_user_id":   receiverId,
+		"pre_msg_time": preMsgTimeStr,
 	}).Debugf("Executing message chat")
 
 	messageActionResponse, err := Client.WechatChat(ctx, &wechat.MessageChatRequest{
-		SenderId:   uint32(senderIdInt),
-		ReceiverId: actorId,
+		SenderId:   actorId,
+		ReceiverId: uint32(receiverId),
 		PreMsgTime: preMsgTime,
 	})
 

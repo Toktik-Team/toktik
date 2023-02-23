@@ -168,13 +168,20 @@ func (s *WechatServiceImpl) WechatChat(ctx context.Context, req *wechat.MessageC
 		} else {
 			content = msg.Msg
 		}
-		respMessageList = append(respMessageList, &wechat.Message{
+		respMsg := &wechat.Message{
 			Id:         uint32(i),
 			Content:    content,
 			CreateTime: msg.Time,
 			FromUserId: &msg.From,
 			ToUserId:   &msg.To,
-		})
+		}
+		if receiverID == 0 {
+			// ChatGPT logic
+			respMsg.CreateTime = time.Now().UnixMilli() - 300
+			*respMsg.FromUserId = 0
+			*respMsg.ToUserId = senderID
+		}
+		respMessageList = append(respMessageList, respMsg)
 	}
 	resp = &wechat.MessageChatResponse{
 		StatusCode:  0,

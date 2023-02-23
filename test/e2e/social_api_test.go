@@ -12,17 +12,13 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+// TestRelation tests the procedure of follow, list users.
 func TestRelation(t *testing.T) {
 	e := newExpect(t)
 
 	userIdA, tokenA := getTestUserToken(testUserA, e)
 	userIdB, tokenB := getTestUserToken(testUserB, e)
 
-	// Sample:
-	//{
-	//    "status_code": 0,
-	//    "status_msg": "string"
-	//}
 	relationResp := e.POST("/douyin/relation/action/").
 		WithQuery("token", tokenA).WithQuery("to_user_id", userIdB).WithQuery("action_type", 1).
 		WithFormField("token", tokenA).WithFormField("to_user_id", userIdB).WithFormField("action_type", 1).
@@ -32,26 +28,6 @@ func TestRelation(t *testing.T) {
 	relationResp.Value("status_code").Number().Equal(0)
 	relationResp.Value("status_msg").String().NotEmpty()
 
-	// Sample:
-	//{
-	//    "status_code": "string",
-	//    "status_msg": "string",
-	//    "user_list": [
-	//        {
-	//            "id": 0,
-	//            "name": "string",
-	//            "follow_count": 0,
-	//            "follower_count": 0,
-	//            "is_follow": true,
-	//            "avatar": "string",
-	//            "background_image": "string",
-	//            "signature": "string",
-	//            "total_favorited": "string",
-	//            "work_count": 0,
-	//            "favorite_count": 0
-	//        }
-	//    ]
-	//}
 	followListResp := e.GET("/douyin/relation/follow/list/").
 		WithQuery("token", tokenA).WithQuery("user_id", userIdA).
 		WithFormField("token", tokenA).WithFormField("user_id", userIdA).
@@ -93,17 +69,13 @@ func TestRelation(t *testing.T) {
 	assert.True(t, containTestUserA, "Follower test user failed")
 }
 
+// TestChat tests the procedure of sending and receiving messages.
 func TestChat(t *testing.T) {
 	e := newExpect(t)
 
 	userIdA, tokenA := getTestUserToken(testUserA, e)
 	userIdB, tokenB := getTestUserToken(testUserB, e)
 
-	// Sample:
-	//{
-	//    "status_code": 0,
-	//    "status_msg": "string"
-	//}
 	messageResp := e.POST("/douyin/message/action/").
 		WithQuery("token", tokenA).WithQuery("to_user_id", userIdB).WithQuery("action_type", 1).WithQuery("content", "Send to UserB").
 		WithFormField("token", tokenA).WithFormField("to_user_id", userIdB).WithFormField("action_type", 1).WithQuery("content", "Send to UserB").
@@ -113,21 +85,6 @@ func TestChat(t *testing.T) {
 	messageResp.Value("status_code").Number().Equal(0)
 	messageResp.Value("status_msg").String().NotEmpty()
 
-	// Sample:
-	//{
-	//    "status_code": "string",
-	//    "status_msg": "string",
-	//    "message_list": [
-	//        {
-	//            "id": 0,
-	//            "to_user_id": 0,
-	//            "from_user_id": 0,
-	//            "content": "string",
-	//            "pre_msg_time": "string",
-	//            "create_time": 0
-	//        }
-	//    ]
-	//}
 	chatResp := e.GET("/douyin/message/chat/").
 		WithQuery("token", tokenA).WithQuery("to_user_id", userIdB).
 		WithFormField("token", tokenA).WithFormField("to_user_id", userIdB).
