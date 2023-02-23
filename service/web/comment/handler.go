@@ -63,11 +63,6 @@ func Action(ctx context.Context, c *app.RequestContext) {
 	commentText, commentTextExists := c.GetQuery("comment_text")
 	commentId, commentIdExists := c.GetQuery("comment_id")
 
-	if actorId == 0 {
-		biz.UnauthorizedError.WithFields(&methodFields).LaunchError(c)
-		return
-	}
-
 	if !videoIdExists || !actionTypeExists {
 		biz.BadRequestError.WithFields(&methodFields).LaunchError(c)
 		return
