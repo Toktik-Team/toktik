@@ -12,6 +12,7 @@ import (
 	"toktik/service/wechat/db"
 
 	"github.com/golang/protobuf/proto"
+	"github.com/redis/go-redis/extra/redisotel/v9"
 	"github.com/redis/go-redis/v9"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/protobuf/encoding/protojson"
@@ -25,6 +26,13 @@ func init() {
 		Password: config.EnvConfig.REDIS_PASSWORD,
 		DB:       config.EnvConfig.REDIS_DB,
 	})
+
+	if err := redisotel.InstrumentTracing(rdb); err != nil {
+		panic(err)
+	}
+	if err := redisotel.InstrumentMetrics(rdb); err != nil {
+		panic(err)
+	}
 }
 
 // WechatServiceImpl implements the last service interface defined in the IDL.

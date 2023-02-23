@@ -28,6 +28,7 @@ require (
 	github.com/sirupsen/logrus v1.9.0
 	github.com/stretchr/testify v1.8.1
 	github.com/swaggo/files v1.0.0
+	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.39.0
 	golang.org/x/crypto v0.4.0
 	google.golang.org/protobuf v1.28.1
 	gorm.io/driver/postgres v1.4.6
@@ -35,7 +36,6 @@ require (
 	gorm.io/gorm v1.24.5
 	gorm.io/plugin/dbresolver v1.3.0
 	gorm.io/plugin/opentelemetry v0.1.0
-	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.39.0
 )
 
 require (
@@ -125,6 +125,8 @@ require (
 	github.com/nyaruka/phonenumbers v1.1.6 // indirect
 	github.com/oleiade/lane v1.0.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
+	github.com/redis/go-redis/extra/rediscmd/v9 v9.0.2 // indirect
+	github.com/redis/go-redis/extra/redisotel/v9 v9.0.2 // indirect
 	github.com/rogpeppe/go-internal v1.8.1 // indirect
 	github.com/sanity-io/litter v1.5.5 // indirect
 	github.com/savsgio/gotils v0.0.0-20220530130905-52f3993e8d6d // indirect
