@@ -49,8 +49,8 @@ func RelationAction(ctx context.Context, c *app.RequestContext) {
 	methodFields := logrus.Fields{
 		"method": "RelationAction",
 	}
-	logger := logging.Logger
-	logger.WithFields(methodFields).Debugf("Process start")
+	logger := logging.Logger.WithFields(methodFields)
+	logger.Debugf("Process start")
 
 	var actorId uint32
 	switch c.GetString(mw.AuthResultKey) {
@@ -128,8 +128,8 @@ func GetFollowList(ctx context.Context, c *app.RequestContext) {
 	methodFields := logrus.Fields{
 		"method": "GetFollowList",
 	}
-	logger := logging.Logger
-	logger.WithFields(methodFields).Info("Process start")
+	logger := logging.Logger.WithFields(methodFields)
+	logger.Debugf("Process start")
 
 	var actorId uint32
 	switch c.GetString(mw.AuthResultKey) {
@@ -175,8 +175,8 @@ func GetFollowerList(ctx context.Context, c *app.RequestContext) {
 	methodFields := logrus.Fields{
 		"method": "GetFollowerList",
 	}
-	logger := logging.Logger
-	logger.WithFields(methodFields).Info("Process start")
+	logger := logging.Logger.WithFields(methodFields)
+	logger.Debugf("Process start")
 
 	var actorId uint32
 	switch c.GetString(mw.AuthResultKey) {
