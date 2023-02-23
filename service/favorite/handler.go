@@ -41,7 +41,7 @@ type FavoriteServiceImpl struct{}
 var logger = logging.Logger
 
 func like(ctx context.Context, actorId uint32, videoId uint32) (resp *favorite.FavoriteResponse, err error) {
-	if err := gen.Q.Favorite.WithContext(ctx).Create(&model.Favorite{
+	if err = gen.Q.Favorite.WithContext(ctx).Create(&model.Favorite{
 		UserId:  actorId,
 		VideoId: videoId,
 	}); err != nil {
