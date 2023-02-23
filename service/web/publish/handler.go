@@ -144,11 +144,6 @@ func List(ctx context.Context, c *app.RequestContext) {
 
 	userId, userIdExists := c.GetQuery("user_id")
 
-	if actorId == 0 {
-		bizConstant.UnauthorizedError.WithFields(&methodFields).LaunchError(c)
-		return
-	}
-
 	if !userIdExists {
 		bizConstant.InvalidArguments.WithFields(&methodFields).LaunchError(c)
 	}
