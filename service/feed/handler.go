@@ -2,10 +2,6 @@ package main
 
 import (
 	"context"
-	"github.com/cloudwego/kitex/client"
-	"github.com/kitex-contrib/obs-opentelemetry/tracing"
-	consul "github.com/kitex-contrib/registry-consul"
-	"github.com/sirupsen/logrus"
 	"log"
 	"strconv"
 	"sync"
@@ -23,6 +19,11 @@ import (
 	gen "toktik/repo"
 	"toktik/repo/model"
 	"toktik/storage"
+
+	"github.com/cloudwego/kitex/client"
+	"github.com/kitex-contrib/obs-opentelemetry/tracing"
+	consul "github.com/kitex-contrib/registry-consul"
+	"github.com/sirupsen/logrus"
 )
 
 var UserClient userservice.Client

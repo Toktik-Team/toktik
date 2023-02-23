@@ -5,9 +5,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/cloudwego/kitex/client"
-	"github.com/kitex-contrib/obs-opentelemetry/tracing"
-	consul "github.com/kitex-contrib/registry-consul"
 	"io"
 	"log"
 	"net/http"
@@ -17,6 +14,10 @@ import (
 	feedService "toktik/kitex_gen/douyin/feed/feedservice"
 	"toktik/logging"
 	"toktik/repo/model"
+
+	"github.com/cloudwego/kitex/client"
+	"github.com/kitex-contrib/obs-opentelemetry/tracing"
+	consul "github.com/kitex-contrib/registry-consul"
 
 	"github.com/sirupsen/logrus"
 

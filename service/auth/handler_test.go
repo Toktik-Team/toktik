@@ -3,14 +3,15 @@ package main
 import (
 	"context"
 	"database/sql"
-	"github.com/DATA-DOG/go-sqlmock"
-	"gorm.io/driver/postgres"
-	"gorm.io/gorm"
 	"reflect"
 	"regexp"
 	"testing"
 	"toktik/kitex_gen/douyin/auth"
 	"toktik/repo"
+
+	"github.com/DATA-DOG/go-sqlmock"
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
 )
 
 var successArg = struct {

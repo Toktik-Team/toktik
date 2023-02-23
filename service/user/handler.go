@@ -2,10 +2,6 @@ package main
 
 import (
 	"context"
-	"github.com/cloudwego/kitex/client"
-	"github.com/kitex-contrib/obs-opentelemetry/tracing"
-	consul "github.com/kitex-contrib/registry-consul"
-	"github.com/sirupsen/logrus"
 	"log"
 	"sync"
 	"toktik/constant/biz"
@@ -19,6 +15,11 @@ import (
 	"toktik/kitex_gen/douyin/user"
 	"toktik/logging"
 	"toktik/repo"
+
+	"github.com/cloudwego/kitex/client"
+	"github.com/kitex-contrib/obs-opentelemetry/tracing"
+	consul "github.com/kitex-contrib/registry-consul"
+	"github.com/sirupsen/logrus"
 )
 
 // UserServiceImpl implements the last service interface defined in the IDL.

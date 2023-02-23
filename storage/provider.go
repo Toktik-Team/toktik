@@ -1,10 +1,11 @@
 package storage
 
 import (
-	"github.com/sirupsen/logrus"
 	"io"
 	"toktik/constant/config"
 	"toktik/logging"
+
+	"github.com/sirupsen/logrus"
 )
 
 var Instance storageProvider = S3Storage{}

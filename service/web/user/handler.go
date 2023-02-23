@@ -2,8 +2,6 @@ package user
 
 import (
 	"context"
-	"github.com/kitex-contrib/obs-opentelemetry/provider"
-	"github.com/kitex-contrib/obs-opentelemetry/tracing"
 	"strconv"
 	"toktik/constant/biz"
 	"toktik/constant/config"
@@ -11,6 +9,9 @@ import (
 	userService "toktik/kitex_gen/douyin/user/userservice"
 	"toktik/logging"
 	"toktik/service/web/mw"
+
+	"github.com/kitex-contrib/obs-opentelemetry/provider"
+	"github.com/kitex-contrib/obs-opentelemetry/tracing"
 
 	"github.com/cloudwego/hertz/pkg/app"
 	httpStatus "github.com/cloudwego/hertz/pkg/protocol/consts"

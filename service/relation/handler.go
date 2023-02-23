@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"github.com/kitex-contrib/obs-opentelemetry/tracing"
 	"log"
 	"sync"
 	"toktik/constant/biz"
@@ -13,6 +12,8 @@ import (
 	"toktik/logging"
 	"toktik/repo"
 	"toktik/repo/model"
+
+	"github.com/kitex-contrib/obs-opentelemetry/tracing"
 
 	"github.com/cloudwego/kitex/client"
 	consul "github.com/kitex-contrib/registry-consul"

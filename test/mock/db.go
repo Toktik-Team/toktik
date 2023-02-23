@@ -2,11 +2,12 @@ package mock
 
 import (
 	"database/sql"
+	"log"
+	"toktik/repo"
+
 	"github.com/DATA-DOG/go-sqlmock"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
-	"log"
-	"toktik/repo"
 )
 
 var DBMock sqlmock.Sqlmock

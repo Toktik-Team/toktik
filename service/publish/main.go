@@ -1,12 +1,13 @@
 package main
 
 import (
-	"github.com/kitex-contrib/obs-opentelemetry/provider"
-	"github.com/kitex-contrib/obs-opentelemetry/tracing"
 	"log"
 	"net"
 	"toktik/constant/config"
 	publish "toktik/kitex_gen/douyin/publish/publishservice"
+
+	"github.com/kitex-contrib/obs-opentelemetry/provider"
+	"github.com/kitex-contrib/obs-opentelemetry/tracing"
 
 	"github.com/cloudwego/kitex/server"
 

@@ -2,15 +2,16 @@ package main
 
 import (
 	"context"
-	"github.com/segmentio/ksuid"
-	"github.com/sirupsen/logrus"
-	"golang.org/x/crypto/bcrypt"
 	"toktik/constant/biz"
 	"toktik/kitex_gen/douyin/auth"
 	"toktik/logging"
 	"toktik/repo"
 	commonModel "toktik/repo/model"
 	"toktik/service/web/mw"
+
+	"github.com/segmentio/ksuid"
+	"github.com/sirupsen/logrus"
+	"golang.org/x/crypto/bcrypt"
 )
 
 func HashPassword(password string) (string, error) {

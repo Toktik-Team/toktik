@@ -2,13 +2,6 @@ package favorite
 
 import (
 	"context"
-	"github.com/cloudwego/hertz/pkg/app"
-	"github.com/cloudwego/hertz/pkg/protocol/consts"
-	"github.com/cloudwego/kitex/client"
-	"github.com/kitex-contrib/obs-opentelemetry/provider"
-	"github.com/kitex-contrib/obs-opentelemetry/tracing"
-	consul "github.com/kitex-contrib/registry-consul"
-	"github.com/sirupsen/logrus"
 	"net/http"
 	"strconv"
 	"toktik/constant/biz"
@@ -17,6 +10,14 @@ import (
 	favoriteService "toktik/kitex_gen/douyin/favorite/favoriteservice"
 	"toktik/logging"
 	"toktik/service/web/mw"
+
+	"github.com/cloudwego/hertz/pkg/app"
+	"github.com/cloudwego/hertz/pkg/protocol/consts"
+	"github.com/cloudwego/kitex/client"
+	"github.com/kitex-contrib/obs-opentelemetry/provider"
+	"github.com/kitex-contrib/obs-opentelemetry/tracing"
+	consul "github.com/kitex-contrib/registry-consul"
+	"github.com/sirupsen/logrus"
 )
 
 var Client favoriteService.Client

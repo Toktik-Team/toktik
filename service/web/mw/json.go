@@ -2,6 +2,7 @@ package mw
 
 import (
 	"encoding/json"
+
 	"github.com/cloudwego/hertz/pkg/app/server/render"
 	"github.com/cloudwego/hertz/pkg/common/hlog"
 	"google.golang.org/protobuf/encoding/protojson"

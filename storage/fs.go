@@ -1,13 +1,14 @@
 package storage
 
 import (
-	"github.com/sirupsen/logrus"
 	"io"
 	"net/url"
 	"os"
 	"path"
 	"toktik/constant/config"
 	"toktik/logging"
+
+	"github.com/sirupsen/logrus"
 )
 
 type FSStorage struct {

@@ -1,15 +1,16 @@
 package main
 
 import (
+	"log"
+	"net"
+	"toktik/constant/config"
+	comment "toktik/kitex_gen/douyin/comment/commentservice"
+
 	"github.com/cloudwego/kitex/pkg/rpcinfo"
 	"github.com/cloudwego/kitex/server"
 	"github.com/kitex-contrib/obs-opentelemetry/provider"
 	"github.com/kitex-contrib/obs-opentelemetry/tracing"
 	consul "github.com/kitex-contrib/registry-consul"
-	"log"
-	"net"
-	"toktik/constant/config"
-	comment "toktik/kitex_gen/douyin/comment/commentservice"
 )
 
 func main() {

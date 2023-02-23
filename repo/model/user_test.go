@@ -1,9 +1,10 @@
 package model
 
 import (
-	"github.com/cloudwego/hertz/pkg/common/test/assert"
 	"strings"
 	"testing"
+
+	"github.com/cloudwego/hertz/pkg/common/test/assert"
 )
 
 func TestUser_GetUserAvatar(t *testing.T) {

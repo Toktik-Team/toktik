@@ -4,8 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/kitex-contrib/obs-opentelemetry/provider"
-	"github.com/kitex-contrib/obs-opentelemetry/tracing"
 	"log"
 	"strconv"
 	"toktik/constant/biz"
@@ -14,6 +12,9 @@ import (
 	"toktik/kitex_gen/douyin/comment/commentservice"
 	"toktik/logging"
 	"toktik/service/web/mw"
+
+	"github.com/kitex-contrib/obs-opentelemetry/provider"
+	"github.com/kitex-contrib/obs-opentelemetry/tracing"
 
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"

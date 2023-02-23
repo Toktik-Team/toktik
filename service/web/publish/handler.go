@@ -3,8 +3,6 @@ package publish
 import (
 	"context"
 	"fmt"
-	"github.com/kitex-contrib/obs-opentelemetry/provider"
-	"github.com/kitex-contrib/obs-opentelemetry/tracing"
 	"mime/multipart"
 	"strconv"
 	bizConstant "toktik/constant/biz"
@@ -13,6 +11,9 @@ import (
 	publishService "toktik/kitex_gen/douyin/publish/publishservice"
 	"toktik/logging"
 	"toktik/service/web/mw"
+
+	"github.com/kitex-contrib/obs-opentelemetry/provider"
+	"github.com/kitex-contrib/obs-opentelemetry/tracing"
 
 	"github.com/cloudwego/hertz/pkg/app"
 	httpStatus "github.com/cloudwego/hertz/pkg/protocol/consts"

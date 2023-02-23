@@ -2,14 +2,15 @@ package auth
 
 import (
 	"context"
-	"github.com/kitex-contrib/obs-opentelemetry/provider"
-	"github.com/kitex-contrib/obs-opentelemetry/tracing"
 	"log"
 	bizConstant "toktik/constant/biz"
 	"toktik/constant/config"
 	"toktik/kitex_gen/douyin/auth"
 	authService "toktik/kitex_gen/douyin/auth/authservice"
 	"toktik/logging"
+
+	"github.com/kitex-contrib/obs-opentelemetry/provider"
+	"github.com/kitex-contrib/obs-opentelemetry/tracing"
 
 	"github.com/cloudwego/hertz/pkg/app"
 	httpStatus "github.com/cloudwego/hertz/pkg/protocol/consts"

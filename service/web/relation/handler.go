@@ -2,8 +2,6 @@ package relation
 
 import (
 	"context"
-	"github.com/kitex-contrib/obs-opentelemetry/provider"
-	"github.com/kitex-contrib/obs-opentelemetry/tracing"
 	"strconv"
 	bizConstant "toktik/constant/biz"
 	"toktik/constant/config"
@@ -11,6 +9,9 @@ import (
 	relationService "toktik/kitex_gen/douyin/relation/relationservice"
 	"toktik/logging"
 	"toktik/service/web/mw"
+
+	"github.com/kitex-contrib/obs-opentelemetry/provider"
+	"github.com/kitex-contrib/obs-opentelemetry/tracing"
 
 	"github.com/cloudwego/hertz/pkg/app"
 	httpStatus "github.com/cloudwego/hertz/pkg/protocol/consts"

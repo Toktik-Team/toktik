@@ -1,11 +1,12 @@
 package main
 
 import (
+	"toktik/constant/config"
+	"toktik/repo/model"
+
 	"gorm.io/driver/postgres"
 	"gorm.io/gen"
 	"gorm.io/gorm"
-	"toktik/constant/config"
-	"toktik/repo/model"
 )
 
 // Querier Dynamic SQL

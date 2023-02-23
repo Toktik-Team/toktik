@@ -2,13 +2,6 @@ package wechat
 
 import (
 	"context"
-	"github.com/cloudwego/hertz/pkg/app"
-	httpStatus "github.com/cloudwego/hertz/pkg/protocol/consts"
-	"github.com/cloudwego/kitex/client"
-	"github.com/kitex-contrib/obs-opentelemetry/provider"
-	"github.com/kitex-contrib/obs-opentelemetry/tracing"
-	consul "github.com/kitex-contrib/registry-consul"
-	"github.com/sirupsen/logrus"
 	"log"
 	"strconv"
 	bizConstant "toktik/constant/biz"
@@ -17,6 +10,14 @@ import (
 	"toktik/kitex_gen/douyin/wechat/wechatservice"
 	"toktik/logging"
 	"toktik/service/web/mw"
+
+	"github.com/cloudwego/hertz/pkg/app"
+	httpStatus "github.com/cloudwego/hertz/pkg/protocol/consts"
+	"github.com/cloudwego/kitex/client"
+	"github.com/kitex-contrib/obs-opentelemetry/provider"
+	"github.com/kitex-contrib/obs-opentelemetry/tracing"
+	consul "github.com/kitex-contrib/registry-consul"
+	"github.com/sirupsen/logrus"
 )
 
 var Client wechatservice.Client

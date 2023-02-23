@@ -2,8 +2,6 @@ package main
 
 import (
 	"context"
-	"github.com/DATA-DOG/go-sqlmock"
-	"github.com/cloudwego/kitex/client/callopt"
 	"reflect"
 	"regexp"
 	"testing"
@@ -13,6 +11,9 @@ import (
 	"toktik/kitex_gen/douyin/user"
 	"toktik/repo/model"
 	"toktik/test/mock"
+
+	"github.com/DATA-DOG/go-sqlmock"
+	"github.com/cloudwego/kitex/client/callopt"
 )
 
 var (

@@ -1,15 +1,16 @@
 package main
 
 import (
+	"log"
+	"net"
+	"toktik/constant/config"
+	"toktik/kitex_gen/douyin/wechat/wechatservice"
+
 	"github.com/cloudwego/kitex/pkg/rpcinfo"
 	"github.com/cloudwego/kitex/server"
 	"github.com/kitex-contrib/obs-opentelemetry/provider"
 	"github.com/kitex-contrib/obs-opentelemetry/tracing"
 	consul "github.com/kitex-contrib/registry-consul"
-	"log"
-	"net"
-	"toktik/constant/config"
-	"toktik/kitex_gen/douyin/wechat/wechatservice"
 )
 
 func main() {
