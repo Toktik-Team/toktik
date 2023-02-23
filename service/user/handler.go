@@ -7,6 +7,7 @@ import (
 	consul "github.com/kitex-contrib/registry-consul"
 	"github.com/sirupsen/logrus"
 	"log"
+	"sync"
 	"toktik/constant/biz"
 	bizConfig "toktik/constant/config"
 	"toktik/kitex_gen/douyin/favorite"
@@ -74,119 +75,170 @@ func (s *UserServiceImpl) GetUser(ctx context.Context, req *user.UserRequest) (r
 		return
 	}
 
-	avatar := u.GetUserAvatar()
-	backgroundImage := u.GetBackgroundImage()
-	signature := u.GetSignature()
+	wg := sync.WaitGroup{}
+	wg.Add(9)
 
-	followCount, err := RelationClient.CountFollowList(ctx, &relation.CountFollowListRequest{
-		UserId: u.ID,
-	})
-	if err != nil {
-		logging.Logger.WithFields(logrus.Fields{
-			"err": err,
-		}).Errorf("get user follow count failed")
-		resp = &user.UserResponse{
-			StatusCode: biz.UnableToQueryFollowList,
-			StatusMsg:  &biz.InternalServerErrorStatusMsg,
-			User:       nil,
-		}
-		return
+	rUser := user.User{
+		Id:   u.ID,
+		Name: u.Username,
 	}
 
-	followerCount, err := RelationClient.CountFollowerList(ctx, &relation.CountFollowerListRequest{
-		UserId: req.UserId,
-	})
-	if err != nil {
-		logging.Logger.WithFields(logrus.Fields{
-			"err": err,
-		}).Errorf("get user follower count failed")
-		resp = &user.UserResponse{
-			StatusCode: biz.UnableToQueryFollowerList,
-			StatusMsg:  &biz.InternalServerErrorStatusMsg,
-			User:       nil,
-		}
-		return
-	}
+	// &user.User{
+	//			Id:              u.ID,
+	//			Name:            u.Username,
+	//			FollowCount:     followCount.Count,
+	//			FollowerCount:   followerCount.Count,
+	//			IsFollow:        isFollow.Result,
+	//			Avatar:          &avatar,
+	//			BackgroundImage: &backgroundImage,
+	//			Signature:       &signature,
+	//			TotalFavorited:  &totalFavorited.Count,
+	//			WorkCount:       &workCount.Count,
+	//			FavoriteCount:   &favoriteCount.Count,
+	//		}
 
-	isFollow, err := RelationClient.IsFollow(ctx, &relation.IsFollowRequest{
-		ActorId: req.ActorId,
-		UserId:  req.UserId,
-	})
-	if err != nil {
-		logging.Logger.WithFields(logrus.Fields{
-			"err": err,
-		}).Errorf("get user is follow failed")
-		resp = &user.UserResponse{
-			StatusCode: biz.UnableToQueryIsFollow,
-			StatusMsg:  &biz.InternalServerErrorStatusMsg,
-			User:       nil,
-		}
-		return
-	}
+	go func() {
+		defer wg.Done()
+		rAvatar := u.GetUserAvatar()
+		rUser.Avatar = &rAvatar
+	}()
 
-	totalFavorited, err := FavoriteClient.CountUserTotalFavorited(ctx, &favorite.CountUserTotalFavoritedRequest{
-		ActorId: req.ActorId,
-		UserId:  req.UserId,
-	})
-	if err != nil {
-		logging.Logger.WithFields(logrus.Fields{
-			"err": err,
-		}).Errorf("get user total favorited failed")
-		resp = &user.UserResponse{
-			StatusCode: biz.UnableToQueryTotalFavorited,
-			StatusMsg:  &biz.InternalServerErrorStatusMsg,
-			User:       nil,
-		}
-		return
-	}
+	go func() {
+		defer wg.Done()
+		rBackgroundImage := u.GetBackgroundImage()
+		rUser.BackgroundImage = &rBackgroundImage
+	}()
 
-	workCount, err := PublishClient.CountVideo(ctx, &publish.CountVideoRequest{
-		UserId: req.UserId,
-	})
-	if err != nil {
-		logging.Logger.WithFields(logrus.Fields{
-			"err": err,
-		}).Errorf("get user work count failed")
-		resp = &user.UserResponse{
-			StatusCode: biz.UnableToQueryVideo,
-			StatusMsg:  &biz.InternalServerErrorStatusMsg,
-			User:       nil,
-		}
-		return
-	}
+	go func() {
+		defer wg.Done()
+		signature := u.GetSignature()
+		rUser.Signature = &signature
+	}()
 
-	favoriteCount, err := FavoriteClient.CountUserFavorite(ctx, &favorite.CountUserFavoriteRequest{
-		UserId: req.UserId,
-	})
-	if err != nil {
-		logging.Logger.WithFields(logrus.Fields{
-			"err": err,
-		}).Errorf("get user favorite count failed")
-		resp = &user.UserResponse{
-			StatusCode: biz.UnableToQueryFavorite,
-			StatusMsg:  &biz.InternalServerErrorStatusMsg,
-			User:       nil,
+	go func() {
+		defer wg.Done()
+		rFollowCount, err := RelationClient.CountFollowList(ctx, &relation.CountFollowListRequest{
+			UserId: u.ID,
+		})
+		if err != nil {
+			logging.Logger.WithFields(logrus.Fields{
+				"err": err,
+			}).Errorf("get user follow count failed")
+			resp = &user.UserResponse{
+				StatusCode: biz.UnableToQueryFollowList,
+				StatusMsg:  &biz.InternalServerErrorStatusMsg,
+				User:       nil,
+			}
+			return
 		}
-		return
-	}
+		rUser.FollowCount = rFollowCount.Count
+	}()
+
+	go func() {
+		defer wg.Done()
+		rFollowerCount, err := RelationClient.CountFollowerList(ctx, &relation.CountFollowerListRequest{
+			UserId: req.UserId,
+		})
+		if err != nil {
+			logging.Logger.WithFields(logrus.Fields{
+				"err": err,
+			}).Errorf("get user follower count failed")
+			resp = &user.UserResponse{
+				StatusCode: biz.UnableToQueryFollowerList,
+				StatusMsg:  &biz.InternalServerErrorStatusMsg,
+				User:       nil,
+			}
+			return
+		}
+		rUser.FollowerCount = rFollowerCount.Count
+	}()
+
+	go func() {
+		defer wg.Done()
+		rIsFollow, err := RelationClient.IsFollow(ctx, &relation.IsFollowRequest{
+			ActorId: req.ActorId,
+			UserId:  req.UserId,
+		})
+		if err != nil {
+			logging.Logger.WithFields(logrus.Fields{
+				"err": err,
+			}).Errorf("get user is follow failed")
+			resp = &user.UserResponse{
+				StatusCode: biz.UnableToQueryIsFollow,
+				StatusMsg:  &biz.InternalServerErrorStatusMsg,
+				User:       nil,
+			}
+			return
+		}
+		rUser.IsFollow = rIsFollow.Result
+	}()
+
+	go func() {
+		defer wg.Done()
+		rTotalFavorited, err := FavoriteClient.CountUserTotalFavorited(ctx, &favorite.CountUserTotalFavoritedRequest{
+			ActorId: req.ActorId,
+			UserId:  req.UserId,
+		})
+		if err != nil {
+			logging.Logger.WithFields(logrus.Fields{
+				"err": err,
+			}).Errorf("get user total favorited failed")
+			resp = &user.UserResponse{
+				StatusCode: biz.UnableToQueryTotalFavorited,
+				StatusMsg:  &biz.InternalServerErrorStatusMsg,
+				User:       nil,
+			}
+			return
+		}
+		rUser.TotalFavorited = &rTotalFavorited.Count
+	}()
+
+	go func() {
+		defer wg.Done()
+		rWorkCount, err := PublishClient.CountVideo(ctx, &publish.CountVideoRequest{
+			UserId: req.UserId,
+		})
+		if err != nil {
+			logging.Logger.WithFields(logrus.Fields{
+				"err": err,
+			}).Errorf("get user work count failed")
+			resp = &user.UserResponse{
+				StatusCode: biz.UnableToQueryVideo,
+				StatusMsg:  &biz.InternalServerErrorStatusMsg,
+				User:       nil,
+			}
+			return
+		}
+		rUser.WorkCount = &rWorkCount.Count
+	}()
+
+	go func() {
+		defer wg.Done()
+		favoriteCount, err := FavoriteClient.CountUserFavorite(ctx, &favorite.CountUserFavoriteRequest{
+			UserId: req.UserId,
+		})
+		if err != nil {
+			logging.Logger.WithFields(logrus.Fields{
+				"err": err,
+			}).Errorf("get user favorite count failed")
+			resp = &user.UserResponse{
+				StatusCode: biz.UnableToQueryFavorite,
+				StatusMsg:  &biz.InternalServerErrorStatusMsg,
+				User:       nil,
+			}
+			return
+		}
+		rUser.FavoriteCount = &favoriteCount.Count
+	}()
+
+	wg.Wait()
 
 	resp = &user.UserResponse{
 		StatusCode: biz.OkStatusCode,
 		StatusMsg:  &biz.OkStatusMsg,
-		User: &user.User{
-			Id:              u.ID,
-			Name:            u.Username,
-			FollowCount:     followCount.Count,
-			FollowerCount:   followerCount.Count,
-			IsFollow:        isFollow.Result,
-			Avatar:          &avatar,
-			BackgroundImage: &backgroundImage,
-			Signature:       &signature,
-			TotalFavorited:  &totalFavorited.Count,
-			WorkCount:       &workCount.Count,
-			FavoriteCount:   &favoriteCount.Count,
-		},
+		User:       &rUser,
 	}
+
 	if u.IsUpdated() {
 		_, err = userInfo.WithContext(ctx).Where(userInfo.ID.Eq(u.ID)).Updates(u)
 		if err != nil {
