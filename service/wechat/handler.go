@@ -177,7 +177,7 @@ func (s *WechatServiceImpl) WechatChat(ctx context.Context, req *wechat.MessageC
 		}
 		if receiverID == 0 {
 			// ChatGPT logic
-			s.withChatGPT(respMsg, senderID)
+			s.receiveChatGPT(respMsg, senderID)
 		}
 		respMessageList = append(respMessageList, respMsg)
 	}
@@ -192,7 +192,7 @@ func (s *WechatServiceImpl) WechatChat(ctx context.Context, req *wechat.MessageC
 	return resp, nil
 }
 
-func (s *WechatServiceImpl) withChatGPT(respMsg *wechat.Message, senderID uint32) {
+func (s *WechatServiceImpl) receiveChatGPT(respMsg *wechat.Message, senderID uint32) {
 	respMsg.CreateTime = time.Now().UnixMilli() - 300
 	*respMsg.FromUserId = 0
 	*respMsg.ToUserId = senderID
