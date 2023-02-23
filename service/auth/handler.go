@@ -10,7 +10,6 @@ import (
 	"toktik/logging"
 	"toktik/repo"
 	commonModel "toktik/repo/model"
-	authModel "toktik/service/auth/model"
 	"toktik/service/web/mw"
 )
 
@@ -101,7 +100,7 @@ func (s *AuthServiceImpl) Register(ctx context.Context, req *auth.RegisterReques
 		return
 	}
 	token := ksuid.New().String()
-	err = userToken.WithContext(ctx).Save(&authModel.UserToken{
+	err = userToken.WithContext(ctx).Save(&commonModel.UserToken{
 		Token:    token,
 		Username: newUser.Username,
 		UserID:   newUser.ID,
@@ -161,7 +160,7 @@ func (s *AuthServiceImpl) Login(ctx context.Context, req *auth.LoginRequest) (re
 		return nil, err
 	}
 	token := ksuid.New().String()
-	err = userToken.WithContext(ctx).Save(&authModel.UserToken{
+	err = userToken.WithContext(ctx).Save(&commonModel.UserToken{
 		Token:    token,
 		Username: dbUser[0].Username,
 		UserID:   dbUser[0].ID,

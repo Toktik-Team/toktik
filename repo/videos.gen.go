@@ -180,7 +180,7 @@ type IVideoDo interface {
 	FilterWithNameAndRole(name string, role string) (result []model.Video, err error)
 }
 
-// SELECT * FROM @@table WHERE name = @name{{if role !=""}} AND role = @role{{end}}
+// FilterWithNameAndRole SELECT * FROM @@table WHERE name = @name{{if role !=""}} AND role = @role{{end}}
 func (v videoDo) FilterWithNameAndRole(name string, role string) (result []model.Video, err error) {
 	var params []interface{}
 

@@ -1,9 +1,5 @@
 package model
 
-import (
-	_ "toktik/repo/model"
-)
-
 // UserToken 用户令牌儿表 /*
 type UserToken struct {
 	Token    string `gorm:"not null;primaryKey"`
