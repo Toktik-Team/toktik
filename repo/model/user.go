@@ -156,3 +156,56 @@ func (u *User) GetUserAvatar() (url string) {
 
 	return unsplashURL
 }
+
+func (u *User) GetSignature() (signature string) {
+	if u.Signature != nil &&
+		*u.Signature != "" &&
+		*u.Signature != u.Username /* For compatibility */ {
+		return *u.Signature
+	}
+
+	defer func() {
+		u.Signature = &signature
+		u.updated = true
+	}()
+
+	client := &http.Client{}
+	req, err := http.NewRequest("GET", "https://v1.hitokoto.cn/?encode=text", nil)
+	if err != nil {
+		logging.Logger.Errorf("GetSignature: %v", err)
+		signature = u.Username
+		return
+	}
+	resp, err := client.Do(req)
+	if err != nil {
+		logging.Logger.Errorf("GetSignature: %v", err)
+		signature = u.Username
+		return
+	}
+
+	if resp.StatusCode != http.StatusOK {
+		logging.Logger.Errorf("GetSignature: %v", err)
+		signature = u.Username
+		return
+	}
+
+	if resp.Body != nil {
+		defer func(Body io.ReadCloser) {
+			err := Body.Close()
+			if err != nil {
+				logging.Logger.Errorf("GetSignature: %v", err)
+			}
+		}(resp.Body)
+	}
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		logging.Logger.Errorf("GetSignature: %v", err)
+		signature = u.Username
+		return
+	}
+
+	signature = string(body)
+
+	return
+}
