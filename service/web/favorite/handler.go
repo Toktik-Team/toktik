@@ -136,10 +136,10 @@ func List(ctx context.Context, c *app.RequestContext) {
 	}
 	logger.WithFields(field).Info("Process start")
 
-	var _ uint32
+	var actorId uint32
 	switch c.GetString(mw.AuthResultKey) {
 	case mw.AUTH_RESULT_SUCCESS, mw.AUTH_RESULT_NO_TOKEN:
-		_ = c.GetUint32(mw.UserIdKey)
+		actorId = c.GetUint32(mw.UserIdKey)
 	default:
 		biz.UnAuthorized.WithFields(&field).LaunchError(c)
 		return
@@ -158,7 +158,8 @@ func List(ctx context.Context, c *app.RequestContext) {
 	}
 
 	response, err := Client.FavoriteList(ctx, &favorite.FavoriteListRequest{
-		UserId: uint32(userId),
+		ActorId: actorId,
+		UserId:  uint32(userId),
 	})
 
 	if err != nil {

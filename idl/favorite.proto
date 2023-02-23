@@ -16,7 +16,8 @@ message FavoriteResponse {
 }
 
 message FavoriteListRequest {
-  uint32 user_id = 1; // 用户id
+  uint32 actor_id = 1; // 发出请求的用户的id
+  uint32 user_id = 2; // 用户id
 }
 
 message FavoriteListResponse {

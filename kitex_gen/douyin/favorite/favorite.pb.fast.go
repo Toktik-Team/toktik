@@ -101,6 +101,11 @@ func (x *FavoriteListRequest) FastRead(buf []byte, _type int8, number int32) (of
 		if err != nil {
 			goto ReadFieldError
 		}
+	case 2:
+		offset, err = x.fastReadField2(buf, _type)
+		if err != nil {
+			goto ReadFieldError
+		}
 	default:
 		offset, err = fastpb.Skip(buf, _type, number)
 		if err != nil {
@@ -115,6 +120,11 @@ ReadFieldError:
 }
 
 func (x *FavoriteListRequest) fastReadField1(buf []byte, _type int8) (offset int, err error) {
+	x.ActorId, offset, err = fastpb.ReadUint32(buf, _type)
+	return offset, err
+}
+
+func (x *FavoriteListRequest) fastReadField2(buf []byte, _type int8) (offset int, err error) {
 	x.UserId, offset, err = fastpb.ReadUint32(buf, _type)
 	return offset, err
 }
@@ -467,7 +477,7 @@ func (x *FavoriteRequest) fastWriteField1(buf []byte) (offset int) {
 	if x.ActorId == 0 {
 		return offset
 	}
-	offset += fastpb.WriteUint32(buf[offset:], 1, x.ActorId)
+	offset += fastpb.WriteUint32(buf[offset:], 1, x.GetActorId())
 	return offset
 }
 
@@ -475,7 +485,7 @@ func (x *FavoriteRequest) fastWriteField2(buf []byte) (offset int) {
 	if x.VideoId == 0 {
 		return offset
 	}
-	offset += fastpb.WriteUint32(buf[offset:], 2, x.VideoId)
+	offset += fastpb.WriteUint32(buf[offset:], 2, x.GetVideoId())
 	return offset
 }
 
@@ -483,7 +493,7 @@ func (x *FavoriteRequest) fastWriteField3(buf []byte) (offset int) {
 	if x.ActionType == 0 {
 		return offset
 	}
-	offset += fastpb.WriteUint32(buf[offset:], 3, x.ActionType)
+	offset += fastpb.WriteUint32(buf[offset:], 3, x.GetActionType())
 	return offset
 }
 
@@ -500,7 +510,7 @@ func (x *FavoriteResponse) fastWriteField1(buf []byte) (offset int) {
 	if x.StatusCode == 0 {
 		return offset
 	}
-	offset += fastpb.WriteUint32(buf[offset:], 1, x.StatusCode)
+	offset += fastpb.WriteUint32(buf[offset:], 1, x.GetStatusCode())
 	return offset
 }
 
@@ -508,7 +518,7 @@ func (x *FavoriteResponse) fastWriteField2(buf []byte) (offset int) {
 	if x.StatusMsg == nil {
 		return offset
 	}
-	offset += fastpb.WriteString(buf[offset:], 2, *x.StatusMsg)
+	offset += fastpb.WriteString(buf[offset:], 2, x.GetStatusMsg())
 	return offset
 }
 
@@ -517,14 +527,23 @@ func (x *FavoriteListRequest) FastWrite(buf []byte) (offset int) {
 		return offset
 	}
 	offset += x.fastWriteField1(buf[offset:])
+	offset += x.fastWriteField2(buf[offset:])
 	return offset
 }
 
 func (x *FavoriteListRequest) fastWriteField1(buf []byte) (offset int) {
+	if x.ActorId == 0 {
+		return offset
+	}
+	offset += fastpb.WriteUint32(buf[offset:], 1, x.GetActorId())
+	return offset
+}
+
+func (x *FavoriteListRequest) fastWriteField2(buf []byte) (offset int) {
 	if x.UserId == 0 {
 		return offset
 	}
-	offset += fastpb.WriteUint32(buf[offset:], 1, x.UserId)
+	offset += fastpb.WriteUint32(buf[offset:], 2, x.GetUserId())
 	return offset
 }
 
@@ -542,7 +561,7 @@ func (x *FavoriteListResponse) fastWriteField1(buf []byte) (offset int) {
 	if x.StatusCode == 0 {
 		return offset
 	}
-	offset += fastpb.WriteUint32(buf[offset:], 1, x.StatusCode)
+	offset += fastpb.WriteUint32(buf[offset:], 1, x.GetStatusCode())
 	return offset
 }
 
@@ -550,7 +569,7 @@ func (x *FavoriteListResponse) fastWriteField2(buf []byte) (offset int) {
 	if x.StatusMsg == nil {
 		return offset
 	}
-	offset += fastpb.WriteString(buf[offset:], 2, *x.StatusMsg)
+	offset += fastpb.WriteString(buf[offset:], 2, x.GetStatusMsg())
 	return offset
 }
 
@@ -558,8 +577,8 @@ func (x *FavoriteListResponse) fastWriteField3(buf []byte) (offset int) {
 	if x.VideoList == nil {
 		return offset
 	}
-	for i := range x.VideoList {
-		offset += fastpb.WriteMessage(buf[offset:], 3, x.VideoList[i])
+	for i := range x.GetVideoList() {
+		offset += fastpb.WriteMessage(buf[offset:], 3, x.GetVideoList()[i])
 	}
 	return offset
 }
@@ -577,7 +596,7 @@ func (x *IsFavoriteRequest) fastWriteField1(buf []byte) (offset int) {
 	if x.UserId == 0 {
 		return offset
 	}
-	offset += fastpb.WriteUint32(buf[offset:], 1, x.UserId)
+	offset += fastpb.WriteUint32(buf[offset:], 1, x.GetUserId())
 	return offset
 }
 
@@ -585,7 +604,7 @@ func (x *IsFavoriteRequest) fastWriteField2(buf []byte) (offset int) {
 	if x.VideoId == 0 {
 		return offset
 	}
-	offset += fastpb.WriteUint32(buf[offset:], 2, x.VideoId)
+	offset += fastpb.WriteUint32(buf[offset:], 2, x.GetVideoId())
 	return offset
 }
 
@@ -601,7 +620,7 @@ func (x *IsFavoriteResponse) fastWriteField1(buf []byte) (offset int) {
 	if !x.Result {
 		return offset
 	}
-	offset += fastpb.WriteBool(buf[offset:], 1, x.Result)
+	offset += fastpb.WriteBool(buf[offset:], 1, x.GetResult())
 	return offset
 }
 
@@ -617,7 +636,7 @@ func (x *CountFavoriteRequest) fastWriteField1(buf []byte) (offset int) {
 	if x.VideoId == 0 {
 		return offset
 	}
-	offset += fastpb.WriteUint32(buf[offset:], 1, x.VideoId)
+	offset += fastpb.WriteUint32(buf[offset:], 1, x.GetVideoId())
 	return offset
 }
 
@@ -635,7 +654,7 @@ func (x *CountFavoriteResponse) fastWriteField1(buf []byte) (offset int) {
 	if x.StatusCode == 0 {
 		return offset
 	}
-	offset += fastpb.WriteUint32(buf[offset:], 1, x.StatusCode)
+	offset += fastpb.WriteUint32(buf[offset:], 1, x.GetStatusCode())
 	return offset
 }
 
@@ -643,7 +662,7 @@ func (x *CountFavoriteResponse) fastWriteField2(buf []byte) (offset int) {
 	if x.StatusMsg == nil {
 		return offset
 	}
-	offset += fastpb.WriteString(buf[offset:], 2, *x.StatusMsg)
+	offset += fastpb.WriteString(buf[offset:], 2, x.GetStatusMsg())
 	return offset
 }
 
@@ -651,7 +670,7 @@ func (x *CountFavoriteResponse) fastWriteField3(buf []byte) (offset int) {
 	if x.Count == 0 {
 		return offset
 	}
-	offset += fastpb.WriteUint32(buf[offset:], 3, x.Count)
+	offset += fastpb.WriteUint32(buf[offset:], 3, x.GetCount())
 	return offset
 }
 
@@ -667,7 +686,7 @@ func (x *CountUserFavoriteRequest) fastWriteField1(buf []byte) (offset int) {
 	if x.UserId == 0 {
 		return offset
 	}
-	offset += fastpb.WriteUint32(buf[offset:], 1, x.UserId)
+	offset += fastpb.WriteUint32(buf[offset:], 1, x.GetUserId())
 	return offset
 }
 
@@ -685,7 +704,7 @@ func (x *CountUserFavoriteResponse) fastWriteField1(buf []byte) (offset int) {
 	if x.StatusCode == 0 {
 		return offset
 	}
-	offset += fastpb.WriteUint32(buf[offset:], 1, x.StatusCode)
+	offset += fastpb.WriteUint32(buf[offset:], 1, x.GetStatusCode())
 	return offset
 }
 
@@ -693,7 +712,7 @@ func (x *CountUserFavoriteResponse) fastWriteField2(buf []byte) (offset int) {
 	if x.StatusMsg == nil {
 		return offset
 	}
-	offset += fastpb.WriteString(buf[offset:], 2, *x.StatusMsg)
+	offset += fastpb.WriteString(buf[offset:], 2, x.GetStatusMsg())
 	return offset
 }
 
@@ -701,7 +720,7 @@ func (x *CountUserFavoriteResponse) fastWriteField3(buf []byte) (offset int) {
 	if x.Count == 0 {
 		return offset
 	}
-	offset += fastpb.WriteUint32(buf[offset:], 3, x.Count)
+	offset += fastpb.WriteUint32(buf[offset:], 3, x.GetCount())
 	return offset
 }
 
@@ -718,7 +737,7 @@ func (x *CountUserTotalFavoritedRequest) fastWriteField1(buf []byte) (offset int
 	if x.ActorId == 0 {
 		return offset
 	}
-	offset += fastpb.WriteUint32(buf[offset:], 1, x.ActorId)
+	offset += fastpb.WriteUint32(buf[offset:], 1, x.GetActorId())
 	return offset
 }
 
@@ -726,7 +745,7 @@ func (x *CountUserTotalFavoritedRequest) fastWriteField2(buf []byte) (offset int
 	if x.UserId == 0 {
 		return offset
 	}
-	offset += fastpb.WriteUint32(buf[offset:], 2, x.UserId)
+	offset += fastpb.WriteUint32(buf[offset:], 2, x.GetUserId())
 	return offset
 }
 
@@ -744,7 +763,7 @@ func (x *CountUserTotalFavoritedResponse) fastWriteField1(buf []byte) (offset in
 	if x.StatusCode == 0 {
 		return offset
 	}
-	offset += fastpb.WriteUint32(buf[offset:], 1, x.StatusCode)
+	offset += fastpb.WriteUint32(buf[offset:], 1, x.GetStatusCode())
 	return offset
 }
 
@@ -752,7 +771,7 @@ func (x *CountUserTotalFavoritedResponse) fastWriteField2(buf []byte) (offset in
 	if x.StatusMsg == nil {
 		return offset
 	}
-	offset += fastpb.WriteString(buf[offset:], 2, *x.StatusMsg)
+	offset += fastpb.WriteString(buf[offset:], 2, x.GetStatusMsg())
 	return offset
 }
 
@@ -760,7 +779,7 @@ func (x *CountUserTotalFavoritedResponse) fastWriteField3(buf []byte) (offset in
 	if x.Count == 0 {
 		return offset
 	}
-	offset += fastpb.WriteUint32(buf[offset:], 3, x.Count)
+	offset += fastpb.WriteUint32(buf[offset:], 3, x.GetCount())
 	return offset
 }
 
@@ -778,7 +797,7 @@ func (x *FavoriteRequest) sizeField1() (n int) {
 	if x.ActorId == 0 {
 		return n
 	}
-	n += fastpb.SizeUint32(1, x.ActorId)
+	n += fastpb.SizeUint32(1, x.GetActorId())
 	return n
 }
 
@@ -786,7 +805,7 @@ func (x *FavoriteRequest) sizeField2() (n int) {
 	if x.VideoId == 0 {
 		return n
 	}
-	n += fastpb.SizeUint32(2, x.VideoId)
+	n += fastpb.SizeUint32(2, x.GetVideoId())
 	return n
 }
 
@@ -794,7 +813,7 @@ func (x *FavoriteRequest) sizeField3() (n int) {
 	if x.ActionType == 0 {
 		return n
 	}
-	n += fastpb.SizeUint32(3, x.ActionType)
+	n += fastpb.SizeUint32(3, x.GetActionType())
 	return n
 }
 
@@ -811,7 +830,7 @@ func (x *FavoriteResponse) sizeField1() (n int) {
 	if x.StatusCode == 0 {
 		return n
 	}
-	n += fastpb.SizeUint32(1, x.StatusCode)
+	n += fastpb.SizeUint32(1, x.GetStatusCode())
 	return n
 }
 
@@ -819,7 +838,7 @@ func (x *FavoriteResponse) sizeField2() (n int) {
 	if x.StatusMsg == nil {
 		return n
 	}
-	n += fastpb.SizeString(2, *x.StatusMsg)
+	n += fastpb.SizeString(2, x.GetStatusMsg())
 	return n
 }
 
@@ -828,14 +847,23 @@ func (x *FavoriteListRequest) Size() (n int) {
 		return n
 	}
 	n += x.sizeField1()
+	n += x.sizeField2()
 	return n
 }
 
 func (x *FavoriteListRequest) sizeField1() (n int) {
+	if x.ActorId == 0 {
+		return n
+	}
+	n += fastpb.SizeUint32(1, x.GetActorId())
+	return n
+}
+
+func (x *FavoriteListRequest) sizeField2() (n int) {
 	if x.UserId == 0 {
 		return n
 	}
-	n += fastpb.SizeUint32(1, x.UserId)
+	n += fastpb.SizeUint32(2, x.GetUserId())
 	return n
 }
 
@@ -853,7 +881,7 @@ func (x *FavoriteListResponse) sizeField1() (n int) {
 	if x.StatusCode == 0 {
 		return n
 	}
-	n += fastpb.SizeUint32(1, x.StatusCode)
+	n += fastpb.SizeUint32(1, x.GetStatusCode())
 	return n
 }
 
@@ -861,7 +889,7 @@ func (x *FavoriteListResponse) sizeField2() (n int) {
 	if x.StatusMsg == nil {
 		return n
 	}
-	n += fastpb.SizeString(2, *x.StatusMsg)
+	n += fastpb.SizeString(2, x.GetStatusMsg())
 	return n
 }
 
@@ -869,8 +897,8 @@ func (x *FavoriteListResponse) sizeField3() (n int) {
 	if x.VideoList == nil {
 		return n
 	}
-	for i := range x.VideoList {
-		n += fastpb.SizeMessage(3, x.VideoList[i])
+	for i := range x.GetVideoList() {
+		n += fastpb.SizeMessage(3, x.GetVideoList()[i])
 	}
 	return n
 }
@@ -888,7 +916,7 @@ func (x *IsFavoriteRequest) sizeField1() (n int) {
 	if x.UserId == 0 {
 		return n
 	}
-	n += fastpb.SizeUint32(1, x.UserId)
+	n += fastpb.SizeUint32(1, x.GetUserId())
 	return n
 }
 
@@ -896,7 +924,7 @@ func (x *IsFavoriteRequest) sizeField2() (n int) {
 	if x.VideoId == 0 {
 		return n
 	}
-	n += fastpb.SizeUint32(2, x.VideoId)
+	n += fastpb.SizeUint32(2, x.GetVideoId())
 	return n
 }
 
@@ -912,7 +940,7 @@ func (x *IsFavoriteResponse) sizeField1() (n int) {
 	if !x.Result {
 		return n
 	}
-	n += fastpb.SizeBool(1, x.Result)
+	n += fastpb.SizeBool(1, x.GetResult())
 	return n
 }
 
@@ -928,7 +956,7 @@ func (x *CountFavoriteRequest) sizeField1() (n int) {
 	if x.VideoId == 0 {
 		return n
 	}
-	n += fastpb.SizeUint32(1, x.VideoId)
+	n += fastpb.SizeUint32(1, x.GetVideoId())
 	return n
 }
 
@@ -946,7 +974,7 @@ func (x *CountFavoriteResponse) sizeField1() (n int) {
 	if x.StatusCode == 0 {
 		return n
 	}
-	n += fastpb.SizeUint32(1, x.StatusCode)
+	n += fastpb.SizeUint32(1, x.GetStatusCode())
 	return n
 }
 
@@ -954,7 +982,7 @@ func (x *CountFavoriteResponse) sizeField2() (n int) {
 	if x.StatusMsg == nil {
 		return n
 	}
-	n += fastpb.SizeString(2, *x.StatusMsg)
+	n += fastpb.SizeString(2, x.GetStatusMsg())
 	return n
 }
 
@@ -962,7 +990,7 @@ func (x *CountFavoriteResponse) sizeField3() (n int) {
 	if x.Count == 0 {
 		return n
 	}
-	n += fastpb.SizeUint32(3, x.Count)
+	n += fastpb.SizeUint32(3, x.GetCount())
 	return n
 }
 
@@ -978,7 +1006,7 @@ func (x *CountUserFavoriteRequest) sizeField1() (n int) {
 	if x.UserId == 0 {
 		return n
 	}
-	n += fastpb.SizeUint32(1, x.UserId)
+	n += fastpb.SizeUint32(1, x.GetUserId())
 	return n
 }
 
@@ -996,7 +1024,7 @@ func (x *CountUserFavoriteResponse) sizeField1() (n int) {
 	if x.StatusCode == 0 {
 		return n
 	}
-	n += fastpb.SizeUint32(1, x.StatusCode)
+	n += fastpb.SizeUint32(1, x.GetStatusCode())
 	return n
 }
 
@@ -1004,7 +1032,7 @@ func (x *CountUserFavoriteResponse) sizeField2() (n int) {
 	if x.StatusMsg == nil {
 		return n
 	}
-	n += fastpb.SizeString(2, *x.StatusMsg)
+	n += fastpb.SizeString(2, x.GetStatusMsg())
 	return n
 }
 
@@ -1012,7 +1040,7 @@ func (x *CountUserFavoriteResponse) sizeField3() (n int) {
 	if x.Count == 0 {
 		return n
 	}
-	n += fastpb.SizeUint32(3, x.Count)
+	n += fastpb.SizeUint32(3, x.GetCount())
 	return n
 }
 
@@ -1029,7 +1057,7 @@ func (x *CountUserTotalFavoritedRequest) sizeField1() (n int) {
 	if x.ActorId == 0 {
 		return n
 	}
-	n += fastpb.SizeUint32(1, x.ActorId)
+	n += fastpb.SizeUint32(1, x.GetActorId())
 	return n
 }
 
@@ -1037,7 +1065,7 @@ func (x *CountUserTotalFavoritedRequest) sizeField2() (n int) {
 	if x.UserId == 0 {
 		return n
 	}
-	n += fastpb.SizeUint32(2, x.UserId)
+	n += fastpb.SizeUint32(2, x.GetUserId())
 	return n
 }
 
@@ -1055,7 +1083,7 @@ func (x *CountUserTotalFavoritedResponse) sizeField1() (n int) {
 	if x.StatusCode == 0 {
 		return n
 	}
-	n += fastpb.SizeUint32(1, x.StatusCode)
+	n += fastpb.SizeUint32(1, x.GetStatusCode())
 	return n
 }
 
@@ -1063,7 +1091,7 @@ func (x *CountUserTotalFavoritedResponse) sizeField2() (n int) {
 	if x.StatusMsg == nil {
 		return n
 	}
-	n += fastpb.SizeString(2, *x.StatusMsg)
+	n += fastpb.SizeString(2, x.GetStatusMsg())
 	return n
 }
 
@@ -1071,7 +1099,7 @@ func (x *CountUserTotalFavoritedResponse) sizeField3() (n int) {
 	if x.Count == 0 {
 		return n
 	}
-	n += fastpb.SizeUint32(3, x.Count)
+	n += fastpb.SizeUint32(3, x.GetCount())
 	return n
 }
 
@@ -1087,7 +1115,8 @@ var fieldIDToName_FavoriteResponse = map[int32]string{
 }
 
 var fieldIDToName_FavoriteListRequest = map[int32]string{
-	1: "UserId",
+	1: "ActorId",
+	2: "UserId",
 }
 
 var fieldIDToName_FavoriteListResponse = map[int32]string{

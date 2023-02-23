@@ -156,7 +156,7 @@ func (s *FavoriteServiceImpl) FavoriteList(ctx context.Context, req *favorite.Fa
 	}
 
 	queryVideoResp, err := FeedClient.QueryVideos(ctx, &feed.QueryVideosRequest{
-		ActorId:  req.UserId,
+		ActorId:  req.ActorId,
 		VideoIds: videoIds,
 	})
 	if err != nil {
