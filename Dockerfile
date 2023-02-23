@@ -25,7 +25,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 # FFmpeg 及依赖
 RUN apt-get update && \
-    apt-get install -yq ffmpeg && \
+    apt-get install -yq ffmpeg ca-certificates && \
     apt-get clean && \
     apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false && \
     rm -rf /var/lib/apt/lists/*
