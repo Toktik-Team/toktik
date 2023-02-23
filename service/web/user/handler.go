@@ -5,7 +5,7 @@ import (
 	"github.com/kitex-contrib/obs-opentelemetry/provider"
 	"github.com/kitex-contrib/obs-opentelemetry/tracing"
 	"strconv"
-	bizConstant "toktik/constant/biz"
+	"toktik/constant/biz"
 	"toktik/constant/config"
 	"toktik/kitex_gen/douyin/user"
 	userService "toktik/kitex_gen/douyin/user/userservice"
@@ -45,15 +45,23 @@ func GetUserInfo(ctx context.Context, c *app.RequestContext) {
 	methodFields := logrus.Fields{
 		"method": "GetUserInfo",
 	}
-	logger := logging.Logger.WithFields(methodFields)
-	logger.Debugf("Process start")
+	logger := logging.Logger
+	logger.WithFields(methodFields).Info("Process start")
+
+	var actorId uint32
+	switch c.GetString(mw.AuthResultKey) {
+	case mw.AUTH_RESULT_SUCCESS, mw.AUTH_RESULT_NO_TOKEN:
+		actorId = c.GetUint32(mw.UserIdKey)
+	default:
+		biz.UnAuthorized.WithFields(&methodFields).LaunchError(c)
+		return
+	}
 
 	userId, idExist := c.GetQuery("user_id")
-	actorId := mw.GetAuthActorId(c)
 	id, err := strconv.Atoi(userId)
 
 	if !idExist || err != nil {
-		bizConstant.InvalidUserID.WithCause(err).WithFields(&methodFields).LaunchError(c)
+		biz.InvalidUserID.WithCause(err).WithFields(&methodFields).LaunchError(c)
 		return
 	}
 
@@ -64,7 +72,7 @@ func GetUserInfo(ctx context.Context, c *app.RequestContext) {
 	})
 
 	if err != nil {
-		bizConstant.RPCCallError.WithCause(err).WithFields(&methodFields).LaunchError(c)
+		biz.RPCCallError.WithCause(err).WithFields(&methodFields).LaunchError(c)
 		return
 	}
 

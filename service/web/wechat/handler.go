@@ -45,11 +45,14 @@ func MessageAction(ctx context.Context, c *app.RequestContext) {
 	methodFields := logrus.Fields{
 		"method": "MessageAction",
 	}
-	logger := logging.Logger.WithFields(methodFields)
-	logger.Debugf("Process start")
+	logger := logging.Logger
+	logger.WithFields(methodFields).Debugf("Process start")
 
-	userId := mw.GetAuthActorId(c)
-	if userId == 0 {
+	var userId uint32
+	switch c.GetString(mw.AuthResultKey) {
+	case mw.AUTH_RESULT_SUCCESS:
+		userId = c.GetUint32(mw.UserIdKey)
+	default:
 		bizConstant.UnAuthorized.WithFields(&methodFields).LaunchError(c)
 		return
 	}
@@ -112,11 +115,14 @@ func MessageChat(ctx context.Context, c *app.RequestContext) {
 	methodFields := logrus.Fields{
 		"method": "MessageChat",
 	}
-	logger := logging.Logger.WithFields(methodFields)
-	logger.Debugf("Process start")
+	logger := logging.Logger
+	logger.WithFields(methodFields).Debugf("Process start")
 
-	userId := mw.GetAuthActorId(c)
-	if userId == 0 {
+	var userId uint32
+	switch c.GetString(mw.AuthResultKey) {
+	case mw.AUTH_RESULT_SUCCESS:
+		userId = c.GetUint32(mw.UserIdKey)
+	default:
 		bizConstant.UnAuthorized.WithFields(&methodFields).LaunchError(c)
 		return
 	}

@@ -49,9 +49,17 @@ func RelationAction(ctx context.Context, c *app.RequestContext) {
 	methodFields := logrus.Fields{
 		"method": "RelationAction",
 	}
-	logger := logging.Logger.WithFields(methodFields)
-	logger.Debugf("Process start")
-	actorId := mw.GetAuthActorId(c)
+	logger := logging.Logger
+	logger.WithFields(methodFields).Debugf("Process start")
+
+	var actorId uint32
+	switch c.GetString(mw.AuthResultKey) {
+	case mw.AUTH_RESULT_SUCCESS:
+		actorId = c.GetUint32(mw.UserIdKey)
+	default:
+		bizConstant.UnAuthorized.WithFields(&methodFields).LaunchError(c)
+		return
+	}
 
 	actionType, exist := c.GetQuery("action_type")
 	if !exist {
@@ -117,12 +125,20 @@ func RelationAction(ctx context.Context, c *app.RequestContext) {
 
 // GetFollowList FollowList [POST] /relation/follow/list/
 func GetFollowList(ctx context.Context, c *app.RequestContext) {
-
 	methodFields := logrus.Fields{
 		"method": "GetFollowList",
 	}
-	logger := logging.Logger.WithFields(methodFields)
-	logger.Debugf("Process start")
+	logger := logging.Logger
+	logger.WithFields(methodFields).Info("Process start")
+
+	var actorId uint32
+	switch c.GetString(mw.AuthResultKey) {
+	case mw.AUTH_RESULT_SUCCESS, mw.AUTH_RESULT_NO_TOKEN:
+		actorId = c.GetUint32(mw.UserIdKey)
+	default:
+		bizConstant.UnAuthorized.WithFields(&methodFields).LaunchError(c)
+		return
+	}
 
 	userId, idExist := c.GetQuery("user_id")
 	id, err := strconv.Atoi(userId)
@@ -131,7 +147,6 @@ func GetFollowList(ctx context.Context, c *app.RequestContext) {
 		bizConstant.InvalidUserID.WithCause(err).WithFields(&methodFields).LaunchError(c)
 		return
 	}
-	actorId := mw.GetAuthActorId(c)
 
 	logger.WithFields(logrus.Fields{
 		"actorId": actorId,
@@ -157,12 +172,21 @@ func GetFollowList(ctx context.Context, c *app.RequestContext) {
 
 // GetFollowerList FollowList [POST] /relation/follower/list/
 func GetFollowerList(ctx context.Context, c *app.RequestContext) {
-
 	methodFields := logrus.Fields{
 		"method": "GetFollowerList",
 	}
-	logger := logging.Logger.WithFields(methodFields)
-	logger.Debugf("Process start")
+	logger := logging.Logger
+	logger.WithFields(methodFields).Info("Process start")
+
+	var actorId uint32
+	switch c.GetString(mw.AuthResultKey) {
+	case mw.AUTH_RESULT_SUCCESS, mw.AUTH_RESULT_NO_TOKEN:
+		actorId = c.GetUint32(mw.UserIdKey)
+	default:
+		bizConstant.UnAuthorized.WithFields(&methodFields).LaunchError(c)
+		return
+	}
+
 	userId, idExist := c.GetQuery("user_id")
 	id, err := strconv.Atoi(userId)
 
@@ -170,7 +194,6 @@ func GetFollowerList(ctx context.Context, c *app.RequestContext) {
 		bizConstant.InvalidUserID.WithCause(err).WithFields(&methodFields).LaunchError(c)
 		return
 	}
-	actorId := mw.GetAuthActorId(c)
 
 	logger.WithFields(logrus.Fields{
 		"actorId": actorId,
@@ -202,6 +225,16 @@ func GetFriendList(ctx context.Context, c *app.RequestContext) {
 	}
 	logger := logging.Logger.WithFields(methodFields)
 	logger.Debugf("Process start")
+
+	var actorId uint32
+	switch c.GetString(mw.AuthResultKey) {
+	case mw.AUTH_RESULT_SUCCESS, mw.AUTH_RESULT_NO_TOKEN:
+		actorId = c.GetUint32(mw.UserIdKey)
+	default:
+		bizConstant.UnAuthorized.WithFields(&methodFields).LaunchError(c)
+		return
+	}
+
 	userId, idExist := c.GetQuery("user_id")
 	id, err := strconv.Atoi(userId)
 
@@ -209,7 +242,6 @@ func GetFriendList(ctx context.Context, c *app.RequestContext) {
 		bizConstant.InvalidUserID.WithCause(err).WithFields(&methodFields).LaunchError(c)
 		return
 	}
-	actorId := mw.GetAuthActorId(c)
 
 	logger.WithFields(logrus.Fields{
 		"userId":  userId,

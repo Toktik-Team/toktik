@@ -20,7 +20,7 @@ const (
 )
 
 const (
-	authResultKey = "authentication_result"
+	AuthResultKey = "authentication_result"
 	UserIdKey     = "user_id"
 )
 
@@ -38,7 +38,7 @@ func AuthMiddleware() app.HandlerFunc {
 		}
 
 		if token == "" {
-			rc.Set(authResultKey, AUTH_RESULT_NO_TOKEN)
+			rc.Set(AuthResultKey, AUTH_RESULT_NO_TOKEN)
 			rc.Set(UserIdKey, 0)
 			rc.Next(ctx)
 			return
@@ -46,16 +46,16 @@ func AuthMiddleware() app.HandlerFunc {
 
 		authResp, err := authHandler.Client.Authenticate(ctx, &auth.AuthenticateRequest{Token: token})
 		if err != nil {
-			rc.Set(authResultKey, AUTH_RESULT_UNKNOWN)
+			rc.Set(AuthResultKey, AUTH_RESULT_UNKNOWN)
 			rc.Set(UserIdKey, 0)
 			rc.Next(ctx)
 			return
 		}
 		if authResp.StatusCode == 0 && authResp.StatusMsg == AUTH_RESULT_SUCCESS {
-			rc.Set(authResultKey, AUTH_RESULT_SUCCESS)
+			rc.Set(AuthResultKey, AUTH_RESULT_SUCCESS)
 			rc.Set(UserIdKey, authResp.UserId)
 		} else {
-			rc.Set(authResultKey, AUTH_RESULT_UNKNOWN)
+			rc.Set(AuthResultKey, AUTH_RESULT_UNKNOWN)
 			rc.Set(UserIdKey, 0)
 		}
 		rc.Next(ctx)
@@ -63,7 +63,7 @@ func AuthMiddleware() app.HandlerFunc {
 }
 
 func GetAuthResult(c *app.RequestContext) string {
-	authResult := c.GetString(authResultKey)
+	authResult := c.GetString(AuthResultKey)
 	if authResult == "" {
 		return AUTH_RESULT_UNKNOWN
 	}

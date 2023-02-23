@@ -43,23 +43,6 @@ func init() {
 
 var logger = logging.Logger
 
-// 获取 actorId
-func getActorId(c *app.RequestContext, actorId *uint32) bool {
-	authResult := mw.GetAuthResult(c)
-	switch authResult {
-	case mw.AUTH_RESULT_SUCCESS:
-		*actorId = mw.GetAuthActorId(c)
-		return false
-	default:
-		biz.AuthFailed.
-			WithFields(&logrus.Fields{
-				"method": "GetActorId",
-			}).
-			LaunchError(c)
-		return true
-	}
-}
-
 // 用于解析 Action 函数所需参数
 func parseParameters(c *app.RequestContext) (videoId uint32, actionType uint32, isEnd bool) {
 	field := logrus.Fields{
@@ -115,7 +98,11 @@ func Action(ctx context.Context, c *app.RequestContext) {
 	logger.WithFields(field).Debugf("Process start")
 
 	var actorId uint32
-	if getActorId(c, &actorId) {
+	switch c.GetString(mw.AuthResultKey) {
+	case mw.AUTH_RESULT_SUCCESS:
+		actorId = c.GetUint32(mw.UserIdKey)
+	default:
+		biz.UnAuthorized.WithFields(&field).LaunchError(c)
 		return
 	}
 
@@ -149,8 +136,12 @@ func List(ctx context.Context, c *app.RequestContext) {
 	}
 	logger.WithFields(field).Info("Process start")
 
-	if mw.GetAuthResult(c) != mw.AUTH_RESULT_SUCCESS {
-		biz.AuthFailed.WithFields(&field).LaunchError(c)
+	var _ uint32
+	switch c.GetString(mw.AuthResultKey) {
+	case mw.AUTH_RESULT_SUCCESS, mw.AUTH_RESULT_NO_TOKEN:
+		_ = c.GetUint32(mw.UserIdKey)
+	default:
+		biz.UnAuthorized.WithFields(&field).LaunchError(c)
 		return
 	}
 
