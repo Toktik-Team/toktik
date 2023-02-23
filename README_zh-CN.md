@@ -1,7 +1,7 @@
 # Toktik
 
-| ![logo](https://avatars.githubusercontent.com/u/124244470?s=200&v=4) | 一个简单的短视频软件微服务后端，具有基本的媒体流功能和社交功能支持，由 [Toktik-Team](https://github.com/Toktik-Team) 在*第五届字节跳动青少年训练营*中开发。 |
-|----------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------|
+| ![logo](https://avatars.githubusercontent.com/u/124244470?s=200&v=4) | 使用 Kitex 和 Hertz 构建的短视频微服务应用，由 [Toktik-Team](https://github.com/Toktik-Team) 开发，作为*第五届字节跳动青训营*大作业。 |
+| -------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
 
 [English](README.md) | **简体中文**
 
@@ -14,10 +14,10 @@ https://toktik.xctra.cn/
 - [constant](constant)
   - [biz](constant/biz) - 业务逻辑相关常量
   - [config](constant/config)
-    - [env.go](constant/config/env.go) - 环境变量
+    - [env.go](constant/config/env.go) - 环境变量配置
     - [service.go](constant/config/service.go) - 服务名称和端口
 - [idl](idl)
-  - [auth.proto](idl/auth.proto) - 鉴权服务 RPC 定义
+  - [auth.proto](idl/auth.proto) - 认证服务 RPC 定义
   - [comment.proto](idl/comment.proto) - 评论服务 RPC 定义
   - [favorite.proto](idl/favorite.proto) - 点赞服务 RPC 定义
   - [feed.proto](idl/feed.proto) - 视频流服务 RPC 定义
@@ -25,10 +25,10 @@ https://toktik.xctra.cn/
   - [relation.proto](idl/relation.proto) - 关注服务 RPC 定义
   - [user.proto](idl/user.proto) - 用户服务 RPC 定义
   - [wechat.proto](idl/wechat.proto) - 聊天服务 RPC 定义
-- [kitex_gen](kitex_gen) - 由 kitex 自动生成的代码
+- [kitex_gen](kitex_gen) - 由 Kitex 自动生成的代码
 - [logging](logging) - 日志中间件配置
 - [manifests-dev](manifests-dev) - Kubernetes 清单文件
-- [repo](repo) - 数据库概要和由 gorm gen 自动生成的代码
+- [repo](repo) - 数据库概要和由 Gorm Gen 自动生成的代码
 - [service](service)
   - [auth](service/auth) - 鉴权服务实现
   - [comment](service/comment) - 评论服务实现
@@ -37,64 +37,54 @@ https://toktik.xctra.cn/
   - [publish](service/publish) - 视频发布服务实现
   - [relation](service/relation) - 关注服务实现
   - [user](service/user) - 用户服务实现
-  - [web](service/web) - 带中间件的 web 服务实现
+  - [web](service/web) - Web API 网关
+    - [mw](service/web/mw) - Hertz 中间件
   - [wechat](service/wechat) - 聊天服务实现
-- [storage](storage) - 对象存储中间件，支持 Amazon S3 和本地存储
+- [storage](storage) - 对象存储中间件，支持 Amazon S3 和本地存储和火山引擎 [ImageX](https://www.volcengine.com/products/imagex)
 - [test](test)
   - [e2e](test/e2e) - 端到端测试
   - [mock](test/mock) - 用于单元测试的 mock 数据
 
-## 编译
+## 准备环境
 
-1. 运行以下命令以安装所需软件包:
+> 本项目不支持 Windows 操作系统，见 [Kitex](https://www.cloudwego.io/zh/docs/kitex/getting-started/#%E5%87%86%E5%A4%87-golang-%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83)
 
-```bash
-apt-get update && \
-    apt-get install -yq git ffmpeg libavcodec-dev libavutil-dev libavformat-dev libswscale-dev && \
-    apt-get clean && \
-    apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false && \
-    rm -rf /var/lib/apt/lists/*
-    
-brew install protobuf
-go install github.com/cloudwego/kitex/tool/cmd/kitex@latest
-```
+- Linux / MacOS
+- Go
+- FFmpeg
+- PostgreSQL
+- Redis
+- OpenTelemetry Collector
 
-2. 运行 `./build-all.sh` 以编译所有服务.
+推荐使用以下可观测性基础设施:
+
+- Jaeger All in one
+- Victoria Metrics
+- Grafana
+
+
+## 构建
+
+执行 `./build-all.sh` 一次性构建所有服务.
 
 ## 配置
 
-- 前往 `./constant/config/env.go` 以查看所需环境变量.
-- 以下软件/服务是运行 toktik 所必需的:
-  - PostgreSQL
-  - Redis
-  - HashiCorp Consul
-  - FFMPEG
-- 以下软件/服务则是可选的:
-  - 一个 Web 服务器，例如 Nginx.
-  - Amazon S3, 否则使用本地存储.
-  - OpenTelemetry
-  - Jaeger
-  - Victoriametrics
-  - Grafana
+见 [`constant/config/env.go`](constant/config/env.go)
 
 ## 运行
 
-- 运行 `start.sh --service <service_name>` 来启动指定服务.
-- 查看 `./service` 文件夹以获得服务列表.
+- 执行 `start.sh --service <service_name>` 启动任一服务.
+- `service_name` 可以是 `./service` 目录下任一子目录名称.
 
 ## 测试
 
-### 对于单元测试
+### 单元测试
 
-- 运行 `./unit-test.sh`
+运行 `./unit-test.sh`
 
-### 对于端到端测试
+### 端到端测试
 
-编译并运行以下文件来进行端到端测试:
-
-- `./test/e2e/base_api_test.go` 对于基本 API 测试
-- `./test/e2e/interact_api_test.go` 对于交互 API 测试
-- `./test/e2e/social_api_test.go` 对于社交 API 测试
+执行 `go test toktik/test/e2e -tags="e2e"`
 
 ## 如何贡献
 
@@ -114,4 +104,3 @@ go install github.com/cloudwego/kitex/tool/cmd/kitex@latest
 ## 协议
 
 Toktik is licensed under the [MIT License](LICENSE).
-
