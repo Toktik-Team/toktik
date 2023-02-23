@@ -325,7 +325,10 @@ func (s *RelationServiceImpl) Unfollow(ctx context.Context, req *relation.Relati
 		return
 	}
 
-	if _, err = r.Where(r.UserId.Eq(req.ActorId), r.TargetId.Eq(req.UserId)).Delete(); err != nil {
+	if _, err = r.
+		Where(r.UserId.Eq(req.ActorId), r.TargetId.Eq(req.UserId)).
+		Unscoped().
+		Delete(); err != nil {
 		logger.WithFields(logrus.Fields{
 			"entry": relationModel,
 			"err":   err,

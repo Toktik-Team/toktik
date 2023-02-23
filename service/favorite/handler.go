@@ -68,6 +68,7 @@ func like(ctx context.Context, actorId uint32, videoId uint32) (resp *favorite.F
 func cancelLike(ctx context.Context, actorId uint32, videoId uint32) (resp *favorite.FavoriteResponse, err error) {
 	if _, err = gen.Q.Favorite.WithContext(ctx).
 		Where(gen.Favorite.UserId.Eq(actorId), gen.Favorite.VideoId.Eq(videoId)).
+		Unscoped().
 		Delete(); err != nil {
 
 		resp = &favorite.FavoriteResponse{
