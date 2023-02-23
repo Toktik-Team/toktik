@@ -76,6 +76,7 @@ func (s *UserServiceImpl) GetUser(ctx context.Context, req *user.UserRequest) (r
 
 	avatar := u.GetUserAvatar()
 	backgroundImage := u.GetBackgroundImage()
+	signature := u.GetSignature()
 
 	followCount, err := RelationClient.CountFollowList(ctx, &relation.CountFollowListRequest{
 		UserId: u.ID,
@@ -180,7 +181,7 @@ func (s *UserServiceImpl) GetUser(ctx context.Context, req *user.UserRequest) (r
 			IsFollow:        isFollow.Result,
 			Avatar:          &avatar,
 			BackgroundImage: &backgroundImage,
-			Signature:       &u.Username, // TODO
+			Signature:       &signature,
 			TotalFavorited:  &totalFavorited.Count,
 			WorkCount:       &workCount.Count,
 			FavoriteCount:   &favoriteCount.Count,
