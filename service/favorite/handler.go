@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"google.golang.org/protobuf/proto"
 	"toktik/constant/biz"
 	"toktik/constant/config"
 	"toktik/kitex_gen/douyin/favorite"
@@ -55,7 +56,7 @@ func like(ctx context.Context, actorId uint32, videoId uint32) (resp *favorite.F
 	if err != nil {
 		resp = &favorite.FavoriteResponse{
 			StatusCode: biz.UnableToLike,
-			StatusMsg:  nil,
+			StatusMsg:  proto.String("点赞失败"),
 		}
 
 		logger.WithFields(logrus.Fields{
@@ -89,7 +90,7 @@ func cancelLike(ctx context.Context, actorId uint32, videoId uint32) (resp *favo
 	if err != nil {
 		resp = &favorite.FavoriteResponse{
 			StatusCode: biz.UnableToCancelLike,
-			StatusMsg:  nil,
+			StatusMsg:  proto.String("取消点赞失败"),
 		}
 
 		logger.WithFields(logrus.Fields{
@@ -119,7 +120,7 @@ func (s *FavoriteServiceImpl) FavoriteAction(ctx context.Context, req *favorite.
 	if err != nil {
 		resp = &favorite.FavoriteResponse{
 			StatusCode: biz.UnableToQueryVideo,
-			StatusMsg:  nil,
+			StatusMsg:  proto.String("视频作者不存在"),
 		}
 
 		logger.WithFields(field).Error("Failed to get video author")
