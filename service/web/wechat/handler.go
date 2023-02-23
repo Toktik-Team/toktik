@@ -115,12 +115,9 @@ func MessageChat(ctx context.Context, c *app.RequestContext) {
 	logger := logging.Logger
 	logger.WithFields(methodFields).Debugf("Process start")
 
-	var userId uint32
-	switch c.GetString(mw.AuthResultKey) {
-	case mw.AUTH_RESULT_SUCCESS:
-		userId = c.GetUint32(mw.UserIdKey)
-	default:
-		bizConstant.UnAuthorized.WithFields(&methodFields).LaunchError(c)
+	actorIdPtr, ok := mw.Auth(c, mw.WithAuthRequired())
+	actorId := *actorIdPtr
+	if !ok {
 		return
 	}
 
@@ -151,7 +148,7 @@ func MessageChat(ctx context.Context, c *app.RequestContext) {
 
 	messageActionResponse, err := Client.WechatChat(ctx, &wechat.MessageChatRequest{
 		SenderId:   uint32(senderIdInt),
-		ReceiverId: userId,
+		ReceiverId: actorId,
 		PreMsgTime: preMsgTime,
 	})
 

@@ -7,7 +7,6 @@ import (
 	"toktik/logging"
 	"toktik/repo"
 	commonModel "toktik/repo/model"
-	"toktik/service/web/mw"
 
 	"github.com/segmentio/ksuid"
 	"github.com/sirupsen/logrus"
@@ -52,7 +51,7 @@ func (s *AuthServiceImpl) Authenticate(ctx context.Context, req *auth.Authentica
 	}
 	resp = &auth.AuthenticateResponse{
 		StatusCode: 0,
-		StatusMsg:  mw.AUTH_RESULT_SUCCESS,
+		StatusMsg:  "success",
 		UserId:     first.UserID,
 	}
 	return
