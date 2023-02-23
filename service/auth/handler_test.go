@@ -27,12 +27,7 @@ var successResp = &auth.AuthenticateResponse{
 
 func TestAuthServiceImpl_Authenticate(t *testing.T) {
 	mock, db := NewDBMock(t)
-	defer func(db *sql.DB) {
-		err := db.Close()
-		if err != nil {
-			panic(err)
-		}
-	}(db)
+	defer db.Close()
 	mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "user_tokens" WHERE "user_tokens"."token" = $1 ORDER BY "user_tokens"."token" LIMIT 1`)).
 		WithArgs(sqlmock.AnyArg()).
 		WillReturnRows(sqlmock.NewRows([]string{"id", "user_id", "token", "created_at", "updated_at"}).

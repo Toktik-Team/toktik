@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"database/sql"
 	"io"
 	"os"
 	"path"
@@ -94,12 +93,6 @@ func TestPublishServiceImpl_CreateVideo(t *testing.T) {
 		StatusMsg:  biz.BadRequestStatusMsg,
 	}
 
-	defer func(MockConn *sql.DB) {
-		err := MockConn.Close()
-		if err != nil {
-			panic(err)
-		}
-	}(mock.Conn)
 	mock.DBMock.ExpectBegin()
 	mock.DBMock.ExpectQuery(regexp.QuoteMeta(`INSERT INTO "videos" 
     		("created_at","updated_at","deleted_at","user_id","title","file_name","cover_name") 
