@@ -41,19 +41,11 @@ type FavoriteServiceImpl struct{}
 var logger = logging.Logger
 
 func like(ctx context.Context, actorId uint32, videoId uint32) (resp *favorite.FavoriteResponse, err error) {
-	q := gen.Use(gen.DB)
-	err = q.Transaction(func(tx *gen.Query) error {
-		// 加入用户喜爱列表
-		err := tx.Favorite.WithContext(ctx).Create(&model.Favorite{
-			UserId:  actorId,
-			VideoId: videoId,
-		})
-		if err != nil {
-			return err
-		}
-		return nil
-	})
-	if err != nil {
+	if err := gen.Q.Favorite.WithContext(ctx).Create(&model.Favorite{
+		UserId:  actorId,
+		VideoId: videoId,
+	}); err != nil {
+
 		resp = &favorite.FavoriteResponse{
 			StatusCode: biz.UnableToLike,
 			StatusMsg:  proto.String("点赞失败"),
@@ -74,20 +66,10 @@ func like(ctx context.Context, actorId uint32, videoId uint32) (resp *favorite.F
 }
 
 func cancelLike(ctx context.Context, actorId uint32, videoId uint32) (resp *favorite.FavoriteResponse, err error) {
-	q := gen.Use(gen.DB)
-	err = q.Transaction(func(tx *gen.Query) error {
-		// 从用户喜爱列表中移除
-		_, err := tx.Favorite.WithContext(ctx).Delete(&model.Favorite{
-			UserId:  actorId,
-			VideoId: videoId,
-		})
-		if err != nil {
-			return err
-		}
+	if _, err = gen.Q.Favorite.WithContext(ctx).
+		Where(gen.Favorite.UserId.Eq(actorId), gen.Favorite.VideoId.Eq(videoId)).
+		Delete(); err != nil {
 
-		return nil
-	})
-	if err != nil {
 		resp = &favorite.FavoriteResponse{
 			StatusCode: biz.UnableToCancelLike,
 			StatusMsg:  proto.String("取消点赞失败"),
