@@ -3,7 +3,7 @@ package biz
 import "github.com/cloudwego/hertz/pkg/protocol/consts"
 
 var (
-	TokenNotFoundMessage = "token not found"
+	TokenNotFoundMessage = "会话已过期"
 )
 
 var (

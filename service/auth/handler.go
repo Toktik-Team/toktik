@@ -66,7 +66,7 @@ func (s *AuthServiceImpl) Register(ctx context.Context, req *auth.RegisterReques
 	if err != nil {
 		resp = &auth.RegisterResponse{
 			StatusCode: biz.ServiceNotAvailable,
-			StatusMsg:  "数据库查询失败",
+			StatusMsg:  biz.InternalServerErrorStatusMsg,
 		}
 		return
 	}
@@ -81,7 +81,7 @@ func (s *AuthServiceImpl) Register(ctx context.Context, req *auth.RegisterReques
 	if err != nil {
 		resp = &auth.RegisterResponse{
 			StatusCode: biz.ServiceNotAvailable,
-			StatusMsg:  "密码加密失败",
+			StatusMsg:  biz.InternalServerErrorStatusMsg,
 		}
 		return
 	}
@@ -95,7 +95,7 @@ func (s *AuthServiceImpl) Register(ctx context.Context, req *auth.RegisterReques
 	if err != nil {
 		resp = &auth.RegisterResponse{
 			StatusCode: biz.ServiceNotAvailable,
-			StatusMsg:  "数据库保存失败",
+			StatusMsg:  biz.InternalServerErrorStatusMsg,
 		}
 		return
 	}
@@ -109,7 +109,7 @@ func (s *AuthServiceImpl) Register(ctx context.Context, req *auth.RegisterReques
 	if err != nil {
 		resp = &auth.RegisterResponse{
 			StatusCode: biz.ServiceNotAvailable,
-			StatusMsg:  "数据库保存失败",
+			StatusMsg:  biz.InternalServerErrorStatusMsg,
 		}
 		return
 	}
@@ -129,7 +129,7 @@ func (s *AuthServiceImpl) Login(ctx context.Context, req *auth.LoginRequest) (re
 	if err != nil {
 		resp = &auth.LoginResponse{
 			StatusCode: biz.ServiceNotAvailable,
-			StatusMsg:  "数据库查询失败",
+			StatusMsg:  biz.InternalServerErrorStatusMsg,
 		}
 		return
 	}
@@ -169,7 +169,7 @@ func (s *AuthServiceImpl) Login(ctx context.Context, req *auth.LoginRequest) (re
 	if err != nil {
 		resp = &auth.LoginResponse{
 			StatusCode: biz.ServiceNotAvailable,
-			StatusMsg:  "数据库保存失败",
+			StatusMsg:  biz.InternalServerErrorStatusMsg,
 		}
 		return
 	}

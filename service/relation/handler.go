@@ -243,7 +243,7 @@ func (s *RelationServiceImpl) Follow(ctx context.Context, req *relation.Relation
 	if req.UserId == req.ActorId {
 		resp = &relation.RelationActionResponse{
 			StatusCode: biz.InvalidToUserId,
-			StatusMsg:  biz.BadRequestStatusMsg,
+			StatusMsg:  "无法关注你自己！",
 		}
 		return
 	}
@@ -262,7 +262,7 @@ func (s *RelationServiceImpl) Follow(ctx context.Context, req *relation.Relation
 		logger.Error("failed to get user info: %w", err)
 		resp = &relation.RelationActionResponse{
 			StatusCode: biz.UserNotFound,
-			StatusMsg:  biz.BadRequestStatusMsg,
+			StatusMsg:  "目标用户不存在！",
 		}
 		return
 	}
@@ -274,7 +274,7 @@ func (s *RelationServiceImpl) Follow(ctx context.Context, req *relation.Relation
 		// Follow a user that is followed already
 		resp = &relation.RelationActionResponse{
 			StatusCode: biz.RelationAlreadyExists,
-			StatusMsg:  biz.BadRequestStatusMsg,
+			StatusMsg:  "该用户已经关注过啦！",
 		}
 		return
 	}
@@ -320,7 +320,7 @@ func (s *RelationServiceImpl) Unfollow(ctx context.Context, req *relation.Relati
 		// Unfollow a user that was not followed before
 		resp = &relation.RelationActionResponse{
 			StatusCode: biz.RelationNotFound,
-			StatusMsg:  biz.BadRequestStatusMsg,
+			StatusMsg:  "该用户未关注！",
 		}
 		return
 	}
