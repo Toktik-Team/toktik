@@ -10,6 +10,7 @@ import (
 	"strings"
 	"toktik/constant/config"
 	"toktik/logging"
+	"toktik/rpc"
 )
 
 // User 用户表 /*
@@ -71,13 +72,7 @@ type unsplashResponse struct {
 func getImageFromUnsplash(query string) (url string, err error) {
 	unsplashUrl := fmt.Sprintf("https://api.unsplash.com/photos/random?query=%s&count=1", query)
 
-	client := &http.Client{}
-	req, err := http.NewRequest("GET", unsplashUrl, nil)
-	if err != nil {
-		return "", err
-	}
-	req.Header.Add("Authorization", "Client-ID "+config.EnvConfig.UNSPLASH_ACCESS_KEY)
-	resp, err := client.Do(req)
+	resp, err := rpc.HttpRequest("GET", unsplashUrl, nil, rpc.WithAuthorizationHeader("Client-ID "+config.EnvConfig.UNSPLASH_ACCESS_KEY))
 	if err != nil {
 		return "", err
 	}
@@ -169,14 +164,7 @@ func (u *User) GetSignature() (signature string) {
 		u.updated = true
 	}()
 
-	client := &http.Client{}
-	req, err := http.NewRequest("GET", "https://v1.hitokoto.cn/?encode=text", nil)
-	if err != nil {
-		logging.Logger.Errorf("GetSignature: %v", err)
-		signature = u.Username
-		return
-	}
-	resp, err := client.Do(req)
+	resp, err := rpc.HttpRequest("GET", "https://v1.hitokoto.cn/?encode=text", nil)
 	if err != nil {
 		logging.Logger.Errorf("GetSignature: %v", err)
 		signature = u.Username
