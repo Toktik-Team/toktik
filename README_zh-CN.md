@@ -5,7 +5,11 @@
 
 [English](README.md) | **简体中文**
 
+*第五届字节跳动青训营*大作业汇报文档: <https://bytedance.feishu.cn/docs/doccnM9KkBAdyDhg8qaeGlIz7S7#>
+
 ## 示例（仅后端 API）
+
+> 从 [此处](https://bytedance.feishu.cn/docs/doccnM9KkBAdyDhg8qaeGlIz7S7#) 下载抖声 app 后, 填入以下地址来体验 demo。
 
 https://toktik.xctra.cn/
 
