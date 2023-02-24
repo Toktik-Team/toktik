@@ -1,6 +1,6 @@
 # Toktik
 
-| ![logo](https://avatars.githubusercontent.com/u/124244470?s=200&v=4) | Short video microservice application built with `Kitex` and `Hertz` , made by [Toktik-Team](https://github.com/Toktik-Team) in _The 5th Bytedance Youth Training Camp_. |
+| ![logo](https://avatars.githubusercontent.com/u/124244470?s=200&v=4) | ChatGPT integrated short video microservice application built with `Kitex` and `Hertz` , made by [Toktik-Team](https://github.com/Toktik-Team) in _The 5th Bytedance Youth Training Camp_. |
 | -------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 
 **English** | [简体中文](README_zh-CN.md)

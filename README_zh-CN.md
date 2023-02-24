@@ -1,6 +1,6 @@
 # Toktik
 
-| ![logo](https://avatars.githubusercontent.com/u/124244470?s=200&v=4) | 使用 Kitex 和 Hertz 构建的短视频微服务应用，由 [Toktik-Team](https://github.com/Toktik-Team) 开发，作为*第五届字节跳动青训营*大作业。 |
+| ![logo](https://avatars.githubusercontent.com/u/124244470?s=200&v=4) | 集成 ChatGPT 的短视频微服务应用，使用 Kitex 和 Hertz 构建，由 [Toktik-Team](https://github.com/Toktik-Team) 开发，作为*第五届字节跳动青训营*大作业。 |
 | -------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
 
 [English](README.md) | **简体中文**
