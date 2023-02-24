@@ -5,7 +5,11 @@
 
 **English** | [简体中文](README_zh-CN.md)
 
+_The 5th Bytedance Youth Training Camp_ Report Documentation: <https://bytedance.feishu.cn/docs/doccnM9KkBAdyDhg8qaeGlIz7S7#>
+
 ## Demo（With Backend API Only）
+
+> Download Dousheng app from [here](https://bytedance.feishu.cn/docs/doccnM9KkBAdyDhg8qaeGlIz7S7#), and use this URL to test with the demo.
 
 https://toktik.xctra.cn/
 
