@@ -63,7 +63,7 @@ func getEmailMD5(email string) (md5String string) {
 	return
 }
 
-type unsplashResponse struct {
+type unsplashResponse []struct {
 	Urls struct {
 		Regular string `json:"regular"`
 	} `json:"urls"`
@@ -93,7 +93,7 @@ func getImageFromUnsplash(query string) (url string, err error) {
 		return "", err
 	}
 
-	url = response.Urls.Regular
+	url = response[0].Urls.Regular
 
 	if url == "" {
 		return "", fmt.Errorf("getImageFromUnsplash: url is empty")
