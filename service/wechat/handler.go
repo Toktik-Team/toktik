@@ -193,7 +193,7 @@ func (s *WechatServiceImpl) WechatChat(ctx context.Context, req *wechat.MessageC
 }
 
 func (s *WechatServiceImpl) receiveChatGPT(respMsg *wechat.Message, senderID uint32) {
-	respMsg.CreateTime = time.Now().UnixMilli() + 300
+	respMsg.CreateTime = time.Now().UnixMilli() + 3000
 	*respMsg.FromUserId = 0
 	*respMsg.ToUserId = senderID
 }
