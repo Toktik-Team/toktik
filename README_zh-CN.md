@@ -7,6 +7,10 @@
 
 *第五届字节跳动青训营*大作业汇报文档: <https://qrggpk56b9.feishu.cn/docx/Djwpdm8oZo3JyRx0JwkcZhRDnVd>
 
+获得 *第五届字节跳动青训营* **_码如磐石奖（一等奖）_** 奖项.
+
+![](docs/images/cert-cut.png)
+
 ## 示例
 
 > 从 [此处](https://bytedance.feishu.cn/docs/doccnM9KkBAdyDhg8qaeGlIz7S7#) 下载抖声 app 后, 填入以下地址来体验 demo。

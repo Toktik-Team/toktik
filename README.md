@@ -7,6 +7,10 @@
 
 _The 5th Bytedance Youth Training Camp_ Report Documentation: <https://qrggpk56b9.feishu.cn/docx/Djwpdm8oZo3JyRx0JwkcZhRDnVd>
 
+Earned the **_Best Project_** award in _the 5th Bytedance Youth Training Camp_.
+
+![](docs/images/cert-cut.png)
+
 ## Demo
 
 > Download Dousheng app from [here](https://bytedance.feishu.cn/docs/doccnM9KkBAdyDhg8qaeGlIz7S7#), and use this URL to test with the demo.
