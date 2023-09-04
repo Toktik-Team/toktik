@@ -7,6 +7,16 @@
 
 _The 5th Bytedance Youth Training Camp_ Report Documentation: <https://qrggpk56b9.feishu.cn/docx/Djwpdm8oZo3JyRx0JwkcZhRDnVd>
 
+# Recommend
+
+Now Recommend for [GuGoTik](https://github.com/GuGoOrg/GuGoTik) !  
+
+[GuGoTik](https://github.com/GuGoOrg/GuGoTik) is next generation of TokTik. GuGoTik respects and follows TokTik's workline, improving and optimizing almost every components from it. For best expermental experience, please use GuGoTik instead of TokTik.
+
+Please give both of us a star ~
+
+# Awards
+
 Earned the **_Best Project_** award in _the 5th Bytedance Youth Training Camp_.
 
 ![](docs/images/cert-cut.png)
