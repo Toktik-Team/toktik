@@ -7,6 +7,15 @@
 
 *第五届字节跳动青训营*大作业汇报文档: <https://qrggpk56b9.feishu.cn/docx/Djwpdm8oZo3JyRx0JwkcZhRDnVd>
 
+## Recommend
+现在推荐使用 [GuGoTik](https://github.com/GuGoOrg/GuGoTik)!  
+
+[GuGoTik](https://github.com/GuGoOrg/GuGoTik) 是下一代的 TokTik。GuGoTik 尊重并遵循 TokTik 的工作流程，改进并优化了几乎每个组件，同时增加了许多新的功能。为了体验最新的实验性功能，请使用 GuGoTik 而不是TokTik。
+
+请给两个项目 Star ~
+
+## Awards
+
 获得 *第五届字节跳动青训营* **_码如磐石奖（一等奖）_** 奖项.
 
 ![](docs/images/cert-cut.png)
