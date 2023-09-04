@@ -10,7 +10,7 @@
 ## Recommend
 现在推荐使用 [GuGoTik](https://github.com/GuGoOrg/GuGoTik)!  
 
-[GuGoTik](https://github.com/GuGoOrg/GuGoTik) 是下一代的 TokTik。GuGoTik 秉承着 TokTik 的核心思想并扬长补短，匠心改进了几乎所有的模块并加入了更丰富的功能。为了让您得到更好的实验体验，请移步到 GuGoTik。
+[GuGoTik](https://github.com/GuGoOrg/GuGoTik) 是下一代的 TokTik。GuGoTik 秉承 TokTik 的核心思想并扬长补短，匠心改进了几乎所有的模块并加入了更丰富的功能。为了让您得到更好的实验体验，请移步到 GuGoTik。
 
 请给两个项目 Star ~
 
