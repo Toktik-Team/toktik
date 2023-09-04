@@ -12,7 +12,7 @@
 
 TokTik 目前不再维护且尚未有维护计划，推荐查看 [GuGoTik](https://github.com/GuGoOrg/GuGoTik)。GuGoTik 秉承 TokTik 的核心思想并扬长避短，匠心改进了几乎所有的模块并加入了更丰富的功能。为了让您得到更好的实验体验，请移玉步到 [GuGoTik](https://github.com/GuGoOrg/GuGoTik)。
 
-请给两个项目 Star ~
+如果你喜欢我们的项目的话，请给我们 Stars ~
 
 ## Awards
 
